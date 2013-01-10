@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-reverse-engineering PUBLIC "-//Hibernate/Hibernate Reverse Engineering DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-reverse-engineering-3.0.dtd" >
+
+<hibernate-reverse-engineering>
+<type-mapping>
+	<sql-type jdbc-type="LONGVARBINARY" hibernate-type="java.io.Serializable">
+	</sql-type>
+</type-mapping>
+
+<table-filter match-catalog="nenuoj" match-name="contest"/>
+  <table-filter match-catalog="nenuoj" match-name="contest_has_problem_description"/>
+  <table-filter match-catalog="nenuoj" match-name="contest_has_user"/>
+  <table-filter match-catalog="nenuoj" match-name="judger"/>
+  <table-filter match-catalog="nenuoj" match-name="login_log"/>
+  <table-filter match-catalog="nenuoj" match-name="message"/>
+  <table-filter match-catalog="nenuoj" match-name="problem"/>
+  <table-filter match-catalog="nenuoj" match-name="problem_description"/>
+  <table-filter match-catalog="nenuoj" match-name="problem_has_tag"/>
+  <table-filter match-catalog="nenuoj" match-name="solution"/>
+  <table-filter match-catalog="nenuoj" match-name="system_config"/>
+  <table-filter match-catalog="nenuoj" match-name="tag"/>
+  <table-filter match-catalog="nenuoj" match-name="user"/>
+</hibernate-reverse-engineering>
