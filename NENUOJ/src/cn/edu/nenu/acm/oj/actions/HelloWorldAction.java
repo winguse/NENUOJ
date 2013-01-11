@@ -6,12 +6,13 @@ import javax.persistence.EntityManagerFactory;
 import org.apache.struts2.convention.annotation.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import cn.edu.nenu.acm.oj.Site;
 import cn.edu.nenu.acm.oj.entitybeans.User;
 
 import com.opensymphony.xwork2.Action;
 
 @Result(name="success",location="/helloworld-success.jsp")
-public class HelloWorldAction implements Action {
+public class HelloWorldAction extends AbstractAction {
 
 	private String username;
 	@Autowired(required=true)
