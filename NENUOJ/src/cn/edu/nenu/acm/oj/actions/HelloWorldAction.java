@@ -11,7 +11,7 @@ import cn.edu.nenu.acm.oj.entitybeans.User;
 
 import com.opensymphony.xwork2.Action;
 
-@Result(name="success",location="/helloworld-success.jsp")
+@Result(name="success",location="helloworld-success.jsp")
 public class HelloWorldAction extends AbstractAction {
 
 	private String username;
