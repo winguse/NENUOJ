@@ -7,5 +7,5 @@
 <head>
 <meta charset="UTF-8">
 <j:head />
-<b:head includeScripts="true" includeScriptsValidation="false" includeStylesResponsive="true"/>
+<b:head includeScripts="true" includeScriptsValidation="true" includeStylesResponsive="true"/>
 <link href="style/global.css" rel="stylesheet">

@@ -10,6 +10,7 @@ import com.opensymphony.xwork2.inject.Inject;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.struts2.convention.annotation.ParentPackage;
 
 public abstract class AbstractAction extends ActionSupport {
 
