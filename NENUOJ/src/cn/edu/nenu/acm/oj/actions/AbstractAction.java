@@ -4,18 +4,33 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import cn.edu.nenu.acm.oj.Site;
 
-import com.opensymphony.xwork2.Action;
+import com.opensymphony.xwork2.ActionSupport;
+import com.opensymphony.xwork2.config.Configuration;
+import com.opensymphony.xwork2.inject.Inject;
 
-public abstract class AbstractAction implements Action {
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-	@Autowired(required=true)
-	private Site site;
-	
+public abstract class AbstractAction extends ActionSupport {
+
+	private static final long serialVersionUID = 1L;
+
+	protected static Logger log = LogManager.getLogger("Actions");
+	protected static Configuration configuration;
+	protected Site site;
+
 	public Site getSite() {
 		return site;
 	}
 
+	@Autowired(required = true)
 	public void setSite(Site site) {
 		this.site = site;
+	}
+
+	@Inject
+	public void setConfiguration(Configuration config) {
+		System.out.println("still inject");
+		AbstractAction.configuration = config;
 	}
 }

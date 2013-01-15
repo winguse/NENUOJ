@@ -4,18 +4,15 @@
 <%@ taglib uri="/struts-tags" prefix="s"%>
 <%@ taglib uri="/struts-jquery-tags" prefix="j"%>
 <%@ taglib uri="/struts-bootstrap-tags" prefix="b"%>
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Title</title>
-<j:head />
-<b:head />
-<link href="style/global.css" rel="stylesheet">
-</head>
-<body>
-
-<script src="js/global.js"></script>
-</body>
-</html>
+<s:include value="include/init.jsp"></s:include>
+<title><s:text name="site.title"/> - Home</title>
+<s:set var="pageTitle" value="getText('site.title')"/>
+<s:include value="include/header.jsp"></s:include>
+<p><s:text name="site.description"/></p>
+<p><s:text name="site.supportedvoj"/></p>
+<s:iterator value="site.supportedVOJ">
+  <a href="<s:property/>"><s:property/></a>
+</s:iterator>
+<p><s:text name="site.statics"/></p>
+<s:include value="include/footer.jsp"></s:include>
 </c:html>

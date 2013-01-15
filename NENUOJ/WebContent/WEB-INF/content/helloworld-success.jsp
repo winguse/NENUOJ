@@ -9,8 +9,11 @@
 <sj:head />
 </head>
 <body>
-<s:textarea label="Your Thougths" name="thoughts"/>
-${site.enableHtmlCompress}
+<a href="?request_locale=zh_CN">cn</a>
+<a href="?request_locale=en_US">en</a>
+<h2><s:property value="%{getText('helloWorld')}"/></h2>
+<s:text name="message"></s:text>
+<s:property value="message"/>
 </body>
 </html>
 </cp:html>

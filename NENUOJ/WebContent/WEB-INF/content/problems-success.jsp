@@ -4,17 +4,12 @@
 <%@ taglib uri="/struts-tags" prefix="s"%>
 <%@ taglib uri="/struts-jquery-tags" prefix="j"%>
 <%@ taglib uri="/struts-bootstrap-tags" prefix="b"%>
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>${site.title} - Title</title>
-<j:head />
-<b:head />
-<link href="style/global.css" rel="stylesheet">
-</head>
-<body>
-<script src="js/global.js"></script>
-</body>
-</html>
+<s:include value="include/init.jsp"></s:include>
+<s:set var="pageTitle" value="getText('problems-list')"/>
+<title><s:text name="site.title"/> - <s:property value="#pageTitle"/></title>
+<s:include value="include/header.jsp"></s:include>
+
+
+
+<s:include value="include/footer.jsp"></s:include>
 </c:html>

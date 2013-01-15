@@ -14,6 +14,8 @@ import com.opensymphony.xwork2.Action;
 @Result(name="success",location="helloworld-success.jsp")
 public class HelloWorldAction extends AbstractAction {
 
+	private static final long serialVersionUID = 4163264957914832012L;
+	
 	private String username;
 	@Autowired(required=true)
 	private EntityManagerFactory emf;
@@ -24,7 +26,8 @@ public class HelloWorldAction extends AbstractAction {
 	public String execute() throws Exception {
 		EntityManager em=emf.createEntityManager();
 		User user=em.find(User.class, 1);
-		message="input username = "+username+", database username:"+user.getUsername();
+		message="input username = "+username+", database username<>:"+user.getUsername()+getText("helloWorld")+" +!";
+		log.info("Hello Terminated.");
 		return SUCCESS;
 	}
 

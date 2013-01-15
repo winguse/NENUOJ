@@ -3,24 +3,14 @@ package cn.edu.nenu.acm.oj.actions;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.ParentPackage;
 import org.apache.struts2.convention.annotation.Result;
-@ParentPackage("json-default")
-@Action("json")
-@Result(name="success",type="json")
-public class JsonTestAction extends AbstractAction {
 
-	private static final long serialVersionUID = 1569199563743036276L;
-	
-	private String name;
-		
+@ParentPackage("json-default")
+@Result(name="success",type="json")
+public class LogoutAction extends AbstractAction {
+
+	private static final long serialVersionUID = -8077897542384482842L;
 	@Override
 	public String execute() throws Exception {
-		name="winguse";
 		return SUCCESS;
 	}
-
-
-	public String getName() {
-		return name;
-	}
-
 }
