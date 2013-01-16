@@ -1,6 +1,6 @@
 package cn.edu.nenu.acm.oj.entitybeans;
 
-// Generated 2013-1-10 21:36:30 by Hibernate Tools 4.0.0
+// Generated 2013-1-16 11:45:31 by Hibernate Tools 4.0.0
 
 import java.io.Serializable;
 import java.util.Date;
@@ -34,8 +34,10 @@ public class User implements java.io.Serializable {
 	private String username;
 	private String password;
 	private String salt;
+	private String email;
 	private String school;
 	private String grade;
+	private String major;
 	private int sloved;
 	private int submitted;
 	private long permission;
@@ -52,14 +54,16 @@ public class User implements java.io.Serializable {
 	public User() {
 	}
 
-	public User(String username, String password, String salt, String school,
-			String grade, int sloved, int submitted, long permission,
-			Date lastUpdateTime) {
+	public User(String username, String password, String salt, String email,
+			String school, String grade, String major, int sloved,
+			int submitted, long permission, Date lastUpdateTime) {
 		this.username = username;
 		this.password = password;
 		this.salt = salt;
+		this.email = email;
 		this.school = school;
 		this.grade = grade;
+		this.major = major;
 		this.sloved = sloved;
 		this.submitted = submitted;
 		this.permission = permission;
@@ -67,9 +71,9 @@ public class User implements java.io.Serializable {
 	}
 
 	public User(Message message, String username, String password, String salt,
-			String school, String grade, int sloved, int submitted,
-			long permission, Date lastUpdateTime, Serializable remark,
-			Set<ProblemDescription> problemDescriptions,
+			String email, String school, String grade, String major,
+			int sloved, int submitted, long permission, Date lastUpdateTime,
+			Serializable remark, Set<ProblemDescription> problemDescriptions,
 			Set<Solution> solutions, Set<Contest> contests,
 			Set<Contest> contests_1, Set<LoginLog> loginLogs,
 			Set<Message> messages) {
@@ -77,8 +81,10 @@ public class User implements java.io.Serializable {
 		this.username = username;
 		this.password = password;
 		this.salt = salt;
+		this.email = email;
 		this.school = school;
 		this.grade = grade;
+		this.major = major;
 		this.sloved = sloved;
 		this.submitted = submitted;
 		this.permission = permission;
@@ -140,6 +146,15 @@ public class User implements java.io.Serializable {
 		this.salt = salt;
 	}
 
+	@Column(name = "email", nullable = false, length = 64)
+	public String getEmail() {
+		return this.email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
 	@Column(name = "school", nullable = false, length = 64)
 	public String getSchool() {
 		return this.school;
@@ -156,6 +171,15 @@ public class User implements java.io.Serializable {
 
 	public void setGrade(String grade) {
 		this.grade = grade;
+	}
+
+	@Column(name = "major", nullable = false, length = 64)
+	public String getMajor() {
+		return this.major;
+	}
+
+	public void setMajor(String major) {
+		this.major = major;
 	}
 
 	@Column(name = "sloved", nullable = false)

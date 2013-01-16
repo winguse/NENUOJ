@@ -16,6 +16,13 @@
 	<s:textfield label="%{getText('username')}" name="username" tooltip="%{getText('tooltip.username')}" />
 	<s:password label="%{getText('password')}" name="password" tooltip="%{getText('tooltip.password')}" />
 	<s:password label="%{getText('password2')}" name="password2" tooltip="%{getText('tooltip.password2')}" />
+	<s:textfield label="%{getText('email')}" name="email" tooltip="%{getText('tooltip.email')}" />
+	<s:textfield label="%{getText('nickname')}" name="nickname" tooltip="%{getText('tooltip.nickname')}" />
+	<s:textfield label="%{getText('school')}" name="school" tooltip="%{getText('tooltip.school')}" />
+	<s:textfield label="%{getText('major')}" name="major" tooltip="%{getText('tooltip.major')}" />
+	<s:textfield label="%{getText('grade')}" name="grade" tooltip="%{getText('tooltip.grade')}" />
+	<s:checkbox label="%{getText('agree_terms')}" name="agree" tooltip="%{getText('tooltip.agree')}"/>
+	<p><s:a action="terms"><s:text name="service_terms"/></s:a></p>
 <div class="form-actions">
 	<j:submit cssClass="btn btn-primary" formIds="register_form" validate="true" validateFunction="bootstrapValidation"/>
 </div>

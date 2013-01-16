@@ -1,6 +1,6 @@
 package cn.edu.nenu.acm.oj.entitybeans;
 
-// Generated 2013-1-10 21:36:30 by Hibernate Tools 4.0.0
+// Generated 2013-1-16 11:45:31 by Hibernate Tools 4.0.0
 
 import java.io.Serializable;
 import java.util.HashSet;

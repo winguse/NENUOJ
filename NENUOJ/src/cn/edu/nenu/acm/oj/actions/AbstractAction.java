@@ -31,7 +31,10 @@ public abstract class AbstractAction extends ActionSupport {
 
 	@Inject
 	public void setConfiguration(Configuration config) {
-		System.out.println("still inject");
 		AbstractAction.configuration = config;
+	}
+	
+	public String _(String aTextName){
+		return super.getText(aTextName);
 	}
 }
