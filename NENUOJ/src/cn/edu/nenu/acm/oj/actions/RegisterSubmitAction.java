@@ -24,22 +24,6 @@ import com.opensymphony.xwork2.validator.annotations.FieldExpressionValidator;
 		@InterceptorRef("jsonValidationWorkflowStack") })
 @Results({ @Result(name = "success", location = "register-success.jsp"),
 		@Result(name = "input", location = "register.jsp") })
-/*
- * @Validations(requiredStrings = {
- * 
- * @RequiredStringValidator(fieldName = "username", type = ValidatorType.FIELD,
- * key = "username_required", message = ""),
- * 
- * @RequiredStringValidator(fieldName = "password", type = ValidatorType.FIELD,
- * key = "helloWorld") }, expressions = { @ExpressionValidator(expression =
- * "password.trim().length() > 5", key = "helloWorld") }, fieldExpressions = {
- * 
- * @FieldExpressionValidator(fieldName = "password", expression =
- * "password.trim().length() > 6", key = "helloWorld"),
- * 
- * @FieldExpressionValidator(fieldName = "agree", expression = "agree == true",
- * message = "Accept the Agreement.") })
- */
 public class RegisterSubmitAction extends AbstractAction {
 
 	private static final long serialVersionUID = -8077897542384482842L;
@@ -182,8 +166,6 @@ public class RegisterSubmitAction extends AbstractAction {
 		Query query = em.createQuery("select u from User u where u.username=?");
 		query.setParameter(1, username);
 		resultCount = query.getResultList().size();
-		em.close();
-		System.out.println(resultCount);
 		return resultCount > 0;
 	}
 }
