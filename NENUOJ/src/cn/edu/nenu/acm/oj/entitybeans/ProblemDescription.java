@@ -1,6 +1,6 @@
 package cn.edu.nenu.acm.oj.entitybeans;
 
-// Generated 2013-1-17 9:19:30 by Hibernate Tools 4.0.0
+// Generated 2013-1-18 15:52:51 by Hibernate Tools 4.0.0
 
 import java.io.Serializable;
 import java.util.Date;
@@ -31,7 +31,7 @@ public class ProblemDescription implements java.io.Serializable {
 	private User user;
 	private Problem problem;
 	private boolean locked;
-	private int vote;
+	private Integer vote;
 	private String title;
 	private String description;
 	private String input;
@@ -48,7 +48,7 @@ public class ProblemDescription implements java.io.Serializable {
 	}
 
 	public ProblemDescription(User user, Problem problem, boolean locked,
-			int vote, String title, String description, String input,
+			Integer vote, String title, String description, String input,
 			String output, String sampleIn, String sampleOut, String hint,
 			String source, Date lastUpdateTime) {
 		this.user = user;
@@ -67,7 +67,7 @@ public class ProblemDescription implements java.io.Serializable {
 	}
 
 	public ProblemDescription(User user, Problem problem, boolean locked,
-			int vote, String title, String description, String input,
+			Integer vote, String title, String description, String input,
 			String output, String sampleIn, String sampleOut, String hint,
 			String source, Date lastUpdateTime, Serializable remark,
 			Set<Contest> contests) {
@@ -129,11 +129,11 @@ public class ProblemDescription implements java.io.Serializable {
 	}
 
 	@Column(name = "vote", nullable = false)
-	public int getVote() {
+	public Integer getVote() {
 		return this.vote;
 	}
 
-	public void setVote(int vote) {
+	public void setVote(Integer vote) {
 		this.vote = vote;
 	}
 

@@ -24,10 +24,11 @@ public class HelloWorldAction extends AbstractAction {
 	
 	@Override
 	public String execute() throws Exception {
-		EntityManager em=emf.createEntityManager();
-		User user=em.find(User.class, 1);
-		message="input username = "+username+", database username<>:"+user.getUsername()+getText("helloWorld")+" +!";
+	//	EntityManager em=emf.createEntityManager();
+	//	User user=em.find(User.class, 1);
+	//	message="input username = "+username+", database username<>:"+user.getUsername()+getText("helloWorld")+" +!";
 		log.info("Hello Terminated.");
+		log.debug("debug");
 		return SUCCESS;
 	}
 

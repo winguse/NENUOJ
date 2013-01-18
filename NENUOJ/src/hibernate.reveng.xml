@@ -3,7 +3,14 @@
 
 <hibernate-reverse-engineering>
 <type-mapping>
-	<sql-type jdbc-type="LONGVARBINARY" hibernate-type="java.io.Serializable">
+	<sql-type jdbc-type="LONGVARBINARY"
+		hibernate-type="java.io.Serializable">
+	</sql-type>
+	<sql-type jdbc-type="INTEGER" hibernate-type="Integer"
+		not-null="true">
+	</sql-type>
+	<sql-type jdbc-type="BIGINT" hibernate-type="java.lang.Long"
+		not-null="true">
 	</sql-type>
 </type-mapping>
 

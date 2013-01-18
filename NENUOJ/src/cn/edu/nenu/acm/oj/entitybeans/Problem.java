@@ -1,6 +1,6 @@
 package cn.edu.nenu.acm.oj.entitybeans;
 
-// Generated 2013-1-17 9:19:30 by Hibernate Tools 4.0.0
+// Generated 2013-1-18 15:52:51 by Hibernate Tools 4.0.0
 
 import java.io.Serializable;
 import java.util.Date;
@@ -34,11 +34,11 @@ public class Problem implements java.io.Serializable {
 	private String title;
 	private String number;
 	private boolean locked;
-	private int timeLimit;
-	private int memoryLimit;
-	private int accepted;
-	private int submitted;
-	private int judgingType;
+	private Integer timeLimit;
+	private Integer memoryLimit;
+	private Integer accepted;
+	private Integer submitted;
+	private Integer judgingType;
 	private Date lastUpdateTime;
 	private Serializable remark;
 	private Set<Solution> solutions = new HashSet<Solution>(0);
@@ -50,8 +50,8 @@ public class Problem implements java.io.Serializable {
 	}
 
 	public Problem(Judger judger, String title, String number, boolean locked,
-			int timeLimit, int memoryLimit, int accepted, int submitted,
-			int judgingType, Date lastUpdateTime) {
+			Integer timeLimit, Integer memoryLimit, Integer accepted,
+			Integer submitted, Integer judgingType, Date lastUpdateTime) {
 		this.judger = judger;
 		this.title = title;
 		this.number = number;
@@ -65,10 +65,10 @@ public class Problem implements java.io.Serializable {
 	}
 
 	public Problem(Message message, Judger judger, String title, String number,
-			boolean locked, int timeLimit, int memoryLimit, int accepted,
-			int submitted, int judgingType, Date lastUpdateTime,
-			Serializable remark, Set<Solution> solutions, Set<Tag> tags,
-			Set<ProblemDescription> problemDescriptions) {
+			boolean locked, Integer timeLimit, Integer memoryLimit,
+			Integer accepted, Integer submitted, Integer judgingType,
+			Date lastUpdateTime, Serializable remark, Set<Solution> solutions,
+			Set<Tag> tags, Set<ProblemDescription> problemDescriptions) {
 		this.message = message;
 		this.judger = judger;
 		this.title = title;
@@ -145,47 +145,47 @@ public class Problem implements java.io.Serializable {
 	}
 
 	@Column(name = "time_limit", nullable = false)
-	public int getTimeLimit() {
+	public Integer getTimeLimit() {
 		return this.timeLimit;
 	}
 
-	public void setTimeLimit(int timeLimit) {
+	public void setTimeLimit(Integer timeLimit) {
 		this.timeLimit = timeLimit;
 	}
 
 	@Column(name = "memory_limit", nullable = false)
-	public int getMemoryLimit() {
+	public Integer getMemoryLimit() {
 		return this.memoryLimit;
 	}
 
-	public void setMemoryLimit(int memoryLimit) {
+	public void setMemoryLimit(Integer memoryLimit) {
 		this.memoryLimit = memoryLimit;
 	}
 
 	@Column(name = "accepted", nullable = false)
-	public int getAccepted() {
+	public Integer getAccepted() {
 		return this.accepted;
 	}
 
-	public void setAccepted(int accepted) {
+	public void setAccepted(Integer accepted) {
 		this.accepted = accepted;
 	}
 
 	@Column(name = "submitted", nullable = false)
-	public int getSubmitted() {
+	public Integer getSubmitted() {
 		return this.submitted;
 	}
 
-	public void setSubmitted(int submitted) {
+	public void setSubmitted(Integer submitted) {
 		this.submitted = submitted;
 	}
 
 	@Column(name = "judging_type", nullable = false)
-	public int getJudgingType() {
+	public Integer getJudgingType() {
 		return this.judgingType;
 	}
 
-	public void setJudgingType(int judgingType) {
+	public void setJudgingType(Integer judgingType) {
 		this.judgingType = judgingType;
 	}
 

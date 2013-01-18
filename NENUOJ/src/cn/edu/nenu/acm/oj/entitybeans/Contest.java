@@ -1,6 +1,6 @@
 package cn.edu.nenu.acm.oj.entitybeans;
 
-// Generated 2013-1-17 9:19:30 by Hibernate Tools 4.0.0
+// Generated 2013-1-18 15:52:51 by Hibernate Tools 4.0.0
 
 import java.io.Serializable;
 import java.util.Date;
@@ -35,7 +35,7 @@ public class Contest implements java.io.Serializable {
 	private String title;
 	private Date startTime;
 	private Date endTime;
-	private int contestType;
+	private Integer contestType;
 	private Date lastUpdateTime;
 	private Serializable remark;
 	private Set<Solution> solutions = new HashSet<Solution>(0);
@@ -47,7 +47,8 @@ public class Contest implements java.io.Serializable {
 	public Contest() {
 	}
 
-	public Contest(User user, String title, int contestType, Date lastUpdateTime) {
+	public Contest(User user, String title, Integer contestType,
+			Date lastUpdateTime) {
 		this.user = user;
 		this.title = title;
 		this.contestType = contestType;
@@ -55,9 +56,10 @@ public class Contest implements java.io.Serializable {
 	}
 
 	public Contest(Contest contest, Message message, User user, String title,
-			Date startTime, Date endTime, int contestType, Date lastUpdateTime,
-			Serializable remark, Set<Solution> solutions, Set<User> users,
-			Set<ProblemDescription> problemDescriptions, Set<Contest> contests) {
+			Date startTime, Date endTime, Integer contestType,
+			Date lastUpdateTime, Serializable remark, Set<Solution> solutions,
+			Set<User> users, Set<ProblemDescription> problemDescriptions,
+			Set<Contest> contests) {
 		this.contest = contest;
 		this.message = message;
 		this.user = user;
@@ -144,11 +146,11 @@ public class Contest implements java.io.Serializable {
 	}
 
 	@Column(name = "contest_type", nullable = false)
-	public int getContestType() {
+	public Integer getContestType() {
 		return this.contestType;
 	}
 
-	public void setContestType(int contestType) {
+	public void setContestType(Integer contestType) {
 		this.contestType = contestType;
 	}
 

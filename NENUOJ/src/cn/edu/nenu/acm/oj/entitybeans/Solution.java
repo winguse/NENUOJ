@@ -1,6 +1,6 @@
 package cn.edu.nenu.acm.oj.entitybeans;
 
-// Generated 2013-1-17 9:19:30 by Hibernate Tools 4.0.0
+// Generated 2013-1-18 15:52:51 by Hibernate Tools 4.0.0
 
 import java.io.Serializable;
 import java.util.Date;
@@ -29,11 +29,11 @@ public class Solution implements java.io.Serializable {
 	private Problem problem;
 	private Contest contest;
 	private String sourceCode;
-	private int codeLength;
+	private Integer codeLength;
 	private String language;
-	private int runTime;
-	private int runMemory;
-	private int status;
+	private Integer runTime;
+	private Integer runMemory;
+	private Integer status;
 	private String ipaddr;
 	private boolean shared;
 	private Date submitTime;
@@ -46,9 +46,9 @@ public class Solution implements java.io.Serializable {
 	}
 
 	public Solution(User user, Problem problem, String sourceCode,
-			int codeLength, String language, int runTime, int runMemory,
-			int status, String ipaddr, boolean shared, float passRate,
-			Date lastUpdateTime) {
+			Integer codeLength, String language, Integer runTime,
+			Integer runMemory, Integer status, String ipaddr, boolean shared,
+			float passRate, Date lastUpdateTime) {
 		this.user = user;
 		this.problem = problem;
 		this.sourceCode = sourceCode;
@@ -64,10 +64,11 @@ public class Solution implements java.io.Serializable {
 	}
 
 	public Solution(User user, Message message, Problem problem,
-			Contest contest, String sourceCode, int codeLength,
-			String language, int runTime, int runMemory, int status,
-			String ipaddr, boolean shared, Date submitTime, Date judgeTime,
-			float passRate, Date lastUpdateTime, Serializable remark) {
+			Contest contest, String sourceCode, Integer codeLength,
+			String language, Integer runTime, Integer runMemory,
+			Integer status, String ipaddr, boolean shared, Date submitTime,
+			Date judgeTime, float passRate, Date lastUpdateTime,
+			Serializable remark) {
 		this.user = user;
 		this.message = message;
 		this.problem = problem;
@@ -148,11 +149,11 @@ public class Solution implements java.io.Serializable {
 	}
 
 	@Column(name = "code_length", nullable = false)
-	public int getCodeLength() {
+	public Integer getCodeLength() {
 		return this.codeLength;
 	}
 
-	public void setCodeLength(int codeLength) {
+	public void setCodeLength(Integer codeLength) {
 		this.codeLength = codeLength;
 	}
 
@@ -166,29 +167,29 @@ public class Solution implements java.io.Serializable {
 	}
 
 	@Column(name = "run_time", nullable = false)
-	public int getRunTime() {
+	public Integer getRunTime() {
 		return this.runTime;
 	}
 
-	public void setRunTime(int runTime) {
+	public void setRunTime(Integer runTime) {
 		this.runTime = runTime;
 	}
 
 	@Column(name = "run_memory", nullable = false)
-	public int getRunMemory() {
+	public Integer getRunMemory() {
 		return this.runMemory;
 	}
 
-	public void setRunMemory(int runMemory) {
+	public void setRunMemory(Integer runMemory) {
 		this.runMemory = runMemory;
 	}
 
 	@Column(name = "status", nullable = false)
-	public int getStatus() {
+	public Integer getStatus() {
 		return this.status;
 	}
 
-	public void setStatus(int status) {
+	public void setStatus(Integer status) {
 		this.status = status;
 	}
 

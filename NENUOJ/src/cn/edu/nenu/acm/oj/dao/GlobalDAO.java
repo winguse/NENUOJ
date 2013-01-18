@@ -27,12 +27,13 @@ public class GlobalDAO implements InitializingBean,DisposableBean  {
 	private EntityManager em;
 	
 	public void persist(Object transientInstance) {
+		em.getTransaction().begin();
 		try {
-			EntityManager em=emf.createEntityManager();
 			em.persist(transientInstance);
-			em.close();
+			em.getTransaction().commit();
 			log.debug("persisting "+transientInstance.getClass().getName()+" successful");
 		} catch (RuntimeException re) {
+			em.getTransaction().rollback();
 			log.error("persisting "+transientInstance.getClass().getName()+" failed", re);
 			throw re;
 		}
