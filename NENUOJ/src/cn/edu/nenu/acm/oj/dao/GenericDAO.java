@@ -8,6 +8,7 @@ import javax.persistence.PersistenceContext;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @Scope("request")
@@ -28,15 +29,18 @@ public class GenericDAO<T extends Serializable> {
 	public List<T> findAll() {
 		return em.createQuery("from " + clazz.getName()).getResultList();
 	}
-
+	
+	@Transactional
 	public void persist(final T entity) {
 		em.persist(entity);
 	}
-
+	
+	@Transactional
 	public T merge(final T entity) {
 		return em.merge(entity);
 	}
-
+	
+	@Transactional
 	public void delete(final T entity) {
 		em.remove(entity);
 	}

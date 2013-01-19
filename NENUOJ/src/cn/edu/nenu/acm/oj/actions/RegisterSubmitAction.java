@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import cn.edu.nenu.acm.oj.dao.HibernateDAO;
 import cn.edu.nenu.acm.oj.dao.UserDAO;
 import cn.edu.nenu.acm.oj.entitybeans.User;
+import cn.edu.nenu.acm.oj.util.Permission;
 import cn.edu.nenu.acm.oj.util.Remark;
 
 import com.opensymphony.xwork2.validator.annotations.EmailValidator;
@@ -52,6 +53,9 @@ public class RegisterSubmitAction extends AbstractAction {
 		Remark remark = new Remark();
 		remark.set("nickname", nickname);
 		newUser.setRemark(remark);
+		newUser.setSloved(0);
+		newUser.setSubmitted(0);
+		newUser.setPermission(Permission.DEFAULT_PERMISSION);
 		userDAO.persist(newUser);
 		return SUCCESS;
 	}
