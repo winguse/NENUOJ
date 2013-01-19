@@ -1,9 +1,5 @@
 package cn.edu.nenu.acm.oj.actions;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Query;
-
 import org.apache.struts2.convention.annotation.InterceptorRef;
 import org.apache.struts2.convention.annotation.InterceptorRefs;
 import org.apache.struts2.convention.annotation.ParentPackage;
@@ -11,7 +7,8 @@ import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.convention.annotation.Results;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import cn.edu.nenu.acm.oj.dao.GlobalDAO;
+import cn.edu.nenu.acm.oj.dao.HibernateDAO;
+import cn.edu.nenu.acm.oj.dao.UserDAO;
 import cn.edu.nenu.acm.oj.entitybeans.User;
 import cn.edu.nenu.acm.oj.util.Remark;
 
@@ -21,8 +18,7 @@ import com.opensymphony.xwork2.validator.annotations.Validations;
 import com.opensymphony.xwork2.validator.annotations.FieldExpressionValidator;
 
 @ParentPackage("json-default")
-@InterceptorRefs({ @InterceptorRef("i18n"),
-		@InterceptorRef("jsonValidationWorkflowStack") })
+@InterceptorRefs({ @InterceptorRef("i18n"), @InterceptorRef("jsonValidationWorkflowStack") })
 @Results({ @Result(name = "success", location = "register-success.jsp"),
 		@Result(name = "input", location = "register.jsp") })
 public class RegisterSubmitAction extends AbstractAction {
@@ -38,15 +34,11 @@ public class RegisterSubmitAction extends AbstractAction {
 	private String email;
 	private boolean agree;
 
-	@Autowired(required = true)
-	private EntityManagerFactory emf;
-	@Autowired(required = true)
-	private GlobalDAO gdao;
-	
+	@Autowired(required=true)
+	private UserDAO userDAO;
+
 	@Override
 	public String execute() throws Exception {
-//		EntityManager em = emf.createEntityManager();
-		
 		User newUser = new User();
 		newUser.setUsername(username);
 		String salt = site.generateSalt();
@@ -60,21 +52,7 @@ public class RegisterSubmitAction extends AbstractAction {
 		Remark remark = new Remark();
 		remark.set("nickname", nickname);
 		newUser.setRemark(remark);
-		
-		gdao.persist(newUser);
-		
-//		em.getTransaction().begin();
-//		try {
-//			em.persist(newUser);
-//			em.getTransaction().commit();
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			em.getTransaction().rollback();
-//			addActionError("SQL Exception:" + e.getMessage());
-//			return INPUT;
-//		} finally {
-//			em.close();
-//		}
+		userDAO.persist(newUser);
 		return SUCCESS;
 	}
 
@@ -151,14 +129,6 @@ public class RegisterSubmitAction extends AbstractAction {
 		return agree;
 	}
 
-	public EntityManagerFactory getEmf() {
-		return emf;
-	}
-
-	public void setEmf(EntityManagerFactory emf) {
-		this.emf = emf;
-	}
-
 	public String getMajor() {
 		return major;
 	}
@@ -167,23 +137,7 @@ public class RegisterSubmitAction extends AbstractAction {
 		this.major = major;
 	}
 
-	public GlobalDAO getGdao() {
-		return gdao;
-	}
-
-	public void setGdao(GlobalDAO gdao) {
-		this.gdao = gdao;
-	}
-
-	public boolean isUsernameExist() {
-		int resultCount = 0;
-//		EntityManager em = emf.createEntityManager();
-//		Query query = em.createQuery("select u from User u where u.username=?");
-//		query.setParameter(1, username);
-//		resultCount = query.getResultList().size();
-		User exampleUser=new User();
-		exampleUser.setUsername(username);
-		resultCount=gdao.findByExample(User.class, exampleUser).size();
-		return resultCount > 0;
+	public boolean isUsernameExist(){
+		return userDAO.isUsernameExist(username);
 	}
 }

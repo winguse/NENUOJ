@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.PersistenceContext;
 
 import org.hibernate.Session;
 import org.apache.logging.log4j.LogManager;
@@ -16,24 +17,25 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @Scope("request")
-public class GlobalDAO implements InitializingBean,DisposableBean  {
+public class DAOTesting {
 	protected static Logger log = LogManager.getLogger("GlobalDAO");
+
+	@PersistenceContext
+	private EntityManager em;
 
 	@Autowired(required = true)
 	private EntityManagerFactory emf;
-	private EntityManager em;
 	
+	@Transactional
 	public void persist(Object transientInstance) {
-		em.getTransaction().begin();
 		try {
 			em.persist(transientInstance);
-			em.getTransaction().commit();
 			log.debug("persisting "+transientInstance.getClass().getName()+" successful");
 		} catch (RuntimeException re) {
-			em.getTransaction().rollback();
 			log.error("persisting "+transientInstance.getClass().getName()+" failed", re);
 			throw re;
 		}
@@ -98,31 +100,14 @@ public class GlobalDAO implements InitializingBean,DisposableBean  {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
-	public List<Object> findByExample(Class<?> c,Object instance) {
-		log.debug("finding Object instance by example");
-		try {
-			Session session=em.unwrap(Session.class);
-			List<Object> results = (List<Object>) session
-					.createCriteria(c)
-					.add(create(instance)).list();
-			log.debug("find by example successful, result size: " + results.size());
-			return results;
-		} catch (RuntimeException re) {
-			log.error("find by example failed", re);
-			throw re;
-		}
-	}
-
-	@Override
 	public void destroy() throws Exception {
-		em.close();
-		log.debug("GlebalDAO destroy, close the em.");
+		// TODO Auto-generated method stub
+		
 	}
 
-	@Override
 	public void afterPropertiesSet() throws Exception {
-		em=emf.createEntityManager();
-		log.debug("GlebalDAO afterPropertiesSet, init the em.");
+		// TODO Auto-generated method stub
+		
 	}
+
 }
