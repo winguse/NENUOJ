@@ -1,14 +1,18 @@
 package cn.edu.nenu.acm.oj.actions;
 
+import java.util.Map;
+
 import org.apache.struts2.convention.annotation.InterceptorRef;
 import org.apache.struts2.convention.annotation.InterceptorRefs;
 import org.apache.struts2.convention.annotation.ParentPackage;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.convention.annotation.Results;
+import org.apache.struts2.interceptor.SessionAware;
+import org.apache.struts2.json.annotations.JSON;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import cn.edu.nenu.acm.oj.dao.HibernateDAO;
 import cn.edu.nenu.acm.oj.dao.UserDAO;
+import cn.edu.nenu.acm.oj.dto.UserSimpleDTO;
 import cn.edu.nenu.acm.oj.entitybeans.User;
 import cn.edu.nenu.acm.oj.util.Permission;
 import cn.edu.nenu.acm.oj.util.Remark;
@@ -18,11 +22,15 @@ import com.opensymphony.xwork2.validator.annotations.RequiredStringValidator;
 import com.opensymphony.xwork2.validator.annotations.Validations;
 import com.opensymphony.xwork2.validator.annotations.FieldExpressionValidator;
 
+
 @ParentPackage("json-default")
 @InterceptorRefs({ @InterceptorRef("i18n"), @InterceptorRef("jsonValidationWorkflowStack") })
-@Results({ @Result(name = "success", location = "register-success.jsp"),
-		@Result(name = "input", location = "register.jsp") })
-public class RegisterSubmitAction extends AbstractAction {
+@Results({
+	@Result(name = "success", type="json"),
+	@Result(name = "input", location="register-success.jsp"),
+	@Result(name = "reject",type="redirect",location="error.action?type=1")
+})
+public class RegisterOperatingAction extends AbstractAction implements SessionAware {
 
 	private static final long serialVersionUID = -8077897542384482842L;
 	private String username;
@@ -34,7 +42,11 @@ public class RegisterSubmitAction extends AbstractAction {
 	private String nickname;
 	private String email;
 	private boolean agree;
-
+	private Map<String, Object> session;
+	
+	private Integer code;
+	private String message;
+	
 	@Autowired(required=true)
 	private UserDAO userDAO;
 
@@ -57,6 +69,14 @@ public class RegisterSubmitAction extends AbstractAction {
 		newUser.setSubmitted(0);
 		newUser.setPermission(Permission.DEFAULT_PERMISSION);
 		userDAO.persist(newUser);
+		UserSimpleDTO user=new UserSimpleDTO();
+		user.setId(newUser.getId());
+		user.setUsername(username);
+		user.setNickname(nickname);
+		user.setPermission(newUser.getPermission());
+		session.put("user", user);
+		code=0;
+		message=_("welcome")+user.getNickname()+"!";
 		return SUCCESS;
 	}
 
@@ -101,47 +121,73 @@ public class RegisterSubmitAction extends AbstractAction {
 		this.nickname = nickname;
 	}
 
-	public String getUsername() {
-		return username;
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
-	public String getPassword2() {
-		return password2;
-	}
-
-	public String getSchool() {
-		return school;
-	}
-
-	public String getGrade() {
-		return grade;
-	}
-
-	public String getNickname() {
-		return nickname;
-	}
-
-	public String getEmail() {
-		return email;
-	}
-
-	public boolean isAgree() {
-		return agree;
-	}
-
-	public String getMajor() {
-		return major;
-	}
-
 	public void setMajor(String major) {
 		this.major = major;
 	}
 
+	@JSON(serialize=false)
 	public boolean isUsernameExist(){
 		return userDAO.isUsernameExist(username);
 	}
+
+	@Override
+	public void setSession(Map<String, Object> session) {
+		this.session=session;
+		
+	}
+
+	@JSON(serialize=false)
+	public String getUsername() {
+		return username;
+	}
+
+	@JSON(serialize=false)
+	public String getPassword() {
+		return password;
+	}
+
+	@JSON(serialize=false)
+	public String getPassword2() {
+		return password2;
+	}
+
+	@JSON(serialize=false)
+	public String getSchool() {
+		return school;
+	}
+
+	@JSON(serialize=false)
+	public String getMajor() {
+		return major;
+	}
+
+	@JSON(serialize=false)
+	public String getGrade() {
+		return grade;
+	}
+
+	@JSON(serialize=false)
+	public String getNickname() {
+		return nickname;
+	}
+
+	@JSON(serialize=false)
+	public String getEmail() {
+		return email;
+	}
+
+	@JSON(serialize=false)
+	public boolean isAgree() {
+		return agree;
+	}
+
+	public Integer getCode() {
+		return code;
+	}
+
+	public String getMessage() {
+		return message;
+	}
+	
+	
 }
