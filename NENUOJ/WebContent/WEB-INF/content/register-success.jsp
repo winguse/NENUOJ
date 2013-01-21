@@ -20,6 +20,9 @@
 	<s:textfield label="%{getText('school')}" name="school" tooltip="%{getText('tooltip.school')}" />
 	<s:textfield label="%{getText('major')}" name="major" tooltip="%{getText('tooltip.major')}" />
 	<s:textfield label="%{getText('grade')}" name="grade" tooltip="%{getText('tooltip.grade')}" />
+	<s:if test="%{site.enableRegisterVerifyCode == false}">
+	<s:textfield label="%{getText('verify_code')}" name="verify_code" tooltip="%{getText('tooltip.verify_code')}"><img /></s:textfield>
+	</s:if>
 	<s:checkbox label="%{getText('agree_terms')}" name="agree" tooltip="%{getText('tooltip.agree')}"/>
 	<p><s:a action="terms"><s:text name="service_terms"/></s:a></p>
 <div class="form-actions">
@@ -30,32 +33,9 @@
 	<s:submit id="register_form_submit" value='%{_("submit")}' cssClass="btn btn-primary" />
 <script>
 $(function(){
-	var sj=jQuery.struts2_jquery,$form=$("#register_form"),params={
-		type:"POST",
-		data:{
-			"struts.enableJSONValidation": true
-		},
-		url:$form[0].action,
-		async:false,
-		cache:false,
-		complete:function(request, status) {
-		//	console.log("@complete");
-		//	console.log(request);
-		//	console.log(status);
-		},
-		success:function(data){
-			if(data.code===0){
-				alert(data.message);
-			}else{
-				bootstrapValidation($form,data);
-			}
-		},
-		dataType:"json"
-	};
-	sj.require("js/plugins/jquery.form" + sj.minSuffix + ".js");
-	$form.submit(function(){
-		$form.ajaxSubmit(params);
-		return false;
+	OJ.prototype.WinguseAjaxForm("#register_form",function(data){
+		if(data.code==0)
+			alert(data.message);
 	});
 });
 </script>

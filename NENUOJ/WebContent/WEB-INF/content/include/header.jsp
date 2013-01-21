@@ -14,7 +14,7 @@
 			<s:a action="register"><s:text name="register" /></s:a>
 	    	<j:dialog
 				id="login_dialog"
-				buttons="{'%{_('login')}':function(){},'%{_('cancle')}':function() {$(this).dialog('close');}}"
+				buttons="{'%{_('login')}':function(){$('#login_form').submit();},'%{_('cancle')}':function() {$(this).dialog('close');}}"
 				autoOpen="false"
 				modal="true"
 				title="%{_('login')}"

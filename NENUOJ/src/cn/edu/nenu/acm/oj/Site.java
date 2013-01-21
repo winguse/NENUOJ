@@ -16,16 +16,27 @@ import com.opensymphony.xwork2.inject.Inject;
 public class Site {
 
 	private boolean enableHtmlCompress;
+	private boolean enableLoginVerifyCode;
+	private boolean enableRegisterVerifyCode;
 	private String globalSalt;
 	private Random random = new Random();
 
-	@Value("${security.globalSalt}")
 	public String getGlobalSalt() {
 		return globalSalt;
 	}
 
+	@Value("${security.globalSalt}")
 	public void setGlobalSalt(String globalSalt) {
 		this.globalSalt = globalSalt;
+	}
+	
+	public boolean isEnableLoginVerifyCode() {
+		return enableLoginVerifyCode;
+	}
+
+	@Value("${security.login.verifycode}")
+	public void setEnableLoginVerifyCode(boolean enableLoginVerifyCode) {
+		this.enableLoginVerifyCode = enableLoginVerifyCode;
 	}
 
 	public boolean isEnableHtmlCompress() {
@@ -35,6 +46,15 @@ public class Site {
 	@Value("${switch.htmlcompress}")
 	public void setEnableHtmlCompress(boolean enableHtmlCompress) {
 		this.enableHtmlCompress = enableHtmlCompress;
+	}
+
+	public boolean isEnableRegisterVerifyCode() {
+		return enableRegisterVerifyCode;
+	}
+
+	@Value("${security.register.verifycode}")
+	public void setEnableRegisterVerifyCode(boolean enableRegisterVerifyCode) {
+		this.enableRegisterVerifyCode = enableRegisterVerifyCode;
 	}
 
 	/**

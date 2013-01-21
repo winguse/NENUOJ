@@ -49,9 +49,15 @@ public class RegisterOperatingAction extends AbstractAction implements SessionAw
 	
 	@Autowired(required=true)
 	private UserDAO userDAO;
+	private String verifyCode;
 
 	@Override
 	public String execute() throws Exception {
+		if (site.isEnableLoginVerifyCode() && (verifyCode == null || !verifyCode.equalsIgnoreCase((String)session.get("verifyCode")))) {
+			code=VIRIFY_CODE_ERROR;
+			message=getText("verify_code_error");
+			return SUCCESS;
+		}
 		User newUser = new User();
 		newUser.setUsername(username);
 		String salt = site.generateSalt();
@@ -179,6 +185,15 @@ public class RegisterOperatingAction extends AbstractAction implements SessionAw
 	@JSON(serialize=false)
 	public boolean isAgree() {
 		return agree;
+	}
+
+	@JSON(serialize=false)
+	public String getVerifyCode() {
+		return verifyCode;
+	}
+
+	public void setVerifyCode(String verifyCode) {
+		this.verifyCode = verifyCode;
 	}
 
 	public Integer getCode() {

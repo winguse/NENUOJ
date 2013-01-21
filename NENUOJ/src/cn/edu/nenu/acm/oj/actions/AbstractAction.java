@@ -3,6 +3,7 @@ package cn.edu.nenu.acm.oj.actions;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import cn.edu.nenu.acm.oj.Site;
+import cn.edu.nenu.acm.oj.StatusCode;
 
 import com.opensymphony.xwork2.ActionSupport;
 import com.opensymphony.xwork2.config.Configuration;
@@ -12,7 +13,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.struts2.convention.annotation.ParentPackage;
 
-public abstract class AbstractAction extends ActionSupport {
+public abstract class AbstractAction extends ActionSupport implements StatusCode {
 
 	private static final long serialVersionUID = 1L;
 
