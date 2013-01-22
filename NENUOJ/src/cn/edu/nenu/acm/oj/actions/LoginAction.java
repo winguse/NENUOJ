@@ -50,6 +50,7 @@ public class LoginAction extends AbstractAction implements SessionAware {
 		} else {
 			code = CODE_SUCCESS;
 			message = getText("login_welcome");
+			session.put("user", user);
 		}
 		return SUCCESS;
 	}

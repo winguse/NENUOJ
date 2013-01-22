@@ -14,14 +14,16 @@
 			<s:a action="register"><s:text name="register" /></s:a>
 	    	<j:dialog
 				id="login_dialog"
-				buttons="{'%{_('login')}':function(){$('#login_form').submit();},'%{_('cancle')}':function() {$(this).dialog('close');}}"
+				buttons="{'%{_('login')}':function(){$(this).find('form').submit();},'%{_('cancle')}':function() {$(this).find('p.validateTips').html('');$(this).dialog('close');}};oj.loginRequired()/*Small Hack*/"
 				autoOpen="false"
 				modal="true"
 				title="%{_('login')}"
 				resizable="true"
 				draggable="true"
+				cssClass="hide"
 			>
 			<s:form id="login_form" action="login" theme="bootstrap" cssClass="form">
+				<p class="validateTips"></p>
 				<s:textfield label="%{_('username')}" name="username" />
 				<s:password label="%{_('password')}" name="password" />
 			</s:form>
@@ -31,9 +33,9 @@
 		<s:else>
 			<s:a action="user-profiles">
 				<s:text name="welcome" />
-				<s:property value="#session.user.nickname"/>
+				<s:property value="#session.user.username"/>
 			</s:a>
-			<a href="#" id="logout"><s:text name="logout" /></a>
+			<a href="#" id="logout" onclick="oj.logout();"><s:text name="logout" /></a>
 		</s:else>
 	</nav>
 	<h3><s:property value="#pageTitle"/></h3>

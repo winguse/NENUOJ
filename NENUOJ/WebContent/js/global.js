@@ -1,20 +1,42 @@
 /**
  * 
  */
+"use strict";
 
 function OJ(){
 }
 
-OJ.prototype.loginCallback=function(data){
-	alert(data.message);
+OJ.prototype.loginRequired=function(){
+	var $form=$("#login_form");
+	WinguseAjaxForm($form,function(data){
+		$form.find("div.error").removeClass("error");
+	    $form.find("span.s2_help_inline").remove();
+	    $form.find("div.s2_validation_errors").remove();
+	    $form.find("p.validateTips").text(data.message);
+	    if(data.code==0)
+			setTimeout(function(){
+				window.location.reload();
+			},1000);
+	});
+	$form.keyup(function(e){
+		if (e.keyCode == 13)$form.submit();
+	});
+};
+OJ.prototype.logout=function(){
+	$.post(
+		"logout.action",{
+			r:Math.random()
+		},function(d){
+			if(d.code==0){
+				$("body").text(d.message);
+			}
+			window.location.reload();
+		},"json"
+	);
 };
 
-OJ.prototype.loginInit=function(){
-	this.WinguseAjaxForm("#login_form",this.loginCallback);
-};
-
-OJ.prototype.WinguseAjaxForm=function(formId,successCallback){
-	var sj=jQuery.struts2_jquery,$form=$(formId),params={
+function WinguseAjaxForm(form,successCallback){
+	var sj=jQuery.struts2_jquery,$form=typeof(form)=="string"?$(form):form,params={
 		type:"POST",
 		data:{
 			"struts.enableJSONValidation": true
@@ -31,7 +53,8 @@ OJ.prototype.WinguseAjaxForm=function(formId,successCallback){
 		},
 		dataType:"json"
 	};
-	sj.require("js/plugins/jquery.form" + sj.minSuffix + ".js");
+	if(!$form.ajaxSubmit)
+		sj.require("js/plugins/jquery.form" + sj.minSuffix + ".js");
 	$form.submit(function(){
 		$form.ajaxSubmit(params);
 		return false;
@@ -39,4 +62,3 @@ OJ.prototype.WinguseAjaxForm=function(formId,successCallback){
 };
 
 var oj=new OJ();
-oj.loginInit();

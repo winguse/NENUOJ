@@ -8,9 +8,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Repository;
 
-import com.opensymphony.xwork2.config.Configuration;
-import com.opensymphony.xwork2.inject.Inject;
-
 @Repository
 @Scope("singleton")
 public class Site {
@@ -70,7 +67,7 @@ public class Site {
 
 	public String hash(String string, String salt) {
 		String method = "SHA";
-		String hex = "i.love_shuxIaO!~";// "1234567890abcdef"
+		String hex = "make-it_SIMPLE!~";// "1234567890abcdef"
 		string = salt + string + globalSalt;
 		String s = "";
 		MessageDigest mdTemp = null;

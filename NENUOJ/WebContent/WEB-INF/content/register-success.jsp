@@ -20,7 +20,7 @@
 	<s:textfield label="%{getText('school')}" name="school" tooltip="%{getText('tooltip.school')}" />
 	<s:textfield label="%{getText('major')}" name="major" tooltip="%{getText('tooltip.major')}" />
 	<s:textfield label="%{getText('grade')}" name="grade" tooltip="%{getText('tooltip.grade')}" />
-	<s:if test="%{site.enableRegisterVerifyCode == false}">
+	<s:if test="%{site.enableRegisterVerifyCode}">
 	<s:textfield label="%{getText('verify_code')}" name="verify_code" tooltip="%{getText('tooltip.verify_code')}"><img /></s:textfield>
 	</s:if>
 	<s:checkbox label="%{getText('agree_terms')}" name="agree" tooltip="%{getText('tooltip.agree')}"/>
@@ -33,7 +33,7 @@
 	<s:submit id="register_form_submit" value='%{_("submit")}' cssClass="btn btn-primary" />
 <script>
 $(function(){
-	OJ.prototype.WinguseAjaxForm("#register_form",function(data){
+	WinguseAjaxForm("#register_form",function(data){
 		if(data.code==0)
 			alert(data.message);
 	});

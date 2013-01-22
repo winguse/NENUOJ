@@ -62,6 +62,7 @@ public class RegisterOperatingAction extends AbstractAction implements SessionAw
 		newUser.setUsername(username);
 		String salt = site.generateSalt();
 		password = site.hash(password, salt);
+		nickname=(nickname==null||nickname.equals(""))?username:nickname;
 		newUser.setPassword(password);
 		newUser.setSalt(salt);
 		newUser.setEmail(email);
