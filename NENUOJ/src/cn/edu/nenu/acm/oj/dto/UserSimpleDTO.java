@@ -1,11 +1,28 @@
 package cn.edu.nenu.acm.oj.dto;
 
+import cn.edu.nenu.acm.oj.entitybeans.User;
+import cn.edu.nenu.acm.oj.util.Remark;
+
 public class UserSimpleDTO {
 	private Integer id;
 	private String username;
 	private String nickname;
 	private Long permission;
 
+	public UserSimpleDTO(){
+	}
+
+	public UserSimpleDTO(User user){
+		this.id=user.getId();
+		this.username=user.getUsername();
+		if(user.getRemark() instanceof Remark){
+			this.nickname=(String)((Remark)(user.getRemark())).get("nickname");
+		}else{
+			this.nickname=this.username;
+		}
+		this.permission=user.getPermission();
+	}
+	
 	public Integer getId() {
 		return id;
 	}

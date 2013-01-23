@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.opensymphony.xwork2.validator.annotations.RequiredStringValidator;
 
 import cn.edu.nenu.acm.oj.dao.UserDAO;
+import cn.edu.nenu.acm.oj.dto.UserSimpleDTO;
 import cn.edu.nenu.acm.oj.entitybeans.User;
 
 @ParentPackage("json-default")
@@ -50,7 +51,7 @@ public class LoginAction extends AbstractAction implements SessionAware {
 		} else {
 			code = CODE_SUCCESS;
 			message = getText("login_welcome");
-			session.put("user", user);
+			session.put("user", new UserSimpleDTO(user));
 		}
 		return SUCCESS;
 	}

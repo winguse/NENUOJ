@@ -23,17 +23,20 @@ import com.opensymphony.xwork2.validator.annotations.Validations;
 import com.opensymphony.xwork2.validator.annotations.FieldExpressionValidator;
 
 
-@ParentPackage("json-default")
-@InterceptorRefs({ @InterceptorRef("i18n"), @InterceptorRef("jsonValidationWorkflowStack") })
+@ParentPackage("default")
+@InterceptorRefs({ 
+	@InterceptorRef("i18n"), 
+	@InterceptorRef("jsonValidationWorkflowStack")
+	,@InterceptorRef("userLoginNeeded")
+})
 @Results({
 	@Result(name = "success", type="json"),
-	@Result(name = "input", location="register-success.jsp"),
-	@Result(name = "reject",type="redirect",location="error.action?type=1")
+	@Result(name = "input", location="user-profiles-success.jsp")
 })
-public class RegisterOperatingAction extends AbstractAction implements SessionAware {
+public class UserProfilesOperatingAction extends AbstractAction implements SessionAware {
 
 	private static final long serialVersionUID = -8077897542384482842L;
-	private String username;
+	private String oldPassword;
 	private String password;
 	private String password2;
 	private String school;
@@ -41,7 +44,6 @@ public class RegisterOperatingAction extends AbstractAction implements SessionAw
 	private String grade;
 	private String nickname;
 	private String email;
-	private boolean agree;
 	private Map<String, Object> session;
 	
 	private Integer code;
@@ -53,52 +55,48 @@ public class RegisterOperatingAction extends AbstractAction implements SessionAw
 
 	@Override
 	public String execute() throws Exception {
-		if (site.isEnableRegisterVerifyCode() && (verifyCode == null || !verifyCode.equalsIgnoreCase((String)session.get("verifyCode")))) {
-			code=VIRIFY_CODE_ERROR;
-			message=getText("verify_code_error");
-			return SUCCESS;
+		UserSimpleDTO user=(UserSimpleDTO) session.get("user");
+		User currentUser = userDAO.findUserByUsername(user.getUsername());
+		if(currentUser==null){
+			session.remove("user");
+			return "reject";
 		}
-		User newUser = new User();
-		newUser.setUsername(username);
-		String salt = site.generateSalt();
-		password = site.hash(password, salt);
-		nickname=(nickname==null||nickname.equals(""))?username:nickname;
-		newUser.setPassword(password);
-		newUser.setSalt(salt);
-		newUser.setEmail(email);
-		newUser.setSchool(school);
-		newUser.setMajor(major);
-		newUser.setGrade(grade);
+		if(password!=null&&!password.equals("")){
+			if(site.hash(oldPassword, currentUser.getSalt()).equals(currentUser.getPassword())){
+				String salt = site.generateSalt();
+				password = site.hash(password, salt);
+				currentUser.setPassword(password);
+				currentUser.setSalt(salt);
+			}else{
+				code=PASSWORD_NOT_MATCH;
+				message=_("old_password_needed_to_update_password");
+				return SUCCESS;
+			}
+		}
+
+		nickname=(nickname==null||nickname.equals(""))?user.getUsername():nickname;
+		currentUser.setEmail(email);
+		currentUser.setSchool(school);
+		currentUser.setMajor(major);
+		currentUser.setGrade(grade);
 		Remark remark = new Remark();
 		remark.set("nickname", nickname);
-		newUser.setRemark(remark);
-		newUser.setSloved(0);
-		newUser.setSubmitted(0);
-		newUser.setPermission(Permission.DEFAULT_PERMISSION);
-		userDAO.persist(newUser);
-		session.put("user", new UserSimpleDTO(newUser));
+		currentUser.setRemark(remark);
+
+		userDAO.merge(currentUser);
+		session.put("user", new UserSimpleDTO(currentUser));
 		code=0;
-		message=_("welcome")+newUser.getUsername()+"!";
+		message=_("profile_updated")+currentUser.getUsername()+"!";
 		return SUCCESS;
 	}
 
-	@RequiredStringValidator(key = "username_required")
-	@FieldExpressionValidator(expression = "!isUsernameExist()", key = "username_exist")
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
 	@Validations(fieldExpressions = {
-			@FieldExpressionValidator(expression = "password.length()>=6 && password.length()<=64", key = "password_length"),
+			@FieldExpressionValidator(expression = "password.length()==0||(password.length()>=6 && password.length()<=64)", key = "password_length"),
 			@FieldExpressionValidator(expression = "!site.isWeekPassword(password)", key = "password_week") })
 	public void setPassword(String password) {
 		this.password = password;
 	}
 
-	@FieldExpressionValidator(expression = "agree", key = "agree_terms")
-	public void setAgree(boolean agree) {
-		this.agree = agree;
-	}
 
 	@FieldExpressionValidator(expression = "password.equals(password2)", key = "password_retype")
 	public void setPassword2(String password2) {
@@ -127,20 +125,10 @@ public class RegisterOperatingAction extends AbstractAction implements SessionAw
 		this.major = major;
 	}
 
-	@JSON(serialize=false)
-	public boolean isUsernameExist(){
-		return userDAO.isUsernameExist(username);
-	}
-
 	@Override
 	public void setSession(Map<String, Object> session) {
 		this.session=session;
 		
-	}
-
-	@JSON(serialize=false)
-	public String getUsername() {
-		return username;
 	}
 
 	@JSON(serialize=false)
@@ -179,13 +167,12 @@ public class RegisterOperatingAction extends AbstractAction implements SessionAw
 	}
 
 	@JSON(serialize=false)
-	public boolean isAgree() {
-		return agree;
-	}
-
-	@JSON(serialize=false)
 	public String getVerifyCode() {
 		return verifyCode;
+	}
+
+	public void setOldPassword(String oldPassword) {
+		this.oldPassword = oldPassword;
 	}
 
 	public void setVerifyCode(String verifyCode) {

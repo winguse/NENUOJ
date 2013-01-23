@@ -9,9 +9,6 @@ function OJ(){
 OJ.prototype.loginRequired=function(){
 	var $form=$("#login_form");
 	WinguseAjaxForm($form,function(data){
-		$form.find("div.error").removeClass("error");
-	    $form.find("span.s2_help_inline").remove();
-	    $form.find("div.s2_validation_errors").remove();
 	    $form.find("p.validateTips").text(data.message);
 	    if(data.code==0)
 			setTimeout(function(){
@@ -45,6 +42,9 @@ function WinguseAjaxForm(form,successCallback){
 		async:false,
 		cache:false,
 		success:function(data){
+			$form.find("div.error").removeClass("error");
+		    $form.find("span.s2_help_inline").remove();
+		    $form.find("div.s2_validation_errors").remove();
 			if(typeof(data.code)=='undefined'){
 				bootstrapValidation($form,data);
 			}else{
