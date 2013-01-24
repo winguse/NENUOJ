@@ -6,12 +6,12 @@
 <body>
 <header>
 	<nav>
-		<s:a action="home"><s:text name="home" /></s:a>
-		<s:a action="problems"><s:text name="problems" /></s:a>
-		<s:a action="status"><s:text name="status" /></s:a>
-		<s:a action="contests"><s:text name="contests" /></s:a>
+		<s:a namespace="/" action="home"><s:text name="home" /></s:a>
+		<s:a namespace="problems" action="list"><s:text name="problems" /></s:a>
+		<s:a namespace="/" action="status"><s:text name="status" /></s:a>
+		<s:a namespace="contests" action="list"><s:text name="contests" /></s:a>
 		<s:if test="#session.user==null">
-			<s:a action="register"><s:text name="register" /></s:a>
+			<s:a namespace="/" action="register"><s:text name="register" /></s:a>
 	    	<j:dialog
 				id="login_dialog"
 				buttons="{'%{_('login')}':function(){$(this).find('form').submit();},'%{_('cancle')}':function() {$(this).find('p.validateTips').html('');$(this).dialog('close');}};oj.loginRequired()/*Small Hack*/"
@@ -22,7 +22,7 @@
 				draggable="true"
 				cssClass="hide"
 			>
-			<s:form id="login_form" action="login" theme="bootstrap" cssClass="form">
+			<s:form id="login_form" namespace="/" action="login" theme="bootstrap" cssClass="form">
 				<p class="validateTips"></p>
 				<s:textfield label="%{_('username')}" name="username" />
 				<s:password label="%{_('password')}" name="password" />

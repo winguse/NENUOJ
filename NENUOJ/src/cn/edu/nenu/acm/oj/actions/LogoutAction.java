@@ -2,12 +2,14 @@ package cn.edu.nenu.acm.oj.actions;
 
 import java.util.Map;
 
+import org.apache.struts2.convention.annotation.Namespace;
 import org.apache.struts2.convention.annotation.ParentPackage;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.interceptor.SessionAware;
 
 @ParentPackage("json-default")
 @Result(name="success",type="json")
+@Namespace("/")
 public class LogoutAction extends AbstractAction implements SessionAware {
 
 	private static final long serialVersionUID = -8077897542384482842L;

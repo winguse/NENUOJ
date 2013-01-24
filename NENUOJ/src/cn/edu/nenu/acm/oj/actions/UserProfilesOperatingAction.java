@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.apache.struts2.convention.annotation.InterceptorRef;
 import org.apache.struts2.convention.annotation.InterceptorRefs;
+import org.apache.struts2.convention.annotation.Namespace;
 import org.apache.struts2.convention.annotation.ParentPackage;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.convention.annotation.Results;
@@ -33,6 +34,7 @@ import com.opensymphony.xwork2.validator.annotations.FieldExpressionValidator;
 	@Result(name = "success", type="json"),
 	@Result(name = "input", location="user-profiles-success.jsp")
 })
+@Namespace("/")
 public class UserProfilesOperatingAction extends AbstractAction implements SessionAware {
 
 	private static final long serialVersionUID = -8077897542384482842L;

@@ -8,4 +8,5 @@
 <meta charset="UTF-8">
 <j:head />
 <b:head includeScripts="true" includeScriptsValidation="true" includeStylesResponsive="true"/>
-<link href="style/global.css" rel="stylesheet">
+<link href="${pageContext.request.contextPath}/style/global.css" rel="stylesheet">
+<script>var baseUrl='${pageContext.request.contextPath}';</script>

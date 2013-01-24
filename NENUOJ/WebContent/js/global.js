@@ -21,7 +21,7 @@ OJ.prototype.loginRequired=function(){
 };
 OJ.prototype.logout=function(){
 	$.post(
-		"logout.action",{
+		baseUrl+"/logout.action",{
 			r:Math.random()
 		},function(d){
 			if(d.code==0){

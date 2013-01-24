@@ -4,7 +4,7 @@
     "http://struts.apache.org/dtds/struts-2.3.dtd">
 
 <struts>
-	<package name="default" extends="struts-default,json-default">
+	<package name="default" extends="struts-default,json-default" namespace="/">
 		<interceptors>
 			<interceptor name="userLoginNeeded"
 				class="cn.edu.nenu.acm.oj.interceptors.UserLoginNeededInterceptor" />

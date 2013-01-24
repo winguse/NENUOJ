@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.apache.struts2.convention.annotation.InterceptorRef;
 import org.apache.struts2.convention.annotation.InterceptorRefs;
+import org.apache.struts2.convention.annotation.Namespace;
 import org.apache.struts2.convention.annotation.ParentPackage;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.convention.annotation.Results;
@@ -21,7 +22,7 @@ import cn.edu.nenu.acm.oj.entitybeans.User;
 	@InterceptorRef("defaultStack")
 	,@InterceptorRef("userLoginNeeded")
 })
-
+@Namespace("/")
 public class UserProfilesAction extends AbstractAction implements SessionAware {
 
 	private static final long serialVersionUID = -8077897542384482842L;
