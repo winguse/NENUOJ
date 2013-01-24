@@ -20,7 +20,7 @@ import cn.edu.nenu.acm.oj.entitybeans.User;
 })
 @InterceptorRefs({ 
 	@InterceptorRef("defaultStack")
-	,@InterceptorRef("userLoginNeeded")
+	,@InterceptorRef("permissionInterceptor")
 })
 @Namespace("/")
 public class UserProfilesAction extends AbstractAction implements SessionAware {

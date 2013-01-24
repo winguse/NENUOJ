@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import cn.edu.nenu.acm.oj.dao.UserDAO;
 import cn.edu.nenu.acm.oj.dto.UserSimpleDTO;
 import cn.edu.nenu.acm.oj.entitybeans.User;
-import cn.edu.nenu.acm.oj.util.Permission;
 import cn.edu.nenu.acm.oj.util.Remark;
 
 import com.opensymphony.xwork2.validator.annotations.EmailValidator;
@@ -28,7 +27,7 @@ import com.opensymphony.xwork2.validator.annotations.FieldExpressionValidator;
 @InterceptorRefs({ 
 	@InterceptorRef("i18n"), 
 	@InterceptorRef("jsonValidationWorkflowStack")
-	,@InterceptorRef("userLoginNeeded")
+	,@InterceptorRef("permissionInterceptor")
 })
 @Results({
 	@Result(name = "success", type="json"),
