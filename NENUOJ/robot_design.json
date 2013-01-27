@@ -1,0 +1,41 @@
+{
+	"parameter":{//need to input parameter, such as PROBLEM_ID
+		"PROBLEM_ID":""
+	},
+	"variable":{
+		"user_agent":"",
+		"username":"",
+		"password":""
+	},
+	"crawler":{
+		"begin":{//begin is required
+			"method":"",//GET POST prease
+			"url":"",//neet to accept global parameter such as ${PROBLEM_ID}
+			"parameter":{
+				"x":"y"
+			},
+			"result":{// result may be store here
+				"status_code":"",
+				"response_text":""
+			},
+			"processing":{//processing may be base on the status code, TODO: how about redirect?
+				"200":"prease",
+				"500":"exit"
+			}
+		},
+		"prease":{
+			"method":"prease",
+			"preasing":{
+				"description":".+?",//regex or xpath
+			}
+			
+		},
+		"exit":{//clean up if needed
+		}
+	},
+	"submitter":{
+		
+	}
+}
+
+//Ñ­»· ÅÐ¶Ï Ë³Ðò ´æ´¢
