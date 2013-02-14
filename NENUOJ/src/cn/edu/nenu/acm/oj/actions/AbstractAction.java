@@ -3,7 +3,7 @@ package cn.edu.nenu.acm.oj.actions;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import cn.edu.nenu.acm.oj.Site;
-import cn.edu.nenu.acm.oj.StatusCode;
+import cn.edu.nenu.acm.oj.util.StatusCode;
 
 import com.opensymphony.xwork2.ActionSupport;
 import com.opensymphony.xwork2.config.Configuration;

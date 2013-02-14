@@ -2,7 +2,6 @@ package cn.edu.nenu.acm.oj.interceptors;
 
 import java.util.Map;
 
-import cn.edu.nenu.acm.oj.dao.UserDAO;
 import cn.edu.nenu.acm.oj.dto.UserSimpleDTO;
 import cn.edu.nenu.acm.oj.util.Permission;
 

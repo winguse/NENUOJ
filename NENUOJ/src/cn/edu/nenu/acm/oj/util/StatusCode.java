@@ -1,4 +1,4 @@
-package cn.edu.nenu.acm.oj;
+package cn.edu.nenu.acm.oj.util;
 
 public interface StatusCode {
 	static final int CODE_SUCCESS=0;
