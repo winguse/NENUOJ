@@ -32,6 +32,7 @@ import javax.persistence.Version;
 		@NamedQuery(name = "Problem.findById", query = "SELECT p FROM Problem p WHERE p.id = :id"),
 		@NamedQuery(name = "Problem.findByTitle", query = "SELECT p FROM Problem p WHERE p.title = :title"),
 		@NamedQuery(name = "Problem.findByNumber", query = "SELECT p FROM Problem p WHERE p.number = :number"),
+		@NamedQuery(name = "Problem.findBySource", query = "SELECT p FROM Problem p WHERE p.source = :source"),
 		@NamedQuery(name = "Problem.findByLocked", query = "SELECT p FROM Problem p WHERE p.locked = :locked"),
 		@NamedQuery(name = "Problem.findByTimeLimit", query = "SELECT p FROM Problem p WHERE p.timeLimit = :timeLimit"),
 		@NamedQuery(name = "Problem.findByMemoryLimit", query = "SELECT p FROM Problem p WHERE p.memoryLimit = :memoryLimit"),
@@ -42,11 +43,17 @@ import javax.persistence.Version;
 public class Problem implements java.io.Serializable {
 
 	private static final long serialVersionUID = 3828345133405527155L;
+
+	public static final int SPECIALL_JUDGE=1;
+	public static final int NORMAL_JUDGE=2;
+	public static final int SPECIAL_JUDGE=4;
+	
 	private Integer id;
 	private Message message;
 	private Judger judger;
 	private String title;
 	private String number;
+	private String source;
 	private boolean locked;
 	private Integer timeLimit;
 	private Integer memoryLimit;
@@ -62,11 +69,12 @@ public class Problem implements java.io.Serializable {
 	public Problem() {
 	}
 
-	public Problem(Judger judger, String title, String number, boolean locked, Integer timeLimit, Integer memoryLimit,
+	public Problem(Judger judger, String title, String number, String source, boolean locked, Integer timeLimit, Integer memoryLimit,
 			Integer accepted, Integer submitted, Integer judgingType, Date lastUpdateTime) {
 		this.judger = judger;
 		this.title = title;
 		this.number = number;
+		this.source = source;
 		this.locked = locked;
 		this.timeLimit = timeLimit;
 		this.memoryLimit = memoryLimit;
@@ -76,13 +84,14 @@ public class Problem implements java.io.Serializable {
 		this.lastUpdateTime = lastUpdateTime;
 	}
 
-	public Problem(Message message, Judger judger, String title, String number, boolean locked, Integer timeLimit,
+	public Problem(Message message, Judger judger, String title, String number, String source, boolean locked, Integer timeLimit,
 			Integer memoryLimit, Integer accepted, Integer submitted, Integer judgingType, Date lastUpdateTime,
 			Serializable remark, Set<Solution> solutions, Set<Tag> tags, Set<ProblemDescription> problemDescriptions) {
 		this.message = message;
 		this.judger = judger;
 		this.title = title;
 		this.number = number;
+		this.source = source;
 		this.locked = locked;
 		this.timeLimit = timeLimit;
 		this.memoryLimit = memoryLimit;
@@ -144,7 +153,16 @@ public class Problem implements java.io.Serializable {
 	public void setNumber(String number) {
 		this.number = number;
 	}
+	
+	@Column(name = "source", nullable = false, length = 255)
+	public String getSource() {
+		return this.source;
+	}
 
+	public void setSource(String source) {
+		this.source = source;
+	}
+	
 	@Column(name = "locked", nullable = false)
 	public boolean isLocked() {
 		return this.locked;

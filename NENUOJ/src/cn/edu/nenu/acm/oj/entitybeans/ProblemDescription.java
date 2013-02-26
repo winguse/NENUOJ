@@ -48,7 +48,6 @@ public class ProblemDescription implements java.io.Serializable {
 	private String sampleIn;
 	private String sampleOut;
 	private String hint;
-	private String source;
 	private Date lastUpdateTime;
 	private Serializable remark;
 	private Set<Contest> contests = new HashSet<Contest>(0);
@@ -57,8 +56,7 @@ public class ProblemDescription implements java.io.Serializable {
 	}
 
 	public ProblemDescription(User user, Problem problem, boolean locked, Integer vote, String title,
-			String description, String input, String output, String sampleIn, String sampleOut, String hint,
-			String source, Date lastUpdateTime) {
+			String description, String input, String output, String sampleIn, String sampleOut, String hint, Date lastUpdateTime) {
 		this.user = user;
 		this.problem = problem;
 		this.locked = locked;
@@ -70,13 +68,12 @@ public class ProblemDescription implements java.io.Serializable {
 		this.sampleIn = sampleIn;
 		this.sampleOut = sampleOut;
 		this.hint = hint;
-		this.source = source;
 		this.lastUpdateTime = lastUpdateTime;
 	}
 
 	public ProblemDescription(User user, Problem problem, boolean locked, Integer vote, String title,
 			String description, String input, String output, String sampleIn, String sampleOut, String hint,
-			String source, Date lastUpdateTime, Serializable remark, Set<Contest> contests) {
+			 Date lastUpdateTime, Serializable remark, Set<Contest> contests) {
 		this.user = user;
 		this.problem = problem;
 		this.locked = locked;
@@ -88,7 +85,6 @@ public class ProblemDescription implements java.io.Serializable {
 		this.sampleIn = sampleIn;
 		this.sampleOut = sampleOut;
 		this.hint = hint;
-		this.source = source;
 		this.lastUpdateTime = lastUpdateTime;
 		this.remark = remark;
 		this.contests = contests;
@@ -204,15 +200,6 @@ public class ProblemDescription implements java.io.Serializable {
 
 	public void setHint(String hint) {
 		this.hint = hint;
-	}
-
-	@Column(name = "source", nullable = false, length = 65535)
-	public String getSource() {
-		return this.source;
-	}
-
-	public void setSource(String source) {
-		this.source = source;
 	}
 
 	@Version
