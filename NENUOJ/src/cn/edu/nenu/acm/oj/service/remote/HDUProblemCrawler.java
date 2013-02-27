@@ -2,12 +2,8 @@ package cn.edu.nenu.acm.oj.service.remote;
 
 import java.io.IOException;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.util.EntityUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
 import cn.edu.nenu.acm.oj.eto.CrawlingException;
 import cn.edu.nenu.acm.oj.eto.RemoteProblemNotFoundException;
@@ -19,7 +15,7 @@ public class HDUProblemCrawler implements IProblemCrawler {
 	public static final String problemBaseUrl = "http://acm.hdu.edu.cn/showproblem.php?pid=";
 
 	private String number;
-	private String html;
+	private Document document;
 
 	@Override
 	public final String getJudgerSource() {
@@ -29,28 +25,19 @@ public class HDUProblemCrawler implements IProblemCrawler {
 	@Override
 	public void crawl(String number) throws CrawlingException,RemoteProblemNotFoundException {
 		this.number = number;
-		HttpClient httpClient = new DefaultHttpClient();
-		HttpGet httpGet = new HttpGet(problemBaseUrl + number);
 		try {
-			HttpResponse response = httpClient.execute(httpGet);
-			HttpEntity entity = response.getEntity();
-			html = EntityUtils.toString(entity);
-			EntityUtils.consume(entity);
+			document = Jsoup.connect(problemBaseUrl+number).get();
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new CrawlingException("IOException: "+e.getMessage());
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new CrawlingException("Other exception: "+e.getMessage());
-		} finally {
-			httpGet.releaseConnection();
 		}
-		
+		if(!document.title().equals("Problem - "+number)){
+			throw new RemoteProblemNotFoundException();
+		}
 	}
 
 	@Override
 	public String getTitle() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
