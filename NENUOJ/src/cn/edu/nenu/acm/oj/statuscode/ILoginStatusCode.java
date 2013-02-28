@@ -1,6 +1,6 @@
-package cn.edu.nenu.acm.oj;
+package cn.edu.nenu.acm.oj.statuscode;
 
-public interface StatusCode {
+public interface ILoginStatusCode {
 	static final int CODE_SUCCESS=0;
 	static final int USERNAME_NOT_EXIST=1;
 	static final int PASSWORD_NOT_MATCH=2;

@@ -3,7 +3,7 @@ package cn.edu.nenu.acm.oj.actions;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import cn.edu.nenu.acm.oj.Site;
-import cn.edu.nenu.acm.oj.StatusCode;
+import cn.edu.nenu.acm.oj.statuscode.ILoginStatusCode;
 
 import com.opensymphony.xwork2.ActionSupport;
 import com.opensymphony.xwork2.config.Configuration;
@@ -12,7 +12,7 @@ import com.opensymphony.xwork2.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public abstract class AbstractAction extends ActionSupport implements StatusCode {
+public abstract class AbstractAction extends ActionSupport implements ILoginStatusCode {
 
 	private static final long serialVersionUID = 1L;
 

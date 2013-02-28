@@ -43,10 +43,6 @@ import javax.persistence.Version;
 public class Problem implements java.io.Serializable {
 
 	private static final long serialVersionUID = 3828345133405527155L;
-
-	public static final int SPECIALL_JUDGE=1;
-	public static final int NORMAL_JUDGE=2;
-	public static final int SPECIAL_JUDGE=4;
 	
 	private Integer id;
 	private Message message;
