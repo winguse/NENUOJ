@@ -12,7 +12,9 @@ public class UserSimpleDTO {
 	public UserSimpleDTO(){
 	}
 
+	@Deprecated
 	public UserSimpleDTO(User user){
+		//TODO Reduce Coupling
 		this.id=user.getId();
 		this.username=user.getUsername();
 		if(user.getRemark() instanceof Remark){
