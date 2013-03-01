@@ -1,5 +1,7 @@
 package cn.edu.nenu.acm.oj.util;
 
+import java.util.ServiceLoader;
+
 import javax.servlet.ServletContextAttributeEvent;
 import javax.servlet.ServletContextAttributeListener;
 import javax.servlet.ServletContextEvent;
@@ -19,6 +21,7 @@ import javax.servlet.http.HttpSessionListener;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import cn.edu.nenu.acm.oj.Site;
+import cn.edu.nenu.acm.oj.service.remote.IProblemCrawler;
 
 /**
  * Application Lifecycle Listener implementation class GlobeListener
@@ -51,6 +54,12 @@ public class GlobeListener implements ServletContextListener, ServletContextAttr
      */
     public void contextInitialized(ServletContextEvent arg0) {
     	System.out.println("Context Initialized.");
+		ServiceLoader<IProblemCrawler> loader=ServiceLoader.load(IProblemCrawler.class);
+		System.out.println("Run...");
+		for(IProblemCrawler crawler: loader){
+			System.out.println("# "+crawler.getJudgerSource());
+		}
+		System.out.println("Terminated...");
     }
 
 	/**

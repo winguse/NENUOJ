@@ -9,13 +9,14 @@ import cn.edu.nenu.acm.oj.service.remote.IProblemSubmitter;
 public class SubmitterTest {
 
 	public static void main(String[] args) {
-		IProblemSubmitter submitter = new HDUProblemSubmitter("qiandusikao_cs", "111111");
+		IProblemSubmitter submitter = new HDUProblemSubmitter();
 		try {
+			submitter.setAccountInformation("qiandusikao_cs", "111111");
 			submitter.login();
 			submitter
 					.submit("1000",
-							"#include <cstdio>\n\nint main(){\nint a,b;\nwhile(~scanf(\"%d%d\",&a,&b)){\nprintf(\"%d\\n\",a+b);\n}\nreturn 0;\n}",
-							"C++");
+							"#include <cstdio>\n\nint main(){\nint a,b;\nwhile(~scanf(\"%d%d\",&a,&b)||true){\nprintf(\"%d\\n\",a+b);\n}\nreturn 0;\n}",
+							"g++");
 			while (submitter.getResult()) {
 				System.out.println(submitter.getStatusDescription());
 			}
