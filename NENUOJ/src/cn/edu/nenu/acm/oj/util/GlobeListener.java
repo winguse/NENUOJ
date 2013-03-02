@@ -21,8 +21,8 @@ import javax.servlet.http.HttpSessionListener;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import cn.edu.nenu.acm.oj.Site;
-import cn.edu.nenu.acm.oj.service.JudgeService;
-import cn.edu.nenu.acm.oj.service.remote.IProblemCrawler;
+import cn.edu.nenu.acm.oj.service.IProblemCrawler;
+import cn.edu.nenu.acm.oj.service.impl.JudgeService;
 
 /**
  * Application Lifecycle Listener implementation class GlobeListener
@@ -55,7 +55,6 @@ public class GlobeListener implements ServletContextListener, ServletContextAttr
      */
     public void contextInitialized(ServletContextEvent arg0) {
     	System.out.println("Context Initialized.");
-		JudgeService.getInstance();
     }
 
 	/**

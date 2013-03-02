@@ -2,7 +2,7 @@ package cn.edu.nenu.acm.oj.test;
 
 import java.util.ServiceLoader;
 
-import cn.edu.nenu.acm.oj.service.remote.IProblemCrawler;
+import cn.edu.nenu.acm.oj.service.IProblemCrawler;
 
 public class Normal {
 

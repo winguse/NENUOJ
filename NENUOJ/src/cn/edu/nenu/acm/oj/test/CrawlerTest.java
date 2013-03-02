@@ -3,8 +3,8 @@ package cn.edu.nenu.acm.oj.test;
 import cn.edu.nenu.acm.oj.eto.CrawlingException;
 import cn.edu.nenu.acm.oj.eto.NetworkException;
 import cn.edu.nenu.acm.oj.eto.RemoteProblemNotFoundException;
-import cn.edu.nenu.acm.oj.service.remote.HDUProblemCrawler;
-import cn.edu.nenu.acm.oj.service.remote.IProblemCrawler;
+import cn.edu.nenu.acm.oj.service.IProblemCrawler;
+import cn.edu.nenu.acm.oj.service.impl.remote.HDUProblemCrawler;
 
 public class CrawlerTest {
 

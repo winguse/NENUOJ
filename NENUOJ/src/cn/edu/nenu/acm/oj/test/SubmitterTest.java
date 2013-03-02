@@ -3,8 +3,8 @@ package cn.edu.nenu.acm.oj.test;
 import cn.edu.nenu.acm.oj.eto.LoginException;
 import cn.edu.nenu.acm.oj.eto.NetworkException;
 import cn.edu.nenu.acm.oj.eto.SubmitException;
-import cn.edu.nenu.acm.oj.service.remote.HDUProblemSubmitter;
-import cn.edu.nenu.acm.oj.service.remote.IProblemSubmitter;
+import cn.edu.nenu.acm.oj.service.IProblemSubmitter;
+import cn.edu.nenu.acm.oj.service.impl.remote.HDUProblemSubmitter;
 
 public class SubmitterTest {
 

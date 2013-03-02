@@ -1,4 +1,4 @@
-package cn.edu.nenu.acm.oj.service.remote;
+package cn.edu.nenu.acm.oj.service;
 
 import cn.edu.nenu.acm.oj.eto.LoginException;
 import cn.edu.nenu.acm.oj.eto.NetworkException;

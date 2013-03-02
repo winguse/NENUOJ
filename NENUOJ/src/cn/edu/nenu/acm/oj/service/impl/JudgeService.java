@@ -1,5 +1,6 @@
-package cn.edu.nenu.acm.oj.service;
+package cn.edu.nenu.acm.oj.service.impl;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
@@ -9,41 +10,32 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.annotation.Scope;
+import org.springframework.core.io.Resource;
+import org.springframework.stereotype.Service;
 
 import cn.edu.nenu.acm.oj.entitybeans.Solution;
-import cn.edu.nenu.acm.oj.service.remote.IProblemCrawler;
-import cn.edu.nenu.acm.oj.service.remote.IProblemSubmitter;
+import cn.edu.nenu.acm.oj.service.IProblemCrawler;
+import cn.edu.nenu.acm.oj.service.IProblemSubmitter;
 
-public class JudgeService extends Thread {
+@Service
+@Scope("singleton")
+public class JudgeService extends Thread implements ApplicationContextAware {
 
+	protected static Logger log = LogManager.getLogger("JudgeService");
+
+	private ApplicationContext applicationContext;
 	private Map<String, LinkedBlockingQueue<IProblemCrawler>> crawlers;
 	private Map<String, LinkedBlockingQueue<IProblemSubmitter>> submitters;
-	protected static Logger log = LogManager.getLogger("JudgeService");
-	private Queue<Solution> judgeQueue;
+	private Map<String, LinkedBlockingQueue<Solution>> judgeQueue;
+	private Map<String, LinkedBlockingQueue<String[]>> accounts;
 
-	private JudgeService() {
-		judgeQueue = new LinkedBlockingQueue<Solution>();
+	public void __JudgeService() {
+		judgeQueue = new HashMap<String, LinkedBlockingQueue<Solution>>();
 		
-		log.info("Loading account information..");
-		Map<String, LinkedBlockingQueue<String[]>> accounts = new HashMap<String, LinkedBlockingQueue<String[]>>();
-		Scanner accountInfo = new Scanner(JudgeService.class.getResourceAsStream("/accounts.conf"));
-		while (accountInfo.hasNext()) {
-			String line = accountInfo.nextLine();
-			String[] segment = line.split("#")[0].split("\\s+");
-			if (segment.length == 3) {
-				String account[] = { segment[1], segment[2] };
-				if (accounts.containsKey(segment[0])) {
-					accounts.get(segment[0]).add(account);
-				} else {
-					LinkedBlockingQueue<String[]> accountQueue = new LinkedBlockingQueue<String[]>();
-					accountQueue.add(account);
-					accounts.put(segment[0], accountQueue);
-				}
-			} else {
-				log.error("Account file error: [" + line + "].");
-			}
-		}
-		accountInfo.close();
 
 		log.info("Initializing crawler...");
 		crawlers = new HashMap<String, LinkedBlockingQueue<IProblemCrawler>>();
@@ -90,21 +82,50 @@ public class JudgeService extends Thread {
 
 	}
 
-	private static JudgeService judgeService = null;
-
-	public static synchronized JudgeService getInstance() {
-		if (judgeService == null || judgeService.getState() == State.TERMINATED)
-			judgeService = new JudgeService();
-		if (judgeService.getState() == State.NEW){
-			judgeService.start();
-			log.info("Judge Service Running #"+judgeService.getId());
-		}
-		return judgeService;
-	}
-
 	@Override
 	public void run() {
 
 	}
 
+	@Override
+	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+		System.out.println("application context comes.");
+		this.applicationContext = applicationContext;
+		// TODO I want to use this feature: applicationContext.getBean("HDU", IProblemCrawler.class);
+
+		log.info("Application context comes. Loading account information..");
+		try {
+			accounts = new HashMap<String, LinkedBlockingQueue<String[]>>();
+			Resource accountResource = applicationContext.getResource("WEB-INF/accounts.conf");
+			Scanner accountInfo = new Scanner(accountResource.getInputStream());
+			while (accountInfo.hasNext()) {
+				String line = accountInfo.nextLine();
+				String[] segment = line.split("#")[0].split("\\s+");
+				if (segment.length == 3) {
+					String account[] = { segment[1], segment[2] };
+					if (accounts.containsKey(segment[0])) {
+						accounts.get(segment[0]).add(account);
+					} else {
+						LinkedBlockingQueue<String[]> accountQueue = new LinkedBlockingQueue<String[]>();
+						accountQueue.add(account);
+						accounts.put(segment[0], accountQueue);
+					}
+				} else {
+					log.error("Account file error: [" + line + "].");
+				}
+			}
+			accountInfo.close();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+	}
+
+	public void begin() {
+		//TODO start the thread only once
+	}
+
+	public IProblemCrawler getCrawler(String judgeSource){
+		return applicationContext.getBean(judgeSource+"_Crawler", IProblemCrawler.class);
+	}
+	
 }

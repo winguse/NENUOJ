@@ -1,4 +1,4 @@
-package cn.edu.nenu.acm.oj.service.remote;
+package cn.edu.nenu.acm.oj.service.impl.remote;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -8,11 +8,15 @@ import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
 import cn.edu.nenu.acm.oj.eto.LoginException;
 import cn.edu.nenu.acm.oj.eto.NetworkException;
 import cn.edu.nenu.acm.oj.eto.SubmitException;
+import cn.edu.nenu.acm.oj.service.IProblemSubmitter;
 
+@Component("HDU_Submitter")
 public class HDUProblemSubmitter implements IProblemSubmitter {
 	public static final String judgerSource = "HDU";
 	public static final String homePage = "http://acm.hdu.edu.cn";

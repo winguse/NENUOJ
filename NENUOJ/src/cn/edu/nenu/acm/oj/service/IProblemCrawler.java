@@ -1,4 +1,4 @@
-package cn.edu.nenu.acm.oj.service.remote;
+package cn.edu.nenu.acm.oj.service;
 
 import cn.edu.nenu.acm.oj.eto.CrawlingException;
 import cn.edu.nenu.acm.oj.eto.NetworkException;
