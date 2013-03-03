@@ -7,6 +7,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.safety.Whitelist;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import cn.edu.nenu.acm.oj.eto.CrawlingException;
@@ -17,6 +18,7 @@ import cn.edu.nenu.acm.oj.service.IProblemCrawler;
 import static cn.edu.nenu.acm.oj.util.StringTools.*;
 
 @Component("HDU_Crawler")
+@Scope("prototype")
 public class HDUProblemCrawler implements IProblemCrawler {
 
 	public static final String judgerSource = "HDU";

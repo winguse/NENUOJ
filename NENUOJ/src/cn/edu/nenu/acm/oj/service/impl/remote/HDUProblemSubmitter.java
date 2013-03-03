@@ -9,6 +9,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import cn.edu.nenu.acm.oj.eto.LoginException;
@@ -17,6 +18,7 @@ import cn.edu.nenu.acm.oj.eto.SubmitException;
 import cn.edu.nenu.acm.oj.service.IProblemSubmitter;
 
 @Component("HDU_Submitter")
+@Scope("prototype")
 public class HDUProblemSubmitter implements IProblemSubmitter {
 	public static final String judgerSource = "HDU";
 	public static final String homePage = "http://acm.hdu.edu.cn";

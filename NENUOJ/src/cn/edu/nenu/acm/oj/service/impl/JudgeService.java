@@ -18,6 +18,9 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 import cn.edu.nenu.acm.oj.entitybeans.Solution;
+import cn.edu.nenu.acm.oj.eto.CrawlerNotExistException;
+import cn.edu.nenu.acm.oj.eto.NotSupportJudgeSourceException;
+import cn.edu.nenu.acm.oj.eto.SubmitterNotExistException;
 import cn.edu.nenu.acm.oj.service.IProblemCrawler;
 import cn.edu.nenu.acm.oj.service.IProblemSubmitter;
 
@@ -28,14 +31,26 @@ public class JudgeService extends Thread implements ApplicationContextAware {
 	protected static Logger log = LogManager.getLogger("JudgeService");
 
 	private ApplicationContext applicationContext;
-	private Map<String, LinkedBlockingQueue<IProblemCrawler>> crawlers;
-	private Map<String, LinkedBlockingQueue<IProblemSubmitter>> submitters;
 	private Map<String, LinkedBlockingQueue<Solution>> judgeQueue;
+	private Map<String, LinkedBlockingQueue<String>> crawlQueue;
 	private Map<String, LinkedBlockingQueue<String[]>> accounts;
 
+	private int maxActiveCrawler = 5;
+	private int maxActiveSubmitter = 5;
+
+	private int activeCrawler = 0;
+	private int activeSubmitter = 0;
+	
+	@Deprecated
+	private Map<String, LinkedBlockingQueue<IProblemCrawler>> crawlers;
+	@Deprecated
+	private Map<String, LinkedBlockingQueue<IProblemSubmitter>> submitters;
+
+	private boolean needRunning = true;
+
+	@Deprecated
 	public void __JudgeService() {
 		judgeQueue = new HashMap<String, LinkedBlockingQueue<Solution>>();
-		
 
 		log.info("Initializing crawler...");
 		crawlers = new HashMap<String, LinkedBlockingQueue<IProblemCrawler>>();
@@ -82,24 +97,93 @@ public class JudgeService extends Thread implements ApplicationContextAware {
 
 	}
 
+	public JudgeService() {
+		judgeQueue = new HashMap<String, LinkedBlockingQueue<Solution>>();
+		crawlQueue = new HashMap<String, LinkedBlockingQueue<String>>();
+	}
+
 	@Override
 	public void run() {
-
+		log.info("Judge Service started.");
+		while (needRunning) {
+			// TODO work
+			
+			for (Map.Entry<String, LinkedBlockingQueue<String>> e : crawlQueue.entrySet()) {
+				if(activeCrawler >= maxActiveCrawler)continue;
+				if(e.getValue().isEmpty())continue;
+					//getCrawler(e.getKey())
+			}
+			for (Map.Entry<String, LinkedBlockingQueue<Solution>> e : judgeQueue.entrySet()) {
+				if(activeSubmitter >= maxActiveSubmitter)continue;
+				if(e.getValue().isEmpty())continue;
+			}
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		log.info("Judge Service stopping...");
+		// TODO clean up
 	}
 
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-		System.out.println("application context comes.");
 		this.applicationContext = applicationContext;
-		// TODO I want to use this feature: applicationContext.getBean("HDU", IProblemCrawler.class);
+		this.loadAccountInformation();
+	}
 
-		log.info("Application context comes. Loading account information..");
+	/**
+	 * Get a new crawler of specify Judge Source
+	 * 
+	 * @param judgeSource
+	 * @return the Crawler you have require
+	 * @throws CrawlerNotExistException
+	 */
+	public IProblemCrawler getCrawler(String judgeSource) throws CrawlerNotExistException {
+		try {
+			return applicationContext.getBean(judgeSource + "_Crawler", IProblemCrawler.class);
+		} catch (Exception e) {
+			e.printStackTrace();
+			log.error("Fail to load crawler Judge Source #" + judgeSource);
+			throw new CrawlerNotExistException("#" + judgeSource);
+		}
+	}
+
+	/**
+	 * Get a new submitter of specify Judge Source, please note that, the
+	 * account information was not set.
+	 * 
+	 * @param judgeSource
+	 * @return the Submitter you have require
+	 * @throws SubmitterNotExistException
+	 */
+	public IProblemSubmitter getSubmitter(String judgeSource) throws SubmitterNotExistException {
+		try {
+			return applicationContext.getBean(judgeSource + "_Submitter", IProblemSubmitter.class);
+		} catch (Exception e) {
+			e.printStackTrace();
+			log.error("Fail to load crawler Judge Source #" + judgeSource);
+			throw new SubmitterNotExistException("#" + judgeSource);
+		}
+	}
+
+	/**
+	 * Load account information from WEB-INF/accounts.conf<br>
+	 * Format:<br>
+	 * #COMMENT<br>
+	 * JUDGE_SOURCE USERNAME PASSWORD #COMMENT
+	 */
+	public void loadAccountInformation() {
+		log.info("Loading account information..");
 		try {
 			accounts = new HashMap<String, LinkedBlockingQueue<String[]>>();
 			Resource accountResource = applicationContext.getResource("WEB-INF/accounts.conf");
 			Scanner accountInfo = new Scanner(accountResource.getInputStream());
 			while (accountInfo.hasNext()) {
 				String line = accountInfo.nextLine();
+				if (line.startsWith("#"))
+					continue;
 				String[] segment = line.split("#")[0].split("\\s+");
 				if (segment.length == 3) {
 					String account[] = { segment[1], segment[2] };
@@ -110,6 +194,7 @@ public class JudgeService extends Thread implements ApplicationContextAware {
 						accountQueue.add(account);
 						accounts.put(segment[0], accountQueue);
 					}
+					log.info("Added " + segment[1] + " of " + segment[0] + " .");
 				} else {
 					log.error("Account file error: [" + line + "].");
 				}
@@ -120,12 +205,50 @@ public class JudgeService extends Thread implements ApplicationContextAware {
 		}
 	}
 
-	public void begin() {
-		//TODO start the thread only once
+	/**
+	 * ask judge service to stop
+	 */
+	public void setStop() {
+		needRunning = false;
 	}
 
-	public IProblemCrawler getCrawler(String judgeSource){
-		return applicationContext.getBean(judgeSource+"_Crawler", IProblemCrawler.class);
+	/**
+	 * TODO this method may lead the problem of database transaction, how about
+	 * passing the solution id as the parameter? set up a judge job for service,
+	 * please note that solution must be persisted.
+	 * 
+	 * @param solution
+	 * @throws NotSupportJudgeSourceException
+	 */
+	public synchronized void putJudgeJob(Solution solution) throws NotSupportJudgeSourceException {
+		String judgeSource = solution.getProblem().getJudger().getSource();
+		if (!accounts.containsKey(judgeSource))
+			throw new NotSupportJudgeSourceException(judgeSource);
+		if (judgeQueue.containsKey(judgeSource)) {
+			LinkedBlockingQueue<Solution> solutionQueue = new LinkedBlockingQueue<Solution>();
+			solutionQueue.add(solution);
+			judgeQueue.put(judgeSource, solutionQueue);
+		} else {
+			judgeQueue.get(judgeSource).add(solution);
+		}
 	}
-	
+
+	/**
+	 * set up a crawl job for the service
+	 * 
+	 * @param judgeSource
+	 * @param problem
+	 * @throws NotSupportJudgeSourceException
+	 */
+	public synchronized void putCrawlJob(String judgeSource, String problem) throws NotSupportJudgeSourceException {
+		if (!accounts.containsKey(judgeSource))
+			throw new NotSupportJudgeSourceException(judgeSource);
+		if (crawlQueue.containsKey(judgeSource)) {
+			LinkedBlockingQueue<String> que = new LinkedBlockingQueue<String>();
+			que.add(problem);
+			crawlQueue.put(judgeSource, que);
+		} else {
+			crawlQueue.get(judgeSource).add(problem);
+		}
+	}
 }

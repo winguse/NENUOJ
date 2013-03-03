@@ -1,7 +1,5 @@
 package cn.edu.nenu.acm.oj.util;
 
-import java.util.ServiceLoader;
-
 import javax.servlet.ServletContextAttributeEvent;
 import javax.servlet.ServletContextAttributeListener;
 import javax.servlet.ServletContextEvent;
@@ -18,15 +16,8 @@ import javax.servlet.http.HttpSessionBindingListener;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
-import cn.edu.nenu.acm.oj.Site;
-import cn.edu.nenu.acm.oj.service.IProblemCrawler;
-import cn.edu.nenu.acm.oj.service.impl.JudgeService;
-
 /**
  * Application Lifecycle Listener implementation class GlobeListener
- *
  */
 @WebListener
 public class GlobeListener implements ServletContextListener, ServletContextAttributeListener, HttpSessionListener, HttpSessionAttributeListener, HttpSessionActivationListener, HttpSessionBindingListener, ServletRequestListener, ServletRequestAttributeListener {
