@@ -3,10 +3,13 @@ package cn.edu.nenu.acm.oj.service.impl;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Scanner;
-import java.util.ServiceLoader;
 import java.util.concurrent.LinkedBlockingQueue;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -16,7 +19,9 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import cn.edu.nenu.acm.oj.entitybeans.Judger;
 import cn.edu.nenu.acm.oj.entitybeans.Solution;
 import cn.edu.nenu.acm.oj.eto.CrawlerNotExistException;
 import cn.edu.nenu.acm.oj.eto.NotSupportJudgeSourceException;
@@ -30,6 +35,9 @@ public class JudgeService extends Thread implements ApplicationContextAware {
 
 	protected static Logger log = LogManager.getLogger("JudgeService");
 
+	@PersistenceContext
+	EntityManager em;
+
 	private ApplicationContext applicationContext;
 	private Map<String, LinkedBlockingQueue<Solution>> judgeQueue;
 	private Map<String, LinkedBlockingQueue<String>> crawlQueue;
@@ -40,62 +48,8 @@ public class JudgeService extends Thread implements ApplicationContextAware {
 
 	private int activeCrawler = 0;
 	private int activeSubmitter = 0;
-	
-	@Deprecated
-	private Map<String, LinkedBlockingQueue<IProblemCrawler>> crawlers;
-	@Deprecated
-	private Map<String, LinkedBlockingQueue<IProblemSubmitter>> submitters;
 
 	private boolean needRunning = true;
-
-	@Deprecated
-	public void __JudgeService() {
-		judgeQueue = new HashMap<String, LinkedBlockingQueue<Solution>>();
-
-		log.info("Initializing crawler...");
-		crawlers = new HashMap<String, LinkedBlockingQueue<IProblemCrawler>>();
-		ServiceLoader<IProblemCrawler> crawlerLoader = ServiceLoader.load(IProblemCrawler.class);
-		for (IProblemCrawler crawler : crawlerLoader) {
-			if (accounts.containsKey(crawler.getJudgerSource())) {
-				LinkedBlockingQueue<IProblemCrawler> cralerQueue = new LinkedBlockingQueue<IProblemCrawler>();
-				cralerQueue.add(crawler);// If one crawler is not enough, add
-											// more in the queue.
-				crawlers.put(crawler.getJudgerSource(), cralerQueue);
-			} else {
-				log.warn("No account information of #" + crawler.getJudgerSource() + ", the crawler was not in used.");
-			}
-		}
-
-		log.info("Initializing submitter...");
-		submitters = new HashMap<String, LinkedBlockingQueue<IProblemSubmitter>>();
-		ServiceLoader<IProblemSubmitter> submitterLoader = ServiceLoader.load(IProblemSubmitter.class);
-		for (IProblemSubmitter submitter : submitterLoader) {
-			if (accounts.containsKey(submitter.getJudgerSource())) {
-				LinkedBlockingQueue<IProblemSubmitter> submitterQueue = new LinkedBlockingQueue<IProblemSubmitter>();
-				LinkedBlockingQueue<String[]> accountQueue = accounts.get(submitter.getJudgerSource());
-				while (!accountQueue.isEmpty()) {
-					String account[] = accountQueue.poll();
-					try {
-						IProblemSubmitter newSubmitter = submitter.getClass().newInstance();
-						newSubmitter.setAccountInformation(account[0], account[1]);
-						log.info("Added submitter #" + newSubmitter.getJudgerSource() + ", [" + account[0] + ","
-								+ account[1] + "]");
-						submitterQueue.add(newSubmitter);
-					} catch (InstantiationException | IllegalAccessException e) {
-						e.printStackTrace();
-						log.error("Serious Error while initialze Submitter: #" + submitter.getJudgerSource() + ","
-								+ e.getMessage());
-					}
-				}
-				submitters.put(submitter.getJudgerSource(), submitterQueue);
-			} else {
-				log.warn("No account information of #" + submitter.getJudgerSource()
-						+ ", the submitter was not in used.");
-			}
-		}
-		log.info("Judge Service Init Finshed.");
-
-	}
 
 	public JudgeService() {
 		judgeQueue = new HashMap<String, LinkedBlockingQueue<Solution>>();
@@ -105,17 +59,22 @@ public class JudgeService extends Thread implements ApplicationContextAware {
 	@Override
 	public void run() {
 		log.info("Judge Service started.");
+		this.loadAccountInformation();
 		while (needRunning) {
 			// TODO work
-			
+
 			for (Map.Entry<String, LinkedBlockingQueue<String>> e : crawlQueue.entrySet()) {
-				if(activeCrawler >= maxActiveCrawler)continue;
-				if(e.getValue().isEmpty())continue;
-					//getCrawler(e.getKey())
+				if (activeCrawler >= maxActiveCrawler)
+					continue;
+				if (e.getValue().isEmpty())
+					continue;
+				// getCrawler(e.getKey())
 			}
 			for (Map.Entry<String, LinkedBlockingQueue<Solution>> e : judgeQueue.entrySet()) {
-				if(activeSubmitter >= maxActiveSubmitter)continue;
-				if(e.getValue().isEmpty())continue;
+				if (activeSubmitter >= maxActiveSubmitter)
+					continue;
+				if (e.getValue().isEmpty())
+					continue;
 			}
 			try {
 				Thread.sleep(1000);
@@ -130,7 +89,6 @@ public class JudgeService extends Thread implements ApplicationContextAware {
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		this.applicationContext = applicationContext;
-		this.loadAccountInformation();
 	}
 
 	/**
@@ -174,9 +132,11 @@ public class JudgeService extends Thread implements ApplicationContextAware {
 	 * #COMMENT<br>
 	 * JUDGE_SOURCE USERNAME PASSWORD #COMMENT
 	 */
+	@Transactional
 	public void loadAccountInformation() {
 		log.info("Loading account information..");
 		try {
+			TypedQuery<Judger> queryJudger = em.createNamedQuery("Judger.findBySource", Judger.class);
 			accounts = new HashMap<String, LinkedBlockingQueue<String[]>>();
 			Resource accountResource = applicationContext.getResource("WEB-INF/accounts.conf");
 			Scanner accountInfo = new Scanner(accountResource.getInputStream());
@@ -190,6 +150,12 @@ public class JudgeService extends Thread implements ApplicationContextAware {
 					if (accounts.containsKey(segment[0])) {
 						accounts.get(segment[0]).add(account);
 					} else {
+						queryJudger.setParameter("source", segment[0]);
+						if (queryJudger.getResultList().size() == 0) {
+							Judger judger = new Judger();
+							judger.setSource(segment[0]);
+							em.persist(judger);
+						}
 						LinkedBlockingQueue<String[]> accountQueue = new LinkedBlockingQueue<String[]>();
 						accountQueue.add(account);
 						accounts.put(segment[0], accountQueue);

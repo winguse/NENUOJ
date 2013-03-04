@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class GenericDAO<T extends Serializable> {
 	private Class<T> clazz;
 	@PersistenceContext
-	EntityManager em;
+	protected EntityManager em;
 
 	public void setClazz(final Class<T> clazzToSet) {
 		this.clazz = clazzToSet;

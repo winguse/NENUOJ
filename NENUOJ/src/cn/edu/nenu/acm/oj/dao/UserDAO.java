@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import cn.edu.nenu.acm.oj.entitybeans.User;
 
 @Repository
-@Scope("request")
+//@Scope("request")
 public class UserDAO extends GenericDAO<User> {
 	public UserDAO(){
 		super();
