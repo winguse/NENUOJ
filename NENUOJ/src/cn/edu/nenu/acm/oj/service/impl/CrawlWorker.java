@@ -3,11 +3,9 @@ package cn.edu.nenu.acm.oj.service.impl;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.persistence.EntityManager;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.TypedQuery;
 
-import org.hibernate.ejb.criteria.CriteriaQueryImpl;
-
+import cn.edu.nenu.acm.oj.entitybeans.Judger;
 import cn.edu.nenu.acm.oj.entitybeans.Problem;
 import cn.edu.nenu.acm.oj.eto.CrawlingException;
 import cn.edu.nenu.acm.oj.eto.NetworkException;
@@ -29,12 +27,22 @@ public class CrawlWorker extends Thread {
 	@Override
 	public void run() {
 		String judgeSource = crawler.getJudgerSource();
-		String problemNumber;
-		String log="";
+		TypedQuery<Judger> judgerQuery = em.createNamedQuery("Judger.findBySource", Judger.class);
+		judgerQuery.setParameter("source", judgeSource);
+		Judger judger = judgerQuery.getSingleResult();
+		String problemNumber = null;
+		String log = "";
 		while (null != (problemNumber = queue.poll())) {
 			try {
-				crawler.crawl(problemNumber);
 				Problem problem = null;
+				TypedQuery<Problem> query = em.createQuery(
+						"SELECT p FROM Problem p WHERE p.judger = :judger AND p.number = :number", Problem.class);
+				query.setParameter("judger", judger);
+				query.setParameter("number", problemNumber);
+				
+				query.getResultList();
+				
+				crawler.crawl(problemNumber);
 			} catch (NetworkException e) {
 				e.printStackTrace();
 			} catch (CrawlingException e) {

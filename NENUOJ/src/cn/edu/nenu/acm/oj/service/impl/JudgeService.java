@@ -151,7 +151,7 @@ public class JudgeService extends Thread implements ApplicationContextAware {
 						accounts.get(segment[0]).add(account);
 					} else {
 						queryJudger.setParameter("source", segment[0]);
-						if (queryJudger.getResultList().size() == 0) {
+						if (queryJudger.getResultList().size() == 0) {// add judger information into the database
 							Judger judger = new Judger();
 							judger.setSource(segment[0]);
 							em.persist(judger);
