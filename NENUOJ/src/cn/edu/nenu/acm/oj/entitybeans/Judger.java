@@ -17,12 +17,13 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
-
+import javax.persistence.UniqueConstraint;
 /**
  * @author Winguse
  */
 @Entity
-@Table(name = "judger", catalog = "nenuoj")
+@Table(name = "judger", catalog = "nenuoj", uniqueConstraints = @UniqueConstraint(columnNames = { "judger_id",
+"number" }))
 @NamedQueries({
     @NamedQuery(name = "Judger.findAll", query = "SELECT j FROM Judger j"),
     @NamedQuery(name = "Judger.findById", query = "SELECT j FROM Judger j WHERE j.id = :id"),
@@ -63,7 +64,7 @@ public class Judger implements java.io.Serializable {
 		this.id = id;
 	}
 
-	@Column(name = "source", nullable = false, length = 45)
+	@Column(name = "source", nullable = false, unique = true, length = 45)
 	public String getSource() {
 		return this.source;
 	}

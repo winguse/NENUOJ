@@ -21,12 +21,12 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
-
+import javax.persistence.UniqueConstraint;
 /**
  * @author Winguse
  */
 @Entity
-@Table(name = "problem", catalog = "nenuoj")
+@Table(name = "problem", catalog = "nenuoj", uniqueConstraints = @UniqueConstraint(columnNames = "source"))
 @NamedQueries({
 		@NamedQuery(name = "Problem.findAll", query = "SELECT p FROM Problem p"),
 		@NamedQuery(name = "Problem.findById", query = "SELECT p FROM Problem p WHERE p.id = :id"),
