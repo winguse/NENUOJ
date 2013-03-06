@@ -21,6 +21,8 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
+import cn.edu.nenu.acm.oj.util.Remark;
+
 /**
  * @author Winguse
  */
@@ -32,6 +34,7 @@ import javax.persistence.Version;
     @NamedQuery(name = "ProblemDescription.findByLocked", query = "SELECT p FROM ProblemDescription p WHERE p.locked = :locked"),
     @NamedQuery(name = "ProblemDescription.findByVote", query = "SELECT p FROM ProblemDescription p WHERE p.vote = :vote"),
     @NamedQuery(name = "ProblemDescription.findByTitle", query = "SELECT p FROM ProblemDescription p WHERE p.title = :title"),
+    @NamedQuery(name = "ProblemDescription.findSystemCrawl", query = "SELECT p FROM ProblemDescription p WHERE p.problem = :problem"),
     @NamedQuery(name = "ProblemDescription.findByLastUpdateTime", query = "SELECT p FROM ProblemDescription p WHERE p.lastUpdateTime = :lastUpdateTime")})
 public class ProblemDescription implements java.io.Serializable {
 
@@ -49,7 +52,7 @@ public class ProblemDescription implements java.io.Serializable {
 	private String sampleOut;
 	private String hint;
 	private Date lastUpdateTime;
-	private Serializable remark;
+	private Remark remark;
 	private Set<Contest> contests = new HashSet<Contest>(0);
 
 	public ProblemDescription() {
@@ -73,7 +76,7 @@ public class ProblemDescription implements java.io.Serializable {
 
 	public ProblemDescription(User user, Problem problem, boolean locked, Integer vote, String title,
 			String description, String input, String output, String sampleIn, String sampleOut, String hint,
-			 Date lastUpdateTime, Serializable remark, Set<Contest> contests) {
+			 Date lastUpdateTime, Remark remark, Set<Contest> contests) {
 		this.user = user;
 		this.problem = problem;
 		this.locked = locked;
@@ -102,7 +105,7 @@ public class ProblemDescription implements java.io.Serializable {
 	}
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_id", nullable = false)
+	@JoinColumn(name = "user_id")//, nullable = false //if user is null, means it's a system crawl
 	public User getUser() {
 		return this.user;
 	}
@@ -214,11 +217,11 @@ public class ProblemDescription implements java.io.Serializable {
 	}
 
 	@Column(name = "remark")
-	public Serializable getRemark() {
+	public Remark getRemark() {
 		return this.remark;
 	}
 
-	public void setRemark(Serializable remark) {
+	public void setRemark(Remark remark) {
 		this.remark = remark;
 	}
 

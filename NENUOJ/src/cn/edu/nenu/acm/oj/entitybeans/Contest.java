@@ -22,6 +22,8 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
+import cn.edu.nenu.acm.oj.util.Remark;
+
 /**
  * @author Winguse
  */
@@ -47,7 +49,7 @@ public class Contest implements java.io.Serializable {
 	private Date endTime;
 	private Integer contestType;
 	private Date lastUpdateTime;
-	private Serializable remark;
+	private Remark remark;
 	private Set<Solution> solutions = new HashSet<Solution>(0);
 	private Set<User> enteredUsers = new HashSet<User>(0);
 	private Set<ProblemDescription> problemDescriptions = new HashSet<ProblemDescription>(0);
@@ -64,7 +66,7 @@ public class Contest implements java.io.Serializable {
 	}
 
 	public Contest(Contest contest, Message message, User user, String title, Date startTime, Date endTime,
-			Integer contestType, Date lastUpdateTime, Serializable remark, Set<Solution> solutions, Set<User> users,
+			Integer contestType, Date lastUpdateTime, Remark remark, Set<Solution> solutions, Set<User> users,
 			Set<ProblemDescription> problemDescriptions, Set<Contest> contests) {
 		this.contest = contest;
 		this.message = message;
@@ -172,11 +174,11 @@ public class Contest implements java.io.Serializable {
 	}
 
 	@Column(name = "remark")
-	public Serializable getRemark() {
+	public Remark getRemark() {
 		return this.remark;
 	}
 
-	public void setRemark(Serializable remark) {
+	public void setRemark(Remark remark) {
 		this.remark = remark;
 	}
 

@@ -68,7 +68,7 @@ public class JudgeService extends Thread implements ApplicationContextAware {
 					continue;
 				if (e.getValue().isEmpty())
 					continue;
-				// getCrawler(e.getKey())
+				//getCrawler(e.getKey())
 			}
 			for (Map.Entry<String, LinkedBlockingQueue<Solution>> e : judgeQueue.entrySet()) {
 				if (activeSubmitter >= maxActiveSubmitter)

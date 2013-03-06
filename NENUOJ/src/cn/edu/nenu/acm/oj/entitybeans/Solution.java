@@ -17,6 +17,8 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
+import cn.edu.nenu.acm.oj.util.Remark;
+
 /**
  * @author Winguse
  */
@@ -56,7 +58,7 @@ public class Solution implements java.io.Serializable {
 	private Date judgeTime;
 	private float passRate;
 	private Date lastUpdateTime;
-	private Serializable remark;
+	private Remark remark;
 
 	public Solution() {
 	}
@@ -80,7 +82,7 @@ public class Solution implements java.io.Serializable {
 
 	public Solution(User user, Message message, Problem problem, Contest contest, String sourceCode,
 			Integer codeLength, String language, Integer runTime, Integer runMemory, Integer status, String ipaddr,
-			boolean shared, Date submitTime, Date judgeTime, float passRate, Date lastUpdateTime, Serializable remark) {
+			boolean shared, Date submitTime, Date judgeTime, float passRate, Date lastUpdateTime, Remark remark) {
 		this.user = user;
 		this.message = message;
 		this.problem = problem;
@@ -264,11 +266,11 @@ public class Solution implements java.io.Serializable {
 	}
 
 	@Column(name = "remark")
-	public Serializable getRemark() {
+	public Remark getRemark() {
 		return this.remark;
 	}
 
-	public void setRemark(Serializable remark) {
+	public void setRemark(Remark remark) {
 		this.remark = remark;
 	}
 

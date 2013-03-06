@@ -22,6 +22,9 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
 import javax.persistence.UniqueConstraint;
+
+import cn.edu.nenu.acm.oj.statuscode.IProblemJudgeType;
+import cn.edu.nenu.acm.oj.util.Remark;
 /**
  * @author Winguse
  */
@@ -39,8 +42,9 @@ import javax.persistence.UniqueConstraint;
 		@NamedQuery(name = "Problem.findByAccepted", query = "SELECT p FROM Problem p WHERE p.accepted = :accepted"),
 		@NamedQuery(name = "Problem.findBySubmitted", query = "SELECT p FROM Problem p WHERE p.submitted = :submitted"),
 		@NamedQuery(name = "Problem.findByJudgingType", query = "SELECT p FROM Problem p WHERE p.judgingType = :judgingType"),
+		@NamedQuery(name = "Problem.findByJudgerAndNumber", query = "SELECT p FROM Problem p WHERE p.judger = :judger AND p.number = :number"),
 		@NamedQuery(name = "Problem.findByLastUpdateTime", query = "SELECT p FROM Problem p WHERE p.lastUpdateTime = :lastUpdateTime") })
-public class Problem implements java.io.Serializable {
+public class Problem implements java.io.Serializable,IProblemJudgeType {
 
 	private static final long serialVersionUID = 3828345133405527155L;
 	
@@ -57,7 +61,7 @@ public class Problem implements java.io.Serializable {
 	private Integer submitted;
 	private Integer judgingType;
 	private Date lastUpdateTime;
-	private Serializable remark;
+	private Remark remark;
 	private Set<Solution> solutions = new HashSet<Solution>(0);
 	private Set<Tag> tags = new HashSet<Tag>(0);
 	private Set<ProblemDescription> problemDescriptions = new HashSet<ProblemDescription>(0);
@@ -82,7 +86,7 @@ public class Problem implements java.io.Serializable {
 
 	public Problem(Message message, Judger judger, String title, String number, String source, boolean locked, Integer timeLimit,
 			Integer memoryLimit, Integer accepted, Integer submitted, Integer judgingType, Date lastUpdateTime,
-			Serializable remark, Set<Solution> solutions, Set<Tag> tags, Set<ProblemDescription> problemDescriptions) {
+			Remark remark, Set<Solution> solutions, Set<Tag> tags, Set<ProblemDescription> problemDescriptions) {
 		this.message = message;
 		this.judger = judger;
 		this.title = title;
@@ -225,11 +229,11 @@ public class Problem implements java.io.Serializable {
 	}
 
 	@Column(name = "remark")
-	public Serializable getRemark() {
+	public Remark getRemark() {
 		return this.remark;
 	}
 
-	public void setRemark(Serializable remark) {
+	public void setRemark(Remark remark) {
 		this.remark = remark;
 	}
 

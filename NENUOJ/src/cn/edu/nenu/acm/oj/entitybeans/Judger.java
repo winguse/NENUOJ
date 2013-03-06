@@ -18,6 +18,8 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
 import javax.persistence.UniqueConstraint;
+
+import cn.edu.nenu.acm.oj.util.Remark;
 /**
  * @author Winguse
  */
@@ -35,7 +37,7 @@ public class Judger implements java.io.Serializable {
 	private Integer id;
 	private String source;
 	private Date lastUpdateTime;
-	private Serializable remark;
+	private Remark remark;
 	private Set<Problem> problems = new HashSet<Problem>(0);
 
 	public Judger() {
@@ -46,7 +48,7 @@ public class Judger implements java.io.Serializable {
 		this.lastUpdateTime = lastUpdateTime;
 	}
 
-	public Judger(String source, Date lastUpdateTime, Serializable remark, Set<Problem> problems) {
+	public Judger(String source, Date lastUpdateTime, Remark remark, Set<Problem> problems) {
 		this.source = source;
 		this.lastUpdateTime = lastUpdateTime;
 		this.remark = remark;
@@ -89,7 +91,7 @@ public class Judger implements java.io.Serializable {
 		return this.remark;
 	}
 
-	public void setRemark(Serializable remark) {
+	public void setRemark(Remark remark) {
 		this.remark = remark;
 	}
 

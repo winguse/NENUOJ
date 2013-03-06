@@ -18,6 +18,8 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
+import cn.edu.nenu.acm.oj.util.Remark;
+
 /**
  * @author Winguse
  */
@@ -39,7 +41,7 @@ public class LoginLog implements java.io.Serializable {
 	private Date logoutTime;
 	private String ipaddr;
 	private Date lastUpdateTime;
-	private Serializable remark;
+	private Remark remark;
 
 	public LoginLog() {
 	}
@@ -50,7 +52,7 @@ public class LoginLog implements java.io.Serializable {
 		this.lastUpdateTime = lastUpdateTime;
 	}
 
-	public LoginLog(User user, Date loginTime, Date logoutTime, String ipaddr, Date lastUpdateTime, Serializable remark) {
+	public LoginLog(User user, Date loginTime, Date logoutTime, String ipaddr, Date lastUpdateTime, Remark remark) {
 		this.user = user;
 		this.loginTime = loginTime;
 		this.logoutTime = logoutTime;
@@ -125,7 +127,7 @@ public class LoginLog implements java.io.Serializable {
 		return this.remark;
 	}
 
-	public void setRemark(Serializable remark) {
+	public void setRemark(Remark remark) {
 		this.remark = remark;
 	}
 

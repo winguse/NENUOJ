@@ -22,6 +22,8 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
+import cn.edu.nenu.acm.oj.util.Remark;
+
 /**
  * @author Winguse
  */
@@ -39,7 +41,7 @@ public class Tag implements java.io.Serializable {
 	private Tag superTag;
 	private String text;
 	private Date lastUpdateTime;
-	private Serializable remark;
+	private Remark remark;
 	private Set<Tag> subTags = new HashSet<Tag>(0);
 	private Set<Problem> problems = new HashSet<Problem>(0);
 
@@ -51,7 +53,7 @@ public class Tag implements java.io.Serializable {
 		this.lastUpdateTime = lastUpdateTime;
 	}
 
-	public Tag(Tag tag, String text, Date lastUpdateTime, Serializable remark, Set<Tag> tags, Set<Problem> problems) {
+	public Tag(Tag tag, String text, Date lastUpdateTime, Remark remark, Set<Tag> tags, Set<Problem> problems) {
 		this.superTag = tag;
 		this.text = text;
 		this.lastUpdateTime = lastUpdateTime;
@@ -102,11 +104,11 @@ public class Tag implements java.io.Serializable {
 	}
 
 	@Column(name = "remark")
-	public Serializable getRemark() {
+	public Remark getRemark() {
 		return this.remark;
 	}
 
-	public void setRemark(Serializable remark) {
+	public void setRemark(Remark remark) {
 		this.remark = remark;
 	}
 
