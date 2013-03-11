@@ -8,6 +8,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import org.apache.logging.log4j.LogManager;
@@ -45,9 +46,6 @@ public class JudgeService extends Thread implements ApplicationContextAware {
 	private int maxActiveCrawler = 5;
 	private int maxActiveSubmitter = 5;
 
-	private int activeCrawler = 0;
-	private int activeSubmitter = 0;
-
 	private boolean needRunning = true;
 
 	public JudgeService() {
@@ -59,10 +57,10 @@ public class JudgeService extends Thread implements ApplicationContextAware {
 	public void run() {
 		log.info("Judge Service started.");
 		this.loadAccountInformation();
+		markAllProcessingSolutionJudgeError();
 		while (needRunning) {
-			// TODO work
 			for (Map.Entry<String, LinkedBlockingQueue<String>> e : crawlQueue.entrySet()) {
-				if (activeCrawler >= maxActiveCrawler)
+				if (CrawlWorker.getActiveWorkerCount() >= maxActiveCrawler)
 					continue;
 				if (e.getValue().isEmpty())
 					continue;
@@ -73,32 +71,33 @@ public class JudgeService extends Thread implements ApplicationContextAware {
 					crawlerWorker.start();
 				} catch (CrawlerNotExistException e1) {
 					e1.printStackTrace();
-					log.error("CrawlerNotExistException:"+e1.getMessage());
+					log.error("CrawlerNotExistException:" + e1.getMessage());
 				}
 			}
 			for (Map.Entry<String, LinkedBlockingQueue<Solution>> e : judgeQueue.entrySet()) {
-				if (activeSubmitter >= maxActiveSubmitter)
+				if (SubmitWorker.getActiveWorkerCount() >= maxActiveSubmitter)
 					continue;
 				if (e.getValue().isEmpty())
 					continue;
-				if(!accounts.containsKey(e.getKey())){
-					log.error("No account was found for Submitter #"+e.getKey());
+				if (!accounts.containsKey(e.getKey())) {
+					log.error("No account was found for Submitter #" + e.getKey());
 					continue;
 				}
 				String[] account = null;
-				if (null==(account=accounts.get(e.getKey()).poll())){
-					log.info("Submitter #"+e.getKey()+" is not enough, if judging too slow, add more accounts.");
+				if (null == (account = accounts.get(e.getKey()).poll())) {
+					log.info("Submitter #" + e.getKey() + " is not enough, if judging too slow, add more accounts.");
 					continue;
 				}
 				try {
 					IProblemSubmitter submitter = getSubmitter(e.getKey());
 					SubmitWorker submitWorker = applicationContext.getBean(SubmitWorker.class);
-					// I make this a litter complex, just to make sure only all resource (especially account) 
+					// I make this a litter complex, just to make sure only all
+					// resource (especially account)
 					// are available.
-					submitWorker.init(submitter, e.getValue(),account,accounts.get(e.getKey()));
+					submitWorker.init(submitter, e.getValue(), account, accounts.get(e.getKey()));
 				} catch (SubmitterNotExistException e1) {
 					e1.printStackTrace();
-					log.error("SubmitterNotExistException:"+e1.getMessage());
+					log.error("SubmitterNotExistException:" + e1.getMessage());
 				}
 			}
 			try {
@@ -108,7 +107,7 @@ public class JudgeService extends Thread implements ApplicationContextAware {
 			}
 		}
 		log.info("Judge Service stopping...");
-		// TODO clean up
+		// clean up
 	}
 
 	@Override
@@ -176,7 +175,12 @@ public class JudgeService extends Thread implements ApplicationContextAware {
 						accounts.get(segment[0]).add(account);
 					} else {
 						queryJudger.setParameter("source", segment[0]);
-						if (queryJudger.getResultList().size() == 0) {// add judger information into the database
+						if (queryJudger.getResultList().size() == 0) {// add
+																		// judger
+																		// information
+																		// into
+																		// the
+																		// database
 							Judger judger = new Judger();
 							judger.setSource(segment[0]);
 							em.persist(judger);
@@ -197,10 +201,34 @@ public class JudgeService extends Thread implements ApplicationContextAware {
 	}
 
 	/**
+	 * mark all processing/pedding solution as judge error
+	 */
+	@Transactional
+	private void markAllProcessingSolutionJudgeError() {
+		Query query = em.createNamedQuery("Solution.updateAllStatusTo");
+		query.setParameter("oldStatus", Solution.STATUS_PROCESSING);
+		query.setParameter("newStatus", Solution.STATUS_JUDGE_ERROR);
+		query.executeUpdate();
+		query.setParameter("oldStatus", Solution.STATUS_PEDDING);
+		query.setParameter("newStatus", Solution.STATUS_JUDGE_ERROR);
+		query.executeUpdate();
+	}
+
+	/**
 	 * ask judge service to stop
 	 */
 	public void setStop() {
 		needRunning = false;
+		this.interrupt();
+		SubmitWorker.setAllStop();
+		CrawlWorker.setAllStop();
+		log.info("wait 5s for some threads to stop...");
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		log.info("wait 5s passed...");
 	}
 
 	/**
@@ -242,6 +270,5 @@ public class JudgeService extends Thread implements ApplicationContextAware {
 			crawlQueue.get(judgeSource).add(problem);
 		}
 	}
-	
-	
+
 }

@@ -1,6 +1,8 @@
 package cn.edu.nenu.acm.oj.service.impl;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.persistence.EntityManager;
@@ -29,6 +31,8 @@ public class CrawlWorker extends Thread {
 
 	protected static Logger log = LogManager.getLogger("CrawlWorker");
 	private static int activeWorkerCount = 0;
+	private static HashMap<Long, CrawlWorker> us = new HashMap<Long, CrawlWorker>();
+
 	private IProblemCrawler crawler;
 	private LinkedBlockingQueue<String> queue;
 	@PersistenceContext
@@ -37,6 +41,7 @@ public class CrawlWorker extends Thread {
 	private ProblemDescription problemDescription = null;
 	private Problem problem = null;
 	private Judger judger = null;
+	private boolean canRunning = true;
 
 	/**
 	 * Init the crawler worker
@@ -56,13 +61,17 @@ public class CrawlWorker extends Thread {
 
 	@Override
 	public void run() {
-		setActive();
+		setActive(this);
 		try {
 			String problemNumber = null;
 			while (null != (problemNumber = queue.poll())) {
+				if (!canRunning)
+					return;
 				try {
 					log.info(problemNumber + ": ");
 					crawler.crawl(problemNumber);
+					if (!canRunning)
+						return;
 					// problem number contains # marked as locked problem
 					boolean locked = problemNumber.contains("#");
 					problemNumber = problemNumber.replace("#", "");
@@ -70,12 +79,16 @@ public class CrawlWorker extends Thread {
 					query.setParameter("judger", judger);
 					query.setParameter("number", problemNumber);
 					List<Problem> lstProblem = query.getResultList();
+					if (!canRunning)
+						return;
 					if (lstProblem.size() > 0) {
 						problem = lstProblem.get(0);
 						log.info("Re-crawl " + problemNumber);
 						// TODO change to named query:
 						// int systemCrawlId =
 						// (Integer)problem.getRemark().get("SystemCrawlId");
+						if (!canRunning)
+							return;
 						TypedQuery<ProblemDescription> querySystemCrawl = em.createNamedQuery(
 								"ProblemDescription.findSystemCrawl", ProblemDescription.class);
 						try {
@@ -114,6 +127,8 @@ public class CrawlWorker extends Thread {
 					problem.setLocked(locked);
 					this.persistProblem();
 					log.info("Crawled successfully");
+					if (!canRunning)
+						return;
 				} catch (NetworkException e) {
 					e.printStackTrace();
 					log.error("NetworkException:" + e.getMessage());
@@ -129,7 +144,7 @@ public class CrawlWorker extends Thread {
 		} catch (Exception e) {
 			log.error("Unknow Exception: " + e.getMessage());
 		} finally {
-			setDisactive();
+			setDisactive(this);
 		}
 	}
 
@@ -144,15 +159,28 @@ public class CrawlWorker extends Thread {
 		em.persist(problemDescription);
 	}
 
-	public static synchronized int getActiveWorkCount() {
+	public static synchronized int getActiveWorkerCount() {
 		return activeWorkerCount;
 	}
 
-	private static synchronized void setActive() {
+	private static synchronized void setActive(CrawlWorker worker) {
 		activeWorkerCount++;
+		us.put(worker.getId(), worker);
 	}
 
-	private static synchronized void setDisactive() {
+	private static synchronized void setDisactive(CrawlWorker worker) {
 		activeWorkerCount--;
+		us.remove(worker.getId());
+	}
+
+	public static synchronized void setAllStop() {
+		for (Map.Entry<Long, CrawlWorker> e : us.entrySet()) {
+			e.getValue().setStop();
+		}
+	}
+
+	public void setStop() {
+		canRunning = false;
+		this.interrupt();
 	}
 }
