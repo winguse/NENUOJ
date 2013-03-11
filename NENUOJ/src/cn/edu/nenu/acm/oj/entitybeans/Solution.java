@@ -17,6 +17,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
+import cn.edu.nenu.acm.oj.statuscode.ISolutionStatusCode;
 import cn.edu.nenu.acm.oj.util.Remark;
 
 /**
@@ -27,6 +28,7 @@ import cn.edu.nenu.acm.oj.util.Remark;
 @NamedQueries({
 		@NamedQuery(name = "Solution.findAll", query = "SELECT s FROM Solution s"),
 		@NamedQuery(name = "Solution.findById", query = "SELECT s FROM Solution s WHERE s.id = :id"),
+		@NamedQuery(name = "Solution.findByStatusDescription", query = "SELECT s FROM Solution s WHERE s.statusDescription = :statusDescription"),
 		@NamedQuery(name = "Solution.findByCodeLength", query = "SELECT s FROM Solution s WHERE s.codeLength = :codeLength"),
 		@NamedQuery(name = "Solution.findByLanguage", query = "SELECT s FROM Solution s WHERE s.language = :language"),
 		@NamedQuery(name = "Solution.findByRunTime", query = "SELECT s FROM Solution s WHERE s.runTime = :runTime"),
@@ -38,11 +40,12 @@ import cn.edu.nenu.acm.oj.util.Remark;
 		@NamedQuery(name = "Solution.findByJudgeTime", query = "SELECT s FROM Solution s WHERE s.judgeTime = :judgeTime"),
 		@NamedQuery(name = "Solution.findByPassRate", query = "SELECT s FROM Solution s WHERE s.passRate = :passRate"),
 		@NamedQuery(name = "Solution.findByLastUpdateTime", query = "SELECT s FROM Solution s WHERE s.lastUpdateTime = :lastUpdateTime") })
-public class Solution implements java.io.Serializable {
+public class Solution implements java.io.Serializable, ISolutionStatusCode {
 
 	private static final long serialVersionUID = -106769681594205859L;
 	private Integer id;
 	private User user;
+	private String statusDescription;
 	private Message message;
 	private Problem problem;
 	private Contest contest;
@@ -121,6 +124,15 @@ public class Solution implements java.io.Serializable {
 
 	public void setUser(User user) {
 		this.user = user;
+	}
+
+	@Column(name = "status_description", length = 45)
+	public String getStatusDescription() {
+		return statusDescription;
+	}
+
+	public void setStatusDescription(String statusDescription) {
+		this.statusDescription = statusDescription;
 	}
 
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -267,7 +279,10 @@ public class Solution implements java.io.Serializable {
 
 	@Column(name = "remark")
 	public Remark getRemark() {
-		return this.remark;
+		if(!(remark instanceof Remark)||remark==null){
+			remark=new Remark();
+		}
+		return remark;
 	}
 
 	public void setRemark(Remark remark) {

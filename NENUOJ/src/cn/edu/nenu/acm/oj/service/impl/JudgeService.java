@@ -8,7 +8,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import org.apache.logging.log4j.LogManager;
@@ -62,19 +61,45 @@ public class JudgeService extends Thread implements ApplicationContextAware {
 		this.loadAccountInformation();
 		while (needRunning) {
 			// TODO work
-
 			for (Map.Entry<String, LinkedBlockingQueue<String>> e : crawlQueue.entrySet()) {
 				if (activeCrawler >= maxActiveCrawler)
 					continue;
 				if (e.getValue().isEmpty())
 					continue;
-				//getCrawler(e.getKey())
+				try {
+					IProblemCrawler crawler = getCrawler(e.getKey());
+					CrawlWorker crawlerWorker = applicationContext.getBean(CrawlWorker.class);
+					crawlerWorker.init(crawler, e.getValue());
+					crawlerWorker.start();
+				} catch (CrawlerNotExistException e1) {
+					e1.printStackTrace();
+					log.error("CrawlerNotExistException:"+e1.getMessage());
+				}
 			}
 			for (Map.Entry<String, LinkedBlockingQueue<Solution>> e : judgeQueue.entrySet()) {
 				if (activeSubmitter >= maxActiveSubmitter)
 					continue;
 				if (e.getValue().isEmpty())
 					continue;
+				if(!accounts.containsKey(e.getKey())){
+					log.error("No account was found for Submitter #"+e.getKey());
+					continue;
+				}
+				String[] account = null;
+				if (null==(account=accounts.get(e.getKey()).poll())){
+					log.info("Submitter #"+e.getKey()+" is not enough, if judging too slow, add more accounts.");
+					continue;
+				}
+				try {
+					IProblemSubmitter submitter = getSubmitter(e.getKey());
+					SubmitWorker submitWorker = applicationContext.getBean(SubmitWorker.class);
+					// I make this a litter complex, just to make sure only all resource (especially account) 
+					// are available.
+					submitWorker.init(submitter, e.getValue(),account,accounts.get(e.getKey()));
+				} catch (SubmitterNotExistException e1) {
+					e1.printStackTrace();
+					log.error("SubmitterNotExistException:"+e1.getMessage());
+				}
 			}
 			try {
 				Thread.sleep(1000);
@@ -217,4 +242,6 @@ public class JudgeService extends Thread implements ApplicationContextAware {
 			crawlQueue.get(judgeSource).add(problem);
 		}
 	}
+	
+	
 }

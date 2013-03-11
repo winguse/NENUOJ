@@ -114,18 +114,27 @@ public class HDUProblemSubmitter implements IProblemSubmitter {
 	}
 
 	@Override
-	public boolean getResult() throws NetworkException {
+	public boolean getResult() throws NetworkException, SubmitException {
 		try {
 			Connection connection = Jsoup.connect(
 					homePage + "/status.php?first=&pid=&user=" + username + "&lang=0&status=0").cookies(cookies);
 			Element result = connection.get().select("form+tr").first();
-			statusDescription = result.select("td:eq(2)").first().text();
-			remoteRunId = Integer.parseInt(result.select("td:eq(0)").first().text());
-			if ("Compiling".equals(statusDescription) || "Queuing".equals(statusDescription)
-					|| "Running".equals(statusDescription))
-				return true;
-			time = Integer.parseInt(result.select("td:eq(4)").first().text().replace("MS", ""));
-			memory = Integer.parseInt(result.select("td:eq(5)").first().text().replace("K", ""));
+			if (result == null) {
+				throw new SubmitException("Cannot find result, update source code is need.");
+			}
+			try {
+				statusDescription = result.select("td:eq(2)").first().text();
+				remoteRunId = Integer.parseInt(result.select("td:eq(0)").first().text());
+				if ("Compiling".equals(statusDescription) || "Queuing".equals(statusDescription)
+						|| "Running".equals(statusDescription))
+					return true;
+				time = Integer.parseInt(result.select("td:eq(4)").first().text().replace("MS", ""));
+				memory = Integer.parseInt(result.select("td:eq(5)").first().text().replace("K", ""));
+			} catch (Exception e) {
+				e.printStackTrace();
+				throw new SubmitException("Find result in tr tags find errors, update source code is need. !!"
+						+ e.getMessage());
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new NetworkException("Maybe Network Error, Cannot get result, IOException:" + e.getMessage());

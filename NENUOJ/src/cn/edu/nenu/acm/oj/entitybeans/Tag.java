@@ -105,7 +105,10 @@ public class Tag implements java.io.Serializable {
 
 	@Column(name = "remark")
 	public Remark getRemark() {
-		return this.remark;
+		if(!(remark instanceof Remark)||remark==null){
+			remark=new Remark();
+		}
+		return remark;
 	}
 
 	public void setRemark(Remark remark) {

@@ -25,6 +25,7 @@ import javax.persistence.UniqueConstraint;
 
 import cn.edu.nenu.acm.oj.statuscode.IProblemJudgeType;
 import cn.edu.nenu.acm.oj.util.Remark;
+
 /**
  * @author Winguse
  */
@@ -44,10 +45,10 @@ import cn.edu.nenu.acm.oj.util.Remark;
 		@NamedQuery(name = "Problem.findByJudgingType", query = "SELECT p FROM Problem p WHERE p.judgingType = :judgingType"),
 		@NamedQuery(name = "Problem.findByJudgerAndNumber", query = "SELECT p FROM Problem p WHERE p.judger = :judger AND p.number = :number"),
 		@NamedQuery(name = "Problem.findByLastUpdateTime", query = "SELECT p FROM Problem p WHERE p.lastUpdateTime = :lastUpdateTime") })
-public class Problem implements java.io.Serializable,IProblemJudgeType {
+public class Problem implements java.io.Serializable, IProblemJudgeType {
 
 	private static final long serialVersionUID = 3828345133405527155L;
-	
+
 	private Integer id;
 	private Message message;
 	private Judger judger;
@@ -69,8 +70,8 @@ public class Problem implements java.io.Serializable,IProblemJudgeType {
 	public Problem() {
 	}
 
-	public Problem(Judger judger, String title, String number, String source, boolean locked, Integer timeLimit, Integer memoryLimit,
-			Integer accepted, Integer submitted, Integer judgingType, Date lastUpdateTime) {
+	public Problem(Judger judger, String title, String number, String source, boolean locked, Integer timeLimit,
+			Integer memoryLimit, Integer accepted, Integer submitted, Integer judgingType, Date lastUpdateTime) {
 		this.judger = judger;
 		this.title = title;
 		this.number = number;
@@ -84,9 +85,10 @@ public class Problem implements java.io.Serializable,IProblemJudgeType {
 		this.lastUpdateTime = lastUpdateTime;
 	}
 
-	public Problem(Message message, Judger judger, String title, String number, String source, boolean locked, Integer timeLimit,
-			Integer memoryLimit, Integer accepted, Integer submitted, Integer judgingType, Date lastUpdateTime,
-			Remark remark, Set<Solution> solutions, Set<Tag> tags, Set<ProblemDescription> problemDescriptions) {
+	public Problem(Message message, Judger judger, String title, String number, String source, boolean locked,
+			Integer timeLimit, Integer memoryLimit, Integer accepted, Integer submitted, Integer judgingType,
+			Date lastUpdateTime, Remark remark, Set<Solution> solutions, Set<Tag> tags,
+			Set<ProblemDescription> problemDescriptions) {
 		this.message = message;
 		this.judger = judger;
 		this.title = title;
@@ -153,7 +155,7 @@ public class Problem implements java.io.Serializable,IProblemJudgeType {
 	public void setNumber(String number) {
 		this.number = number;
 	}
-	
+
 	@Column(name = "source", nullable = false, length = 255)
 	public String getSource() {
 		return this.source;
@@ -162,7 +164,7 @@ public class Problem implements java.io.Serializable,IProblemJudgeType {
 	public void setSource(String source) {
 		this.source = source;
 	}
-	
+
 	@Column(name = "locked", nullable = false)
 	public boolean isLocked() {
 		return this.locked;
@@ -230,7 +232,10 @@ public class Problem implements java.io.Serializable,IProblemJudgeType {
 
 	@Column(name = "remark")
 	public Remark getRemark() {
-		return this.remark;
+		if(!(remark instanceof Remark)||remark==null){
+			remark=new Remark();
+		}
+		return remark;
 	}
 
 	public void setRemark(Remark remark) {
