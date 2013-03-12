@@ -39,7 +39,7 @@ public abstract class AbstractDAO<T extends Serializable> {
 	 * @return a list of result
 	 */
 	public List<T> findByColumn(final String column, final Object value) {
-		TypedQuery<T> query = em.createNamedQuery(clazz.getName() + ".findBy" + column.substring(0, 1).toUpperCase()
+		TypedQuery<T> query = em.createNamedQuery(clazz.getSimpleName() + ".findBy" + column.substring(0, 1).toUpperCase()
 				+ column.substring(1), clazz);
 		query.setParameter(column, value);
 		return query.getResultList();

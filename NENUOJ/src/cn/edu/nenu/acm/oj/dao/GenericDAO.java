@@ -35,7 +35,7 @@ public class GenericDAO {
 	 * @return a list of result
 	 */
 	public <T extends Serializable> List<T> findByColumn(final String column, final Object value, final Class<T> clazz) {
-		TypedQuery<T> query = em.createNamedQuery(clazz.getName() + ".findBy" + column.substring(0, 1).toUpperCase()
+		TypedQuery<T> query = em.createNamedQuery(clazz.getSimpleName() + ".findBy" + column.substring(0, 1).toUpperCase()
 				+ column.substring(1), clazz);
 		query.setParameter(column, value);
 		return query.getResultList();

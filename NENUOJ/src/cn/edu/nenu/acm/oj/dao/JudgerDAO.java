@@ -1,7 +1,9 @@
 package cn.edu.nenu.acm.oj.dao;
 
-import cn.edu.nenu.acm.oj.entitybeans.Judger;
+import org.springframework.stereotype.Repository;
 
+import cn.edu.nenu.acm.oj.entitybeans.Judger;
+@Repository
 public class JudgerDAO extends AbstractDAO<Judger> {
 
 	public JudgerDAO() {

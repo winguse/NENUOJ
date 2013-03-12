@@ -2,10 +2,11 @@ package cn.edu.nenu.acm.oj.dao;
 
 import javax.persistence.Query;
 
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import cn.edu.nenu.acm.oj.entitybeans.Solution;
-
+@Repository
 public class SolutionDAO extends AbstractDAO<Solution> {
 
 	public SolutionDAO() {
