@@ -20,7 +20,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 @Repository
-@Scope("request")
 public class DAOTesting {
 	protected static Logger log = LogManager.getLogger("GlobalDAO");
 

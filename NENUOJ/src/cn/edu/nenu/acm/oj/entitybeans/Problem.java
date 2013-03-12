@@ -30,7 +30,7 @@ import cn.edu.nenu.acm.oj.util.Remark;
  * @author Winguse
  */
 @Entity
-@Table(name = "problem", catalog = "nenuoj", uniqueConstraints = @UniqueConstraint(columnNames = "source"))
+@Table(name = "problem", catalog = "nenuoj", uniqueConstraints = @UniqueConstraint(columnNames = {"judger_id", "number"}))
 @NamedQueries({
 		@NamedQuery(name = "Problem.findAll", query = "SELECT p FROM Problem p"),
 		@NamedQuery(name = "Problem.findById", query = "SELECT p FROM Problem p WHERE p.id = :id"),

@@ -27,7 +27,7 @@ import org.springframework.stereotype.Repository;
  * @param <T>
  */
 @Repository
-@Scope("request")
+//@Scope("request")
 @SuppressWarnings("unchecked")
 @Deprecated
 public class HibernateDAO<T extends Serializable> implements InitializingBean, DisposableBean {

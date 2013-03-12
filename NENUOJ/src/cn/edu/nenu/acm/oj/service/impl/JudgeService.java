@@ -6,21 +6,17 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
-import javax.persistence.TypedQuery;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
+import cn.edu.nenu.acm.oj.dao.JudgerDAO;
+import cn.edu.nenu.acm.oj.dao.SolutionDAO;
 import cn.edu.nenu.acm.oj.entitybeans.Judger;
 import cn.edu.nenu.acm.oj.entitybeans.Solution;
 import cn.edu.nenu.acm.oj.eto.CrawlerNotExistException;
@@ -31,13 +27,16 @@ import cn.edu.nenu.acm.oj.service.IProblemSubmitter;
 
 @Service
 @Scope("singleton")
-public class JudgeService extends Thread implements ApplicationContextAware {
+@Qualifier("judgeService")
+public class JudgeService extends Thread{
 
 	protected static Logger log = LogManager.getLogger("JudgeService");
 
-	@PersistenceContext
-	EntityManager em;
-
+	@Autowired
+	private SolutionDAO solutionDAO;
+	@Autowired
+	private JudgerDAO judgerDAO;
+	
 	private ApplicationContext applicationContext;
 	private Map<String, LinkedBlockingQueue<Solution>> judgeQueue;
 	private Map<String, LinkedBlockingQueue<String>> crawlQueue;
@@ -49,6 +48,7 @@ public class JudgeService extends Thread implements ApplicationContextAware {
 	private boolean needRunning = true;
 
 	public JudgeService() {
+		System.out.println("Judge Service init");
 		judgeQueue = new HashMap<String, LinkedBlockingQueue<Solution>>();
 		crawlQueue = new HashMap<String, LinkedBlockingQueue<String>>();
 	}
@@ -57,7 +57,7 @@ public class JudgeService extends Thread implements ApplicationContextAware {
 	public void run() {
 		log.info("Judge Service started.");
 		this.loadAccountInformation();
-		markAllProcessingSolutionJudgeError();
+		solutionDAO.markAllProcessingSolutionJudgeError();
 		while (needRunning) {
 			for (Map.Entry<String, LinkedBlockingQueue<String>> e : crawlQueue.entrySet()) {
 				if (CrawlWorker.getActiveWorkerCount() >= maxActiveCrawler)
@@ -110,8 +110,7 @@ public class JudgeService extends Thread implements ApplicationContextAware {
 		// clean up
 	}
 
-	@Override
-	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+	public void setApplicationContext(ApplicationContext applicationContext) {
 		this.applicationContext = applicationContext;
 	}
 
@@ -156,11 +155,9 @@ public class JudgeService extends Thread implements ApplicationContextAware {
 	 * #COMMENT<br>
 	 * JUDGE_SOURCE USERNAME PASSWORD #COMMENT
 	 */
-	@Transactional
 	public void loadAccountInformation() {
 		log.info("Loading account information..");
 		try {
-			TypedQuery<Judger> queryJudger = em.createNamedQuery("Judger.findBySource", Judger.class);
 			accounts = new HashMap<String, LinkedBlockingQueue<String[]>>();
 			Resource accountResource = applicationContext.getResource("WEB-INF/accounts.conf");
 			Scanner accountInfo = new Scanner(accountResource.getInputStream());
@@ -174,16 +171,12 @@ public class JudgeService extends Thread implements ApplicationContextAware {
 					if (accounts.containsKey(segment[0])) {
 						accounts.get(segment[0]).add(account);
 					} else {
-						queryJudger.setParameter("source", segment[0]);
-						if (queryJudger.getResultList().size() == 0) {// add
-																		// judger
-																		// information
-																		// into
-																		// the
-																		// database
+						if (judgerDAO.findByColumn("source", segment[0]).size() == 0) {
+							// add judger information into the database
 							Judger judger = new Judger();
 							judger.setSource(segment[0]);
-							em.persist(judger);
+							judgerDAO.persist(judger);
+							log.info("Persist new judger: #"+segment[0]);
 						}
 						LinkedBlockingQueue<String[]> accountQueue = new LinkedBlockingQueue<String[]>();
 						accountQueue.add(account);
@@ -198,20 +191,6 @@ public class JudgeService extends Thread implements ApplicationContextAware {
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-	}
-
-	/**
-	 * mark all processing/pedding solution as judge error
-	 */
-	@Transactional
-	private void markAllProcessingSolutionJudgeError() {
-		Query query = em.createNamedQuery("Solution.updateAllStatusTo");
-		query.setParameter("oldStatus", Solution.STATUS_PROCESSING);
-		query.setParameter("newStatus", Solution.STATUS_JUDGE_ERROR);
-		query.executeUpdate();
-		query.setParameter("oldStatus", Solution.STATUS_PEDDING);
-		query.setParameter("newStatus", Solution.STATUS_JUDGE_ERROR);
-		query.executeUpdate();
 	}
 
 	/**

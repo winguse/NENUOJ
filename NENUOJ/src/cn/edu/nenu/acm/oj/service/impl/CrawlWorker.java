@@ -5,17 +5,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
-import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import cn.edu.nenu.acm.oj.dao.GenericDAO;
 import cn.edu.nenu.acm.oj.entitybeans.Judger;
 import cn.edu.nenu.acm.oj.entitybeans.Problem;
 import cn.edu.nenu.acm.oj.entitybeans.ProblemDescription;
@@ -27,6 +25,7 @@ import cn.edu.nenu.acm.oj.util.Remark;
 
 @Component
 @Scope("prototype")
+@Qualifier("crawlWorker")
 public class CrawlWorker extends Thread {
 
 	protected static Logger log = LogManager.getLogger("CrawlWorker");
@@ -35,8 +34,9 @@ public class CrawlWorker extends Thread {
 
 	private IProblemCrawler crawler;
 	private LinkedBlockingQueue<String> queue;
-	@PersistenceContext
-	private EntityManager em;
+
+	@Autowired
+	private GenericDAO dao;
 
 	private ProblemDescription problemDescription = null;
 	private Problem problem = null;
@@ -53,10 +53,7 @@ public class CrawlWorker extends Thread {
 		this.queue = queue;
 		this.crawler = crawler;
 		// load judger
-		String judgeSource = crawler.getJudgerSource();
-		TypedQuery<Judger> judgerQuery = em.createNamedQuery("Judger.findBySource", Judger.class);
-		judgerQuery.setParameter("source", judgeSource);
-		judger = judgerQuery.getSingleResult();
+		judger = dao.findByColumn("source", crawler.getJudgerSource(), Judger.class).get(0);
 	}
 
 	@Override
@@ -75,10 +72,8 @@ public class CrawlWorker extends Thread {
 					// problem number contains # marked as locked problem
 					boolean locked = problemNumber.contains("#");
 					problemNumber = problemNumber.replace("#", "");
-					TypedQuery<Problem> query = em.createNamedQuery("Problem.findByJudgerAndNumber", Problem.class);
-					query.setParameter("judger", judger);
-					query.setParameter("number", problemNumber);
-					List<Problem> lstProblem = query.getResultList();
+					List<Problem> lstProblem = dao.namedQuery("Problem.findByJudgerAndNumber", new String[] { "judger",
+							"number" }, new Object[] { judger, problemNumber }, Problem.class);
 					if (!canRunning)
 						return;
 					if (lstProblem.size() > 0) {
@@ -89,13 +84,10 @@ public class CrawlWorker extends Thread {
 						// (Integer)problem.getRemark().get("SystemCrawlId");
 						if (!canRunning)
 							return;
-						TypedQuery<ProblemDescription> querySystemCrawl = em.createNamedQuery(
-								"ProblemDescription.findSystemCrawl", ProblemDescription.class);
-						try {
-							problemDescription = querySystemCrawl.getSingleResult();
-						} catch (NoResultException e) {
-							// keep it null.
-						}
+						List<ProblemDescription> lstPD = dao.namedQuery("ProblemDescription.findSystemCrawl",
+								new String[] { "problem" }, new Object[] { problem }, ProblemDescription.class);
+						if (lstPD.size() > 0)
+							problemDescription = lstPD.get(0);
 					} else {
 						log.info("Newly crawl " + problemNumber);
 						problem = new Problem();
@@ -155,8 +147,8 @@ public class CrawlWorker extends Thread {
 	public void persistProblem() {
 		if (problem == null || problemDescription == null)
 			return;
-		em.persist(problem);
-		em.persist(problemDescription);
+		dao.persist(problem);
+		dao.persist(problemDescription);
 	}
 
 	public static synchronized int getActiveWorkerCount() {

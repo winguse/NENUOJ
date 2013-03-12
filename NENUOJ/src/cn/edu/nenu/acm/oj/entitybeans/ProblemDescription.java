@@ -34,7 +34,7 @@ import cn.edu.nenu.acm.oj.util.Remark;
     @NamedQuery(name = "ProblemDescription.findByLocked", query = "SELECT p FROM ProblemDescription p WHERE p.locked = :locked"),
     @NamedQuery(name = "ProblemDescription.findByVote", query = "SELECT p FROM ProblemDescription p WHERE p.vote = :vote"),
     @NamedQuery(name = "ProblemDescription.findByTitle", query = "SELECT p FROM ProblemDescription p WHERE p.title = :title"),
-    @NamedQuery(name = "ProblemDescription.findSystemCrawl", query = "SELECT p FROM ProblemDescription p WHERE p.problem = :problem"),
+    @NamedQuery(name = "ProblemDescription.findSystemCrawl", query = "SELECT p FROM ProblemDescription p WHERE p.problem = :problem AND p.user IS NULL"),
     @NamedQuery(name = "ProblemDescription.findByLastUpdateTime", query = "SELECT p FROM ProblemDescription p WHERE p.lastUpdateTime = :lastUpdateTime")})
 public class ProblemDescription implements java.io.Serializable {
 

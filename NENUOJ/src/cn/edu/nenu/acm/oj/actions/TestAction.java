@@ -9,6 +9,7 @@ import org.apache.struts2.interceptor.SessionAware;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import cn.edu.nenu.acm.oj.service.impl.JudgeService;
+import cn.edu.nenu.acm.oj.service.impl.SubmitWorker;
 
 @ParentPackage("json-default")
 @Result(name="success",type="json")
@@ -25,10 +26,13 @@ public class TestAction extends AbstractAction implements SessionAware {
 	@Autowired
 	private JudgeService service;
 	
+	@Autowired
+	private SubmitWorker submitWorker;
+	
 	@Override
 	public String execute() throws Exception {
 		code=CODE_SUCCESS;
-		message=service.getCrawler("HDU").getJudgerSource();
+		message=service.getCrawler("HDU").getJudgerSource()+submitWorker.getId();
 		return SUCCESS;
 	}
 	

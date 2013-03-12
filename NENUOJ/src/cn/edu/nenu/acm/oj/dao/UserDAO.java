@@ -11,7 +11,7 @@ import cn.edu.nenu.acm.oj.entitybeans.User;
 
 @Repository
 //@Scope("request")
-public class UserDAO extends GenericDAO<User> {
+public class UserDAO extends AbstractDAO<User> {
 	public UserDAO(){
 		super();
 		super.setClazz(User.class);
