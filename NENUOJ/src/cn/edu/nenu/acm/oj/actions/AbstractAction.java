@@ -7,12 +7,14 @@ import cn.edu.nenu.acm.oj.statuscode.ILoginStatusCode;
 
 import com.opensymphony.xwork2.ActionSupport;
 import com.opensymphony.xwork2.config.Configuration;
-import com.opensymphony.xwork2.inject.Inject;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public abstract class AbstractAction extends ActionSupport implements ILoginStatusCode {
+
+	public static final int STATUS_SUCCESS = 0;
+	public static final int STATUS_ERROR = 1;
 
 	private static final long serialVersionUID = 1L;
 
@@ -29,7 +31,7 @@ public abstract class AbstractAction extends ActionSupport implements ILoginStat
 		this.site = site;
 	}
 
-	@Inject
+	@Autowired
 	public void setConfiguration(Configuration config) {
 		AbstractAction.configuration = config;
 	}

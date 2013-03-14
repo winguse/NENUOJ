@@ -9,4 +9,6 @@ public class ProblemSimpleDTO {
 	private Integer accepted;
 	private Integer submitted;
 	private String source;
+	
+	
 }

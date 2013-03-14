@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public abstract class AbstractDAO<T extends Serializable> {
-	private Class<T> clazz;
+	protected Class<T> clazz;
 	@PersistenceContext
 	protected EntityManager em;
 
