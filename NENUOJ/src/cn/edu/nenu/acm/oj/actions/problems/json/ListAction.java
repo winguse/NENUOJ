@@ -1,5 +1,6 @@
 package cn.edu.nenu.acm.oj.actions.problems.json;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -17,9 +18,14 @@ import cn.edu.nenu.acm.oj.dto.ProblemSimpleDTO;
 import cn.edu.nenu.acm.oj.util.Pair;
 
 @ParentPackage("json-default")
-@InterceptorRefs({ @InterceptorRef("i18n") })
+@InterceptorRefs({
+	@InterceptorRef("i18n"),
+	@InterceptorRef("jsonValidationWorkflowStack")
+})
 @Results({ @Result(name = "success", type = "json") })
 public class ListAction extends AbstractJsonAction implements SessionAware {
+
+	private static final long serialVersionUID = -1246689012240563630L;
 
 	@Autowired
 	private ProblemDAO dao;
@@ -30,16 +36,28 @@ public class ListAction extends AbstractJsonAction implements SessionAware {
 	private String filterString = "";
 	private int orderByIndex = 0;
 	private boolean includeLocked = false;
-	private List<ProblemSimpleDTO> problemSimpleList;
 	private Long totalCount;
+	private LinkedList<Object[]> data;
+	private String[] indexMapping;
+	private static Long allProblemCount;
 	
 	@Override
 	public String execute() throws Exception {
 		code = 0;
 		message = "success";
-		Pair<Long,List<ProblemSimpleDTO>> result=dao.getProblemList(judgerSource, filterString, page, pageSize,includeLocked,orderByIndex);
-		problemSimpleList = result.second;
+		Pair<Long, List<ProblemSimpleDTO>> result = dao.getProblemList(judgerSource, filterString, page, pageSize,
+				includeLocked, orderByIndex);
+		indexMapping = new String[] { _("judger_source"), _("problem_number"), _("problem_title"), _("accepted"),
+				_("submitted"), _("source"), _("is_locked") };
+		data = new LinkedList<Object[]>();
+		for (ProblemSimpleDTO p : result.second) {
+			data.push(new Object[] { p.getJudgerSource(), p.getNumber(), p.getTitle(), p.getAccepted(),
+					p.getSubmitted(), p.getSource(), p.getLocked() });
+		}
 		totalCount = result.first;
+		if("".equals(judgerSource)&&"".equals(filterString)){
+			allProblemCount = result.first;
+		}
 		return SUCCESS;
 	}
 
@@ -64,6 +82,7 @@ public class ListAction extends AbstractJsonAction implements SessionAware {
 	}
 
 	public void setFilterString(String filterString) {
+		System.out.println(filterString);
 		if (filterString == null)
 			return;
 		if (filterString.length() > 50)
@@ -71,10 +90,10 @@ public class ListAction extends AbstractJsonAction implements SessionAware {
 		this.filterString = filterString;
 	}
 
-	public List<ProblemSimpleDTO> getProblemSimpleList() {
-		return problemSimpleList;
+	public void setOrderByIndex(int orderByIndex) {
+		this.orderByIndex = orderByIndex;
 	}
-	
+
 	public Long getTotalCount() {
 		return totalCount;
 	}
@@ -86,10 +105,22 @@ public class ListAction extends AbstractJsonAction implements SessionAware {
 	public String getMessage() {
 		return message;
 	}
-	
+
 	@Override
 	public void setSession(Map<String, Object> arg0) {
-		//TODO set includeLocked if the user logined and has the permission
+		// TODO set includeLocked if the user logined and has the permission
+	}
+
+	public LinkedList<Object[]> getData() {
+		return data;
+	}
+
+	public String[] getIndexMapping() {
+		return indexMapping;
+	}
+
+	public Long getAllProblemCount() {
+		return allProblemCount;
 	}
 
 }

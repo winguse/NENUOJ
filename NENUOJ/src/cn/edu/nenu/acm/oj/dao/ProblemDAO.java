@@ -22,11 +22,14 @@ import cn.edu.nenu.acm.oj.util.Pair;
 @Repository
 public class ProblemDAO extends AbstractDAO<Problem> {
 
-	public static final int ORDER_BY_NUMBER = 1;
-	public static final int ORDER_BY_ACCEPTED = 2;
-	public static final int ORDER_BY_SUBMITTED = 3;
-	public static final int ORDER_BY_AC_RATE = 4;
-
+	public static final int ORDER_BY_JUDGER_SOURCE = 1;
+	public static final int ORDER_BY_NUMBER = 2;
+	public static final int ORDER_BY_TITLE = 3;
+	public static final int ORDER_BY_ACCEPTED = 4;
+	public static final int ORDER_BY_SUBMITTED = 5;
+	public static final int ORDER_BY_AC_RATE = 6;
+	public static final int ORDER_BY_SOURCE = 7;
+	
 	ProblemDAO() {
 		super();
 		super.setClazz(Problem.class);
@@ -57,6 +60,7 @@ public class ProblemDAO extends AbstractDAO<Problem> {
 	 */
 	public Pair<Long,List<ProblemSimpleDTO>> getProblemList(String judgerSource, String filterString, int page, int pageSize,
 			boolean includeLoocked, int orderIndex) {
+		System.out.println(orderIndex+"#"+filterString+"#"+judgerSource);
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Problem> query = cb.createQuery(Problem.class);
 		CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
@@ -83,14 +87,15 @@ public class ProblemDAO extends AbstractDAO<Problem> {
 		}
 		if (!"".equals(filterString)) {
 			filterString = "%" + filterString + "%";
-			Predicate predicateOr = cb.conjunction();
-			Predicate countPredicateOr = cb.conjunction();
+			System.out.println(filterString);
+			Predicate predicateOr = cb.disjunction();
+			Predicate countPredicateOr = cb.disjunction();
 			predicateOr = cb.or(predicateOr, cb.like(problemRoot.get(Problem_.title), filterString));
-			countPredicateOr = cb.or(predicateOr, cb.like(countProblemRoot.get(Problem_.title), filterString));
+			countPredicateOr = cb.or(countPredicateOr, cb.like(countProblemRoot.get(Problem_.title), filterString));
 			predicateOr = cb.or(predicateOr, cb.like(problemRoot.get(Problem_.source), filterString));
-			countPredicateOr = cb.or(predicateOr, cb.like(countProblemRoot.get(Problem_.source), filterString));
+			countPredicateOr = cb.or(countPredicateOr, cb.like(countProblemRoot.get(Problem_.source), filterString));
 			predicateOr = cb.or(predicateOr, cb.like(problemRoot.get(Problem_.number), filterString));
-			countPredicateOr = cb.or(predicateOr, cb.like(countProblemRoot.get(Problem_.number), filterString));
+			countPredicateOr = cb.or(countPredicateOr, cb.like(countProblemRoot.get(Problem_.number), filterString));
 			predicate = cb.and(predicate, predicateOr);
 			countPredicate = cb.and(countPredicate, countPredicateOr);
 		}
@@ -98,6 +103,12 @@ public class ProblemDAO extends AbstractDAO<Problem> {
 		Pair<Long,List<ProblemSimpleDTO>> result=new Pair<Long,List<ProblemSimpleDTO>>();
 		result.first=em.createQuery(countQuery).getSingleResult();
 		switch (orderIndex) {
+		case ORDER_BY_JUDGER_SOURCE:
+			query.orderBy(cb.asc(problemRoot.get(Problem_.judger)));
+			break;
+		case -ORDER_BY_JUDGER_SOURCE:
+			query.orderBy(cb.desc(problemRoot.get(Problem_.judger)));
+			break;
 		case ORDER_BY_NUMBER:
 			query.orderBy(cb.asc(problemRoot.get(Problem_.number)));
 			break;
@@ -122,7 +133,20 @@ public class ProblemDAO extends AbstractDAO<Problem> {
 		case -ORDER_BY_AC_RATE:
 			query.orderBy(cb.desc(cb.quot(problemRoot.get(Problem_.accepted), problemRoot.get(Problem_.submitted))));
 			break;
+		case ORDER_BY_TITLE:
+			query.orderBy(cb.asc(problemRoot.get(Problem_.title)));
+			break;
+		case -ORDER_BY_TITLE:
+			query.orderBy(cb.desc(problemRoot.get(Problem_.title)));
+			break;
+		case ORDER_BY_SOURCE:
+			query.orderBy(cb.asc(problemRoot.get(Problem_.source)));
+			break;
+		case -ORDER_BY_SOURCE:
+			query.orderBy(cb.desc(problemRoot.get(Problem_.source)));
+			break;
 		default:
+			System.out.println("Not ordered");
 			//don't order
 		}
 		query.select(problemRoot).where(predicate);

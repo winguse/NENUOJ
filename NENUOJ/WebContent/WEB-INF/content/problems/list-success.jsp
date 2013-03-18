@@ -46,19 +46,61 @@ $(function(){
 			alert(data.message);
 	});
 	$('#problemList').dataTable( {
+		"sDom": '<"H"if>t<"F"plr>',
 		"bProcessing": true,
 		"bServerSide": true,
-		"sAjaxSource": "<s:url action="list" namespace="/problems/json"/>",
-		"fnServerData": function ( sSource, aoData, fnCallback ) {
-			console.log(sSource+"\n",aoData);
-			fnCallback(aoData);
-			/* Add some extra data to the sender #/
-			aoData.push( { "name": "more_data", "value": "my_value" } );
-			$.getJSON( sSource, aoData, function (json) { 
-				/# Do whatever additional processing you want on the callback, then tell DataTables #/
-				fnCallback(json);
-			} );*/
+		"iDisplayLength": 50,
+		"bStateSave":true,
+		"oLanguage": {
+			"sInfo": "_START_ to _END_ of _TOTAL_ problems",//TODO replace to _("xxx")
+			"sInfoEmpty": "No problems",
+			"sInfoFiltered": " (filtering from _MAX_ total problems)"
 		},
+		"aaSorting": [[ 1, "asc" ]],
+		"sAjaxSource": "<s:url action="list" namespace="/problems/json"/>",
+		"fnServerData": function ( sSource, _aoData, fnCallback ) {
+			var aoData={};
+			for(var i in _aoData){
+				aoData[_aoData[i].name]=_aoData[i].value;
+			}
+			var orderIndex=aoData.iSortCol_0+1;
+			console.log(aoData.sSortDir_0);
+			if(aoData.sSortDir_0=="desc")
+				orderIndex=-orderIndex;
+			$.getJSON( sSource, {
+				orderByIndex:orderIndex,
+				filterString:aoData.sSearch,
+				page:aoData.iDisplayStart/aoData.iDisplayLength,
+				pageSize:aoData.iDisplayLength
+			}, function (json) {
+				fnCallback({
+					sEcho:aoData.sEcho,
+					iTotalDisplayRecords:json.totalCount,
+					iTotalRecords:json.allProblemCount,
+					aaData:json.data
+				});
+			} );
+		},
+		"aoColumns": [{
+				"sClass": ""//judger soruce
+			},{
+				"sClass": ""//problem number
+			},{
+				"sClass": ""//problem title
+			},{
+				"sClass": ""//accepted
+			},{
+				"sClass": ""//submitted
+			},{
+				"fnRender": function ( oObj ) {
+					var t=oObj.aData[3]==0?1:0;
+					return parseInt(oObj.aData[3]/t*10000)/100.0+"%";
+				},
+				"sClass": ""//rate
+			},{
+				"sClass":""//source
+			}
+		],
 		"sPaginationType": "full_numbers",
 		"bJQueryUI": true
 	} );
