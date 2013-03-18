@@ -16,7 +16,7 @@
 	</bean>
 
 	<!-- ### Database Configuration ### -->
-	<!-- direct begin #->
+	<!-- direct begin -->
 	<bean id="directDataSource"
 		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
 		<property name="driverClassName" value="${db.driver}" />
@@ -24,7 +24,7 @@
 		<property name="username" value="${db.username}" />
 		<property name="password" value="${db.password}" />
 	</bean>
-	<!-# direct end -->
+	<!-- direct end -->
 
 	<!-- datasource using dbcp begin #-> <bean id="dbcpDataSource" class="org.apache.commons.dbcp.BasicDataSource" 
 		destroy-method="close"> <property name="driverClassName" value="${db.driver}" 
@@ -35,7 +35,7 @@
 		name="removeAbandonedTimeout" value="120" /> </bean> <!-# datasource using 
 		dbcp end -->
 
-	<!-- datasource using c3p0 connection pool -->
+	<!-- datasource using c3p0 connection pool #->
 	<bean id="c3p0DataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
 		<property name="driverClass" value="${db.driver}" />
 		<property name="jdbcUrl" value="${db.url}" />
@@ -45,9 +45,9 @@
 		<property name="user" value="${db.username}" />
 		<property name="password" value="${db.password}" />
 	</bean>
-	<!-- c3p0 pool end -->
+	<!-# c3p0 pool end -->
 	<!-- default data source -->
-	<alias name="c3p0DataSource" alias="dataSource" />
+	<alias name="directDataSource" alias="dataSource" />
 
 	<!-- Using JPA, so, setup the EntityManagerFactory, take a look at: http://www.baeldung.com/2011/12/13/the-persistence-layer-with-spring-3-1-and-jpa/ -->
 	<bean id="entityManagerFactory"

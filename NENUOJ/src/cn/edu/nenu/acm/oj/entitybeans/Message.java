@@ -21,6 +21,9 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
+
 import cn.edu.nenu.acm.oj.util.Remark;
 
 /**
@@ -28,6 +31,8 @@ import cn.edu.nenu.acm.oj.util.Remark;
  */
 @Entity
 @Table(name = "message", catalog = "nenuoj")
+@DynamicInsert
+@DynamicUpdate
 @NamedQueries({
     @NamedQuery(name = "Message.findAll", query = "SELECT m FROM Message m"),
     @NamedQuery(name = "Message.findById", query = "SELECT m FROM Message m WHERE m.id = :id"),

@@ -19,12 +19,17 @@ import javax.persistence.TemporalType;
 import javax.persistence.Version;
 import javax.persistence.UniqueConstraint;
 
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
+
 import cn.edu.nenu.acm.oj.util.Remark;
 /**
  * @author Winguse
  */
 @Entity
 @Table(name = "judger", catalog = "nenuoj", uniqueConstraints = @UniqueConstraint(columnNames = "source"))
+@DynamicInsert
+@DynamicUpdate
 @NamedQueries({
     @NamedQuery(name = "Judger.findAll", query = "SELECT j FROM Judger j"),
     @NamedQuery(name = "Judger.findById", query = "SELECT j FROM Judger j WHERE j.id = :id"),

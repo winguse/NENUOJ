@@ -23,6 +23,9 @@ import javax.persistence.TemporalType;
 import javax.persistence.Version;
 import javax.persistence.UniqueConstraint;
 
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
+
 import cn.edu.nenu.acm.oj.statuscode.IProblemJudgeType;
 import cn.edu.nenu.acm.oj.util.Remark;
 
@@ -31,6 +34,8 @@ import cn.edu.nenu.acm.oj.util.Remark;
  */
 @Entity
 @Table(name = "problem", catalog = "nenuoj", uniqueConstraints = @UniqueConstraint(columnNames = {"judger_id", "number"}))
+@DynamicInsert
+@DynamicUpdate
 @NamedQueries({
 		@NamedQuery(name = "Problem.findAll", query = "SELECT p FROM Problem p"),
 		@NamedQuery(name = "Problem.findById", query = "SELECT p FROM Problem p WHERE p.id = :id"),
@@ -128,7 +133,7 @@ public class Problem implements java.io.Serializable, IProblemJudgeType {
 		this.message = message;
 	}
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "judger_id", nullable = false)
 	public Judger getJudger() {
 		return this.judger;

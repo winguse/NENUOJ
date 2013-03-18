@@ -19,7 +19,6 @@ public abstract class AbstractAction extends ActionSupport implements ILoginStat
 	private static final long serialVersionUID = 1L;
 
 	protected static Logger log = LogManager.getLogger("Actions");
-	protected static Configuration configuration;
 	protected Site site;
 
 	public Site getSite() {
@@ -31,11 +30,6 @@ public abstract class AbstractAction extends ActionSupport implements ILoginStat
 		this.site = site;
 	}
 
-	@Autowired
-	public void setConfiguration(Configuration config) {
-		AbstractAction.configuration = config;
-	}
-	
 	public String _(String aTextName){
 		return super.getText(aTextName);
 	}

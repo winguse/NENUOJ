@@ -14,11 +14,16 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
+
 /**
  * @author Winguse
  */
 @Entity
 @Table(name = "system_config", catalog = "nenuoj")
+@DynamicInsert
+@DynamicUpdate
 @NamedQueries({
     @NamedQuery(name = "SystemConfig.findAll", query = "SELECT s FROM SystemConfig s"),
     @NamedQuery(name = "SystemConfig.findById", query = "SELECT s FROM SystemConfig s WHERE s.id = :id"),

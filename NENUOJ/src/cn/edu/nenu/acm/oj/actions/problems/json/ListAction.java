@@ -1,5 +1,6 @@
-package cn.edu.nenu.acm.oj.actions.json.problems;
+package cn.edu.nenu.acm.oj.actions.problems.json;
 
+import java.util.List;
 import java.util.Map;
 
 import org.apache.struts2.convention.annotation.InterceptorRef;
@@ -10,14 +11,15 @@ import org.apache.struts2.convention.annotation.Results;
 import org.apache.struts2.interceptor.SessionAware;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import cn.edu.nenu.acm.oj.actions.AbstractAction;
-import cn.edu.nenu.acm.oj.dao.GenericDAO;
+import cn.edu.nenu.acm.oj.actions.AbstractJsonAction;
 import cn.edu.nenu.acm.oj.dao.ProblemDAO;
+import cn.edu.nenu.acm.oj.dto.ProblemSimpleDTO;
+import cn.edu.nenu.acm.oj.util.Pair;
 
 @ParentPackage("json-default")
 @InterceptorRefs({ @InterceptorRef("i18n") })
 @Results({ @Result(name = "success", type = "json") })
-public class ListAction extends AbstractAction implements SessionAware {
+public class ListAction extends AbstractJsonAction implements SessionAware {
 
 	@Autowired
 	private ProblemDAO dao;
@@ -28,10 +30,16 @@ public class ListAction extends AbstractAction implements SessionAware {
 	private String filterString = "";
 	private int orderByIndex = 0;
 	private boolean includeLocked = false;
+	private List<ProblemSimpleDTO> problemSimpleList;
+	private Long totalCount;
 	
 	@Override
 	public String execute() throws Exception {
-		dao.getProblemList(judgerSource, filterString, page, pageSize,includeLocked,orderByIndex);
+		code = 0;
+		message = "success";
+		Pair<Long,List<ProblemSimpleDTO>> result=dao.getProblemList(judgerSource, filterString, page, pageSize,includeLocked,orderByIndex);
+		problemSimpleList = result.second;
+		totalCount = result.first;
 		return SUCCESS;
 	}
 
@@ -63,6 +71,22 @@ public class ListAction extends AbstractAction implements SessionAware {
 		this.filterString = filterString;
 	}
 
+	public List<ProblemSimpleDTO> getProblemSimpleList() {
+		return problemSimpleList;
+	}
+	
+	public Long getTotalCount() {
+		return totalCount;
+	}
+
+	public int getCode() {
+		return code;
+	}
+
+	public String getMessage() {
+		return message;
+	}
+	
 	@Override
 	public void setSession(Map<String, Object> arg0) {
 		//TODO set includeLocked if the user logined and has the permission

@@ -18,6 +18,9 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
+
 import cn.edu.nenu.acm.oj.util.Remark;
 
 /**
@@ -25,6 +28,8 @@ import cn.edu.nenu.acm.oj.util.Remark;
  */
 @Entity
 @Table(name = "login_log", catalog = "nenuoj")
+@DynamicInsert
+@DynamicUpdate
 @NamedQueries({
     @NamedQuery(name = "LoginLog.findAll", query = "SELECT l FROM LoginLog l"),
     @NamedQuery(name = "LoginLog.findById", query = "SELECT l FROM LoginLog l WHERE l.id = :id"),

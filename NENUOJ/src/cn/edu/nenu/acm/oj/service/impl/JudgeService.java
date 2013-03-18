@@ -220,9 +220,9 @@ public class JudgeService extends Thread{
 	 */
 	public synchronized void putJudgeJob(Solution solution) throws NotSupportJudgeSourceException {
 		String judgeSource = solution.getProblem().getJudger().getSource();
-		if (!accounts.containsKey(judgeSource))
+		if (accounts.get(judgeSource)==null)
 			throw new NotSupportJudgeSourceException(judgeSource);
-		if (judgeQueue.containsKey(judgeSource)) {
+		if (judgeQueue.get(judgeSource)==null) {
 			LinkedBlockingQueue<Solution> solutionQueue = new LinkedBlockingQueue<Solution>();
 			solutionQueue.add(solution);
 			judgeQueue.put(judgeSource, solutionQueue);
@@ -239,9 +239,9 @@ public class JudgeService extends Thread{
 	 * @throws NotSupportJudgeSourceException
 	 */
 	public synchronized void putCrawlJob(String judgeSource, String problem) throws NotSupportJudgeSourceException {
-		if (!accounts.containsKey(judgeSource))
+		if (accounts.get(judgeSource)==null)
 			throw new NotSupportJudgeSourceException(judgeSource);
-		if (crawlQueue.containsKey(judgeSource)) {
+		if (crawlQueue.get(judgeSource)==null) {
 			LinkedBlockingQueue<String> que = new LinkedBlockingQueue<String>();
 			que.add(problem);
 			crawlQueue.put(judgeSource, que);

@@ -23,6 +23,9 @@ import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
+
 import cn.edu.nenu.acm.oj.util.Remark;
 
 /**
@@ -30,6 +33,8 @@ import cn.edu.nenu.acm.oj.util.Remark;
  */
 @Entity
 @Table(name = "user", catalog = "nenuoj", uniqueConstraints = @UniqueConstraint(columnNames = "username"))
+@DynamicInsert
+@DynamicUpdate
 @NamedQueries({
 		@NamedQuery(name = "User.findAll", query = "SELECT u FROM User u"),
 		@NamedQuery(name = "User.findById", query = "SELECT u FROM User u WHERE u.id = :id"),
