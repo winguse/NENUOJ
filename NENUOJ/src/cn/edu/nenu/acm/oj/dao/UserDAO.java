@@ -4,7 +4,6 @@ import java.util.List;
 
 import javax.persistence.Query;
 
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Repository;
 
 import cn.edu.nenu.acm.oj.entitybeans.User;

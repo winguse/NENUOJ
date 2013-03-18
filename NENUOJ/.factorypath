@@ -1,0 +1,10 @@
+<factorypath>
+    <factorypathentry kind="EXTJAR" id="F:\ssh\hibernate-jpamodelgen-1.2.0.Final\hibernate-jpamodelgen-1.2.0.Final.jar" enabled="true" runInBatchMode="true"/>
+    <factorypathentry kind="EXTJAR" id="F:\ssh\hibernate-release-4.1.9.Final\lib\required\hibernate-jpa-2.0-api-1.0.1.Final.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="PLUGIN" id="org.eclipse.jst.ws.annotations.core" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="EXTJAR" id="F:\ssh\hibernate-release-4.1.9.Final\lib\required\hibernate-commons-annotations-4.0.1.Final.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="EXTJAR" id="F:\ssh\hibernate-release-4.1.9.Final\lib\required\hibernate-core-4.1.9.Final.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="EXTJAR" id="F:\ssh\hibernate-release-4.1.9.Final\lib\required\antlr-2.7.7.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="EXTJAR" id="F:\ssh\hibernate-release-4.1.9.Final\lib\required\dom4j-1.6.1.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="EXTJAR" id="F:\ssh\hibernate-release-4.1.9.Final\lib\jpa\hibernate-entitymanager-4.1.9.Final.jar" enabled="true" runInBatchMode="false"/>
+</factorypath>

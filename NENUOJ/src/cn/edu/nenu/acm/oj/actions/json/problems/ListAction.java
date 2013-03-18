@@ -1,37 +1,38 @@
 package cn.edu.nenu.acm.oj.actions.json.problems;
 
+import java.util.Map;
+
 import org.apache.struts2.convention.annotation.InterceptorRef;
 import org.apache.struts2.convention.annotation.InterceptorRefs;
 import org.apache.struts2.convention.annotation.ParentPackage;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.convention.annotation.Results;
+import org.apache.struts2.interceptor.SessionAware;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import cn.edu.nenu.acm.oj.actions.AbstractAction;
 import cn.edu.nenu.acm.oj.dao.GenericDAO;
+import cn.edu.nenu.acm.oj.dao.ProblemDAO;
 
 @ParentPackage("json-default")
 @InterceptorRefs({ @InterceptorRef("i18n") })
 @Results({ @Result(name = "success", type = "json") })
-public class ListAction extends AbstractAction {
+public class ListAction extends AbstractAction implements SessionAware {
 
 	@Autowired
-	private GenericDAO dao;
+	private ProblemDAO dao;
 
 	private String judgerSource = "";
 	private int page = 0;
 	private int pageSize = 50;
 	private String filterString = "";
 	private int orderByIndex = 0;
+	private boolean includeLocked = false;
 	
 	@Override
 	public String execute() throws Exception {
-		
+		dao.getProblemList(judgerSource, filterString, page, pageSize,includeLocked,orderByIndex);
 		return SUCCESS;
-	}
-
-	public void setDao(GenericDAO dao) {
-		this.dao = dao;
 	}
 
 	public void setJudgerSource(String judgerSource) {
@@ -60,6 +61,11 @@ public class ListAction extends AbstractAction {
 		if (filterString.length() > 50)
 			filterString = filterString.substring(0, 50);
 		this.filterString = filterString;
+	}
+
+	@Override
+	public void setSession(Map<String, Object> arg0) {
+		//TODO set includeLocked if the user logined and has the permission
 	}
 
 }
