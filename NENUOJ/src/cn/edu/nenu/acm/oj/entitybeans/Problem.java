@@ -133,7 +133,7 @@ public class Problem implements java.io.Serializable, IProblemJudgeType {
 		this.message = message;
 	}
 
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "judger_id", nullable = false)
 	public Judger getJudger() {
 		return this.judger;

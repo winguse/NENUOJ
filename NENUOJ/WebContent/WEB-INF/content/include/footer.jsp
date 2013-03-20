@@ -6,6 +6,9 @@
 	<p>&copy;2012 <s:text name="association"/></p>
 </footer>
 <script src="${pageContext.request.contextPath}/js/jquery.dataTables.min.js"></script>
+<script src="${pageContext.request.contextPath}/js/i18next.min.js"></script>
+<script src="${pageContext.request.contextPath}/js/jquery.ba-hashchange.min.js"></script>
+<script src="${pageContext.request.contextPath}/js/prettify.js"></script>
 <script src="${pageContext.request.contextPath}/js/global.js"></script>
 </body>
 </html>

@@ -2,6 +2,7 @@ package cn.edu.nenu.acm.oj.dto;
 
 public class ProblemSimpleDTO {
 
+	private Integer id;
 	private Boolean locked;
 	private String title;
 	private String judgerSource;
@@ -10,9 +11,10 @@ public class ProblemSimpleDTO {
 	private Integer submitted;
 	private String source;
 
-	public ProblemSimpleDTO(Boolean locked, String title, String judgerSource, String number, Integer accepted,
+	public ProblemSimpleDTO(Integer id,Boolean locked, String title, String judgerSource, String number, Integer accepted,
 			Integer submitted, String source) {
 		super();
+		this.id = id;
 		this.locked = locked;
 		this.title = title;
 		this.judgerSource = judgerSource;
@@ -20,6 +22,14 @@ public class ProblemSimpleDTO {
 		this.accepted = accepted;
 		this.submitted = submitted;
 		this.source = source;
+	}
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
 	}
 
 	public Boolean getLocked() {

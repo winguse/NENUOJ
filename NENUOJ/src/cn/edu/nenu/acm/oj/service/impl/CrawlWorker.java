@@ -116,6 +116,8 @@ public class CrawlWorker extends Thread {
 					problemDescription.setSampleIn(crawler.getSampleIn());
 					problemDescription.setSampleOut(crawler.getSampleOut());
 					problemDescription.setTitle(crawler.getTitle());
+					problemDescription.getRemark().set("versionMark", "System Crawl");
+					problemDescription.setRemark(problem.getRemark());
 					problem.setLocked(locked);
 					this.persistProblem();
 					log.info("Crawled successfully");

@@ -1,5 +1,6 @@
 package cn.edu.nenu.acm.oj.dao;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -12,10 +13,15 @@ import javax.persistence.criteria.Root;
 import org.apache.logging.log4j.core.Filter.Result;
 import org.hibernate.criterion.Order;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
+import cn.edu.nenu.acm.oj.dto.ProblemDTO;
+import cn.edu.nenu.acm.oj.dto.ProblemDescriptionDTO;
+import cn.edu.nenu.acm.oj.dto.ProblemDescriptionSimpleDTO;
 import cn.edu.nenu.acm.oj.dto.ProblemSimpleDTO;
 import cn.edu.nenu.acm.oj.entitybeans.Judger;
 import cn.edu.nenu.acm.oj.entitybeans.Problem;
+import cn.edu.nenu.acm.oj.entitybeans.ProblemDescription;
 import cn.edu.nenu.acm.oj.entitybeans.Problem_;
 import cn.edu.nenu.acm.oj.util.Pair;
 
@@ -29,27 +35,55 @@ public class ProblemDAO extends AbstractDAO<Problem> {
 	public static final int ORDER_BY_SUBMITTED = 5;
 	public static final int ORDER_BY_AC_RATE = 6;
 	public static final int ORDER_BY_SOURCE = 7;
-	
+
 	ProblemDAO() {
 		super();
 		super.setClazz(Problem.class);
 	}
 
 	/**
-	 * default not included locked problem and order by number
-	 * @see ProblemDAO#getProblemList(String, String, int, int, boolean, int)
-	 * @param judgerSource
-	 * @param filterString
-	 * @param page
-	 * @param pageSize
+	 * return a problem dto contains a list of description simple dto and a
+	 * description dto. if the descriptionId is not valid, ie, descriptionId<=0,
+	 * the system crawl is returned.
+	 * 
+	 * @param problemId
+	 * @param descriptionId
+	 * @param includeLocked
+	 *            if true return the description is locked, be aware of
+	 *            permission
 	 * @return
 	 */
-	public Pair<Long,List<ProblemSimpleDTO>> getProblemList(String judgerSource, String filterString, int page, int pageSize) {
-		return getProblemList(judgerSource, filterString, page, pageSize, false, ORDER_BY_NUMBER);
+	@Transactional(readOnly = true)
+	public ProblemDTO getProblemAndDescription(int problemId, int descriptionId, boolean includeLocked) {
+		Problem problem = em.find(Problem.class, problemId);
+		if (problem == null)
+			return null;
+		ProblemDescription problemDescription = null;
+		List<ProblemDescriptionSimpleDTO> lstPDS = new ArrayList<ProblemDescriptionSimpleDTO>();
+		for (ProblemDescription pd : problem.getProblemDescriptions()) {
+			if (!includeLocked && pd.isLocked())
+				continue;
+			lstPDS.add(new ProblemDescriptionSimpleDTO(pd.getId(), problem.getId(), pd.isLocked(), pd.getVote(), pd
+					.getTitle(),pd.getUser()!=null?pd.getUser().getUsername():"System",pd.getLastUpdateTime().getTime(),(String)pd.getRemark().get("versionMark")));
+			if(descriptionId==pd.getId()||(descriptionId <= 0 && pd.getUser()==null)){
+				problemDescription=pd;
+			}
+		}
+		ProblemDescriptionDTO problemDescriptionDTO = null;
+		if (problemDescription != null)
+			problemDescriptionDTO = new ProblemDescriptionDTO(problemDescription.getId(), problem.getId(),
+					problemDescription.isLocked(), problemDescription.getVote(), problemDescription.getTitle(),"System",problemDescription.getLastUpdateTime().getTime(),(String)problemDescription.getRemark().get("versionMark"),
+					problemDescription.getDescription(), problemDescription.getInput(), problemDescription.getOutput(),
+					problemDescription.getSampleIn(), problemDescription.getSampleOut(), problemDescription.getHint());
+		return new ProblemDTO(problem.getId(), problem.isLocked(), problem.getTitle(), problem.getJudger().getSource(),
+				problem.getNumber(), problem.getAccepted(), problem.getSubmitted(), problem.getSource(),
+				problem.getTimeLimit(), problem.getMemoryLimit(), (String) problem.getJudger().getRemark()
+						.get("longIntFormat"), problem.getJudgingType(), problemDescriptionDTO, lstPDS);
 	}
 
 	/**
 	 * Select a list of ProblemSimpleDTO of some criteria.
+	 * 
 	 * @param judgerSource
 	 * @param filterString
 	 * @param page
@@ -58,9 +92,10 @@ public class ProblemDAO extends AbstractDAO<Problem> {
 	 * @param orderIndex
 	 * @return
 	 */
-	public Pair<Long,List<ProblemSimpleDTO>> getProblemList(String judgerSource, String filterString, int page, int pageSize,
-			boolean includeLoocked, int orderIndex) {
-		System.out.println(orderIndex+"#"+filterString+"#"+judgerSource);
+	@Transactional(readOnly = true)
+	public Pair<Long, List<ProblemSimpleDTO>> getProblemList(String judgerSource, String filterString, int page,
+			int pageSize, boolean includeLoocked, int orderIndex) {
+		System.out.println(orderIndex + "#" + filterString + "#" + judgerSource);
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Problem> query = cb.createQuery(Problem.class);
 		CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
@@ -68,7 +103,7 @@ public class ProblemDAO extends AbstractDAO<Problem> {
 		Root<Problem> countProblemRoot = countQuery.from(Problem.class);
 		Predicate predicate = cb.conjunction();
 		Predicate countPredicate = cb.conjunction();
-		if (!includeLoocked){
+		if (!includeLoocked) {
 			predicate = cb.and(predicate, cb.equal(problemRoot.get(Problem_.locked), false));
 			countPredicate = cb.and(countPredicate, cb.equal(countProblemRoot.get(Problem_.locked), false));
 		}
@@ -100,8 +135,8 @@ public class ProblemDAO extends AbstractDAO<Problem> {
 			countPredicate = cb.and(countPredicate, countPredicateOr);
 		}
 		countQuery.select(cb.count(countProblemRoot)).where(countPredicate);
-		Pair<Long,List<ProblemSimpleDTO>> result=new Pair<Long,List<ProblemSimpleDTO>>();
-		result.first=em.createQuery(countQuery).getSingleResult();
+		Pair<Long, List<ProblemSimpleDTO>> result = new Pair<Long, List<ProblemSimpleDTO>>();
+		result.first = em.createQuery(countQuery).getSingleResult();
 		switch (orderIndex) {
 		case ORDER_BY_JUDGER_SOURCE:
 			query.orderBy(cb.asc(problemRoot.get(Problem_.judger)));
@@ -147,17 +182,17 @@ public class ProblemDAO extends AbstractDAO<Problem> {
 			break;
 		default:
 			System.out.println("Not ordered");
-			//don't order
+			// don't order
 		}
 		query.select(problemRoot).where(predicate);
 		List<Problem> problemList = em.createQuery(query).setFirstResult(page * pageSize).setMaxResults(pageSize)
 				.getResultList();
 		List<ProblemSimpleDTO> problemDTOList = new LinkedList<ProblemSimpleDTO>();
 		for (Problem p : problemList) {
-			problemDTOList.add(new ProblemSimpleDTO(p.isLocked(), p.getTitle(), p.getJudger().getSource(), p
+			problemDTOList.add(new ProblemSimpleDTO(p.getId(), p.isLocked(), p.getTitle(), p.getJudger().getSource(), p
 					.getNumber(), p.getAccepted(), p.getSubmitted(), p.getSource()));
 		}
-		result.second=problemDTOList;
+		result.second = problemDTOList;
 		return result;
 	}
 }

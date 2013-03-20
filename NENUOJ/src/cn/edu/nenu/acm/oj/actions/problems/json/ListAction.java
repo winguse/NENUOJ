@@ -48,11 +48,11 @@ public class ListAction extends AbstractJsonAction implements SessionAware {
 		Pair<Long, List<ProblemSimpleDTO>> result = dao.getProblemList(judgerSource, filterString, page, pageSize,
 				includeLocked, orderByIndex);
 		indexMapping = new String[] { _("judger_source"), _("problem_number"), _("problem_title"), _("accepted"),
-				_("submitted"), _("source"), _("is_locked") };
+				_("submitted"), _("is_locked"), _("source"),_("id") };
 		data = new LinkedList<Object[]>();
 		for (ProblemSimpleDTO p : result.second) {
 			data.push(new Object[] { p.getJudgerSource(), p.getNumber(), p.getTitle(), p.getAccepted(),
-					p.getSubmitted(), p.getSource(), p.getLocked() });
+					p.getSubmitted(), p.getLocked(), p.getSource(), p.getId() });
 		}
 		totalCount = result.first;
 		if("".equals(judgerSource)&&"".equals(filterString)){

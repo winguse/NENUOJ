@@ -6,10 +6,10 @@
 <%@ taglib uri="/struts-bootstrap-tags" prefix="b"%>
 <s:include value="../include/init.jsp"></s:include>
 <s:set var="pageTitle" value="getText('problems-list')"/>
-<title><s:text name="site.title"/> - <s:property value="#pageTitle"/></title>
+<title><s:property value="#pageTitle"/> - <s:text name="site.title"/></title>
 <s:include value="../include/header.jsp"></s:include>
 <div>
-<s:form id="addRemoteProblem_form" action="add-remote-problem" namespace="/problems/json" theme="bootstrap">
+<s:form id="addRemoteProblem_form" action="add-remote-problem" namespace="/problems/json" theme="bootstrap" cssClass="form-inline">
 <s:select
 	tooltip="%{getText('tooltip.judgerSource')}"
 	label="%{getText('judgerSource')}"
@@ -37,77 +37,11 @@
 		</tr>
 	</tbody>
 </table>
-
-
 <script>
 $(function(){
-	WinguseAjaxForm("#addRemoteProblem_form",function(data){
-		if(data.code==0)
-			alert(data.message);
-	});
-	$('#problemList').dataTable( {
-		"sDom": '<"H"if>t<"F"plr>',
-		"bProcessing": true,
-		"bServerSide": true,
-		"iDisplayLength": 50,
-		"bStateSave":true,
-		"oLanguage": {
-			"sInfo": "_START_ to _END_ of _TOTAL_ problems",//TODO replace to _("xxx")
-			"sInfoEmpty": "No problems",
-			"sInfoFiltered": " (filtering from _MAX_ total problems)"
-		},
-		"aaSorting": [[ 1, "asc" ]],
-		"sAjaxSource": "<s:url action="list" namespace="/problems/json"/>",
-		"fnServerData": function ( sSource, _aoData, fnCallback ) {
-			var aoData={};
-			for(var i in _aoData){
-				aoData[_aoData[i].name]=_aoData[i].value;
-			}
-			var orderIndex=aoData.iSortCol_0+1;
-			console.log(aoData.sSortDir_0);
-			if(aoData.sSortDir_0=="desc")
-				orderIndex=-orderIndex;
-			$.getJSON( sSource, {
-				orderByIndex:orderIndex,
-				filterString:aoData.sSearch,
-				page:aoData.iDisplayStart/aoData.iDisplayLength,
-				pageSize:aoData.iDisplayLength
-			}, function (json) {
-				fnCallback({
-					sEcho:aoData.sEcho,
-					iTotalDisplayRecords:json.totalCount,
-					iTotalRecords:json.allProblemCount,
-					aaData:json.data
-				});
-			} );
-		},
-		"aoColumns": [{
-				"sClass": ""//judger soruce
-			},{
-				"sClass": ""//problem number
-			},{
-				"sClass": ""//problem title
-			},{
-				"sClass": ""//accepted
-			},{
-				"sClass": ""//submitted
-			},{
-				"fnRender": function ( oObj ) {
-					var t=oObj.aData[3]==0?1:0;
-					return parseInt(oObj.aData[3]/t*10000)/100.0+"%";
-				},
-				"sClass": ""//rate
-			},{
-				"sClass":""//source
-			}
-		],
-		"sPaginationType": "full_numbers",
-		"bJQueryUI": true
-	} );
+	oj.loadProblemList();
 });
 </script>
 </div>
-
-
 <s:include value="../include/footer.jsp"></s:include>
 </c:html>

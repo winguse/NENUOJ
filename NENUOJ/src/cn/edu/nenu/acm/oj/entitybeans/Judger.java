@@ -91,7 +91,7 @@ public class Judger implements java.io.Serializable {
 	}
 
 	@Column(name = "remark")
-	public Serializable getRemark() {
+	public Remark getRemark() {
 		if(!(remark instanceof Remark)||remark==null){
 			remark=new Remark();
 		}

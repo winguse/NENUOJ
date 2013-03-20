@@ -17,9 +17,9 @@
 			<div class="nav-collapse">
 				<ul class="nav">
 					<li><s:a namespace="/" action="home"><s:text name="home" /></s:a></li>
-					<li><s:a namespace="problems" action="list"><s:text name="problems" /></s:a></li>
+					<li><s:a namespace="/problems" action="list"><s:text name="problems" /></s:a></li>
 					<li><s:a namespace="/" action="status"><s:text name="status" /></s:a></li>
-					<li><s:a namespace="contests" action="list"><s:text name="contests" /></s:a></li>
+					<li><s:a namespace="/contests" action="list"><s:text name="contests" /></s:a></li>
 					<s:if test="#session.user==null">
 						<li><s:a namespace="/" action="register"><s:text name="register" /></s:a></li>
 						<j:dialog
@@ -55,4 +55,4 @@
 </div>
 </header>
 <div class="container">
-<h3><s:property value="#pageTitle"/></h3>
+<h1><s:property value="#pageTitle"/></h1>

@@ -6,7 +6,7 @@
 <%@ taglib uri="/struts-bootstrap-tags" prefix="b"%>
 <s:include value="include/init.jsp"></s:include>
 <s:set var="pageTitle" value="getText('register')"/>
-<title><s:text name="site.title"/> - <s:property value="#pageTitle"/></title>
+<title><s:property value="#pageTitle"/> - <s:text name="site.title"/></title>
 <s:include value="include/header.jsp"></s:include>
 <s:actionerror theme="bootstrap"/>
 <s:actionmessage theme="bootstrap"/>
