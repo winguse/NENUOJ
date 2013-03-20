@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 
  */
 "use strict";
@@ -166,7 +166,7 @@ OJ.prototype.loadProblemList=function(){
 			console.log(aoData.sSortDir_0);
 			if(aoData.sSortDir_0=="desc")
 				orderIndex=-orderIndex;
-			$.getJSON( sSource, {
+			$.post( sSource, {
 				orderByIndex:orderIndex,
 				filterString:aoData.sSearch,
 				page:aoData.iDisplayStart/aoData.iDisplayLength,
@@ -178,7 +178,7 @@ OJ.prototype.loadProblemList=function(){
 					iTotalRecords:json.allProblemCount,
 					aaData:json.data
 				});
-			} );
+			},"json" );
 		},
 		"aoColumns": [{
 				"sClass": ""//judger soruce

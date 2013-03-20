@@ -87,6 +87,7 @@ public class ListAction extends AbstractJsonAction implements SessionAware {
 			return;
 		if (filterString.length() > 50)
 			filterString = filterString.substring(0, 50);
+		System.out.println(filterString);
 		this.filterString = filterString;
 	}
 
