@@ -2,6 +2,7 @@ package cn.edu.nenu.acm.oj.service.impl;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -28,7 +29,7 @@ import cn.edu.nenu.acm.oj.service.IProblemSubmitter;
 @Service
 @Scope("singleton")
 @Qualifier("judgeService")
-public class JudgeService extends Thread{
+public class JudgeService extends Thread {
 
 	protected static Logger log = LogManager.getLogger("JudgeService");
 
@@ -36,7 +37,7 @@ public class JudgeService extends Thread{
 	private SolutionDAO solutionDAO;
 	@Autowired
 	private JudgerDAO judgerDAO;
-	
+
 	private ApplicationContext applicationContext;
 	private Map<String, LinkedBlockingQueue<Solution>> judgeQueue;
 	private Map<String, LinkedBlockingQueue<String>> crawlQueue;
@@ -170,19 +171,30 @@ public class JudgeService extends Thread{
 					String account[] = { segment[1], segment[2] };
 					if (accounts.containsKey(segment[0])) {
 						accounts.get(segment[0]).add(account);
-					} else {
-						if (judgerDAO.findByColumn("source", segment[0]).size() == 0) {
+						log.info("Added account" + segment[1] + " of " + segment[0] + " .");
+					} else if (applicationContext.containsBeanDefinition(segment[0] + "_Submitter")
+							&& applicationContext.containsBeanDefinition(segment[0] + "_Crawler")) {
+						List<Judger> lstJudger = judgerDAO.findByColumn("source", segment[0]);
+						Judger judger = null;
+						if (lstJudger.size() == 0) {
 							// add judger information into the database
-							Judger judger = new Judger();
+							judger = new Judger();
 							judger.setSource(segment[0]);
-							judgerDAO.persist(judger);
-							log.info("Persist new judger: #"+segment[0]);
+							log.info("Persist new judger: #" + segment[0]);
+						} else {
+							judger = lstJudger.get(0);
 						}
+						judger.getRemark().set("supportedLanguage",
+								getSubmitter(segment[0]).getSupportedLanguage());
+						judger.setRemark(judger.getRemark());
+						judgerDAO.merge(judger);
 						LinkedBlockingQueue<String[]> accountQueue = new LinkedBlockingQueue<String[]>();
 						accountQueue.add(account);
 						accounts.put(segment[0], accountQueue);
+						log.info("Dectected new judgerSource, added account" + segment[1] + " of " + segment[0] + " .");
+					} else {
+						log.error("Crawler or Submitter of #" + segment[0] + " not found.");
 					}
-					log.info("Added " + segment[1] + " of " + segment[0] + " .");
 				} else {
 					log.error("Account file error: [" + line + "].");
 				}
@@ -190,6 +202,8 @@ public class JudgeService extends Thread{
 			accountInfo.close();
 		} catch (IOException e1) {
 			e1.printStackTrace();
+		} catch (SubmitterNotExistException e) {
+			e.printStackTrace();
 		}
 	}
 
@@ -220,9 +234,9 @@ public class JudgeService extends Thread{
 	 */
 	public synchronized void putJudgeJob(Solution solution) throws NotSupportJudgeSourceException {
 		String judgeSource = solution.getProblem().getJudger().getSource();
-		if (accounts.get(judgeSource)==null)
+		if (accounts.get(judgeSource) == null)
 			throw new NotSupportJudgeSourceException(judgeSource);
-		if (judgeQueue.get(judgeSource)==null) {
+		if (judgeQueue.get(judgeSource) == null) {
 			LinkedBlockingQueue<Solution> solutionQueue = new LinkedBlockingQueue<Solution>();
 			solutionQueue.add(solution);
 			judgeQueue.put(judgeSource, solutionQueue);
@@ -239,9 +253,9 @@ public class JudgeService extends Thread{
 	 * @throws NotSupportJudgeSourceException
 	 */
 	public synchronized void putCrawlJob(String judgeSource, String problem) throws NotSupportJudgeSourceException {
-		if (accounts.get(judgeSource)==null)
+		if (accounts.get(judgeSource) == null)
 			throw new NotSupportJudgeSourceException(judgeSource);
-		if (crawlQueue.get(judgeSource)==null) {
+		if (crawlQueue.get(judgeSource) == null) {
 			LinkedBlockingQueue<String> que = new LinkedBlockingQueue<String>();
 			que.add(problem);
 			crawlQueue.put(judgeSource, que);

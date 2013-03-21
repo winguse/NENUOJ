@@ -3,6 +3,7 @@ package cn.edu.nenu.acm.oj.service.impl.remote;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import cn.edu.nenu.acm.oj.entitybeans.Solution;
 import cn.edu.nenu.acm.oj.eto.LoginException;
 import cn.edu.nenu.acm.oj.eto.NetworkException;
 import cn.edu.nenu.acm.oj.eto.SubmitException;
@@ -20,6 +22,7 @@ import cn.edu.nenu.acm.oj.service.IProblemSubmitter;
 @Component("HDU_Submitter")
 @Scope("prototype")
 public class HDUProblemSubmitter implements IProblemSubmitter {
+	public static String[] supportedLanguage = null;
 	public static final String judgerSource = "HDU";
 	public static final String homePage = "http://acm.hdu.edu.cn";
 	public static final Map<String, String> languageMapping = new HashMap<String, String>() {
@@ -187,6 +190,18 @@ public class HDUProblemSubmitter implements IProblemSubmitter {
 	public void setAccountInformation(String username, String password) {
 		this.username = username;
 		this.password = password;
+	}
+
+	@Override
+	public String[] getSupportedLanguage() {
+		if (supportedLanguage == null) {
+			supportedLanguage = new String[languageMapping.size()];
+			int idx = 0;
+			for (Map.Entry<String, String> e : languageMapping.entrySet()) {
+				supportedLanguage[idx++] = e.getKey();
+			}
+		}
+		return supportedLanguage;
 	}
 
 }

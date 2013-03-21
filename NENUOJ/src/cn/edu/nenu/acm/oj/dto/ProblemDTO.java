@@ -11,10 +11,12 @@ public class ProblemDTO extends ProblemSimpleDTO {
 	private List<ProblemDescriptionSimpleDTO> descriptionList;// list of the
 																// other
 																// description
+	private String[] supprotedLanguage;
 
 	public ProblemDTO(Integer id, Boolean locked, String title, String judgerSource, String number, Integer accepted,
 			Integer submitted, String source, Integer timeLimit, Integer memoryLimit, String longIntFormat,
-			Integer judgingType, ProblemDescriptionDTO description, List<ProblemDescriptionSimpleDTO> descriptionList) {
+			Integer judgingType, ProblemDescriptionDTO description, List<ProblemDescriptionSimpleDTO> descriptionList,
+			String[] supprotedLanguage) {
 		super(id, locked, title, judgerSource, number, accepted, submitted, source);
 		this.timeLimit = timeLimit;
 		this.memoryLimit = memoryLimit;
@@ -22,6 +24,7 @@ public class ProblemDTO extends ProblemSimpleDTO {
 		this.judgingType = judgingType;
 		this.description = description;
 		this.descriptionList = descriptionList;
+		this.supprotedLanguage = supprotedLanguage;
 	}
 
 	public Integer getTimeLimit() {
@@ -70,6 +73,14 @@ public class ProblemDTO extends ProblemSimpleDTO {
 
 	public void setDescriptionList(List<ProblemDescriptionSimpleDTO> descriptionList) {
 		this.descriptionList = descriptionList;
+	}
+
+	public String[] getSupprotedLanguage() {
+		return supprotedLanguage;
+	}
+
+	public void setSupprotedLanguage(String[] supprotedLanguage) {
+		this.supprotedLanguage = supprotedLanguage;
 	}
 
 }

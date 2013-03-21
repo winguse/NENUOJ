@@ -81,6 +81,7 @@ OJ.prototype.loadProblem=function(problemId,descriptionId){
 		problemId=parseInt(this.getParm("problemId"));
 	if(!descriptionId)
 		descriptionId=parseInt(this.getParm("descriptionId"));
+	var $progress=$(".progress>.bar"),I=this;
 	if(isNaN(problemId)){
 		$progress.animate({width:"100%"});
 		I.setPageTitle($.t("invalid_parameter"));
@@ -88,7 +89,6 @@ OJ.prototype.loadProblem=function(problemId,descriptionId){
 	}
 	if(isNaN(descriptionId))
 		descriptionId=0;
-	var $progress=$(".progress>.bar"),I=this;
 	$progress.animate({width:"40%"});
 	$.get(baseUrl + "/problems/json/view.action",{
 		problemId:problemId,

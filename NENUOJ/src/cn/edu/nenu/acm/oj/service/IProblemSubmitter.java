@@ -107,4 +107,8 @@ public interface IProblemSubmitter extends ISolutionStatusCode {
 	 */
 	public String getAdditionalInformation() throws NetworkException;
 
+	/**
+	 * @return a array of supportted language
+	 */
+	public String[] getSupportedLanguage();
 }

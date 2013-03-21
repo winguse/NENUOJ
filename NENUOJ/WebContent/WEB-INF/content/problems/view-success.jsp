@@ -19,13 +19,20 @@
 </figure>
 <div class="row">
 <div class="span9">
-<section class="description"><h2><s:text name="description"/></h2><div class="well"></div></section>
-<section class="input"><h2><s:text name="input"/></h2><div class="well"></div></section>
-<section class="output"><h2><s:text name="output"/></h2><div class="well"></div></section>
-<section class="sampleIn"><h2><s:text name="sampleIn"/></h2><pre class="prettyprint linenums"></pre></section>
-<section class="sampleOut"><h2><s:text name="sampleOut"/></h2><pre class="prettyprint linenums"></pre></section>
-<section class="source"><h2><s:text name="source"/></h2><div class="well"></div></section>
-<section class="hint"><h2><s:text name="hint"/></h2><div class="well"></div></section>
+	<section class="description"><h2><s:text name="description"/></h2><div class="well"></div></section>
+	<section class="input"><h2><s:text name="input"/></h2><div class="well"></div></section>
+	<section class="output"><h2><s:text name="output"/></h2><div class="well"></div></section>
+	<section class="sampleIn"><h2><s:text name="sampleIn"/></h2><pre class="prettyprint linenums"></pre></section>
+	<section class="sampleOut"><h2><s:text name="sampleOut"/></h2><pre class="prettyprint linenums"></pre></section>
+	<section class="source"><h2><s:text name="source"/></h2><div class="well"></div></section>
+	<section class="hint"><h2><s:text name="hint"/></h2><div class="well"></div></section>
+	<section class="control pagination-centered">
+		<div class="btn-group">
+			<j:a cssClass="btn" openDialog="problem_submit" href="#"><s:text name="submit" /></j:a>
+			<j:a cssClass="btn" href="#"><s:text name="status" /></j:a>
+			<j:a cssClass="btn" href="#"><s:text name="discuss" /></j:a>
+		</div>
+	</section>
 </div>
 <div class="span3">
 	<h4><s:text name="description_list"/></h4>
@@ -33,6 +40,23 @@
 	</ul>
 </div>
 </div>
+<j:dialog
+	id="problem_submit"
+	buttons="{'%{_('submit')}':function(){$(this).find('form').submit();},'%{_('cancle')}':function() {$(this).find('p.validateTips').html('');$(this).dialog('close');}}/*Hack here*/"
+	autoOpen="false"
+	modal="true"
+	title="%{_('submit_your_solution')}"
+	resizable="true"
+	draggable="true"
+	cssClass="hide"
+>
+<s:form id="problem_submit_form" namespace="/problem/json" action="submit" theme="bootstrap" cssClass="form">
+	<p class="validateTips"></p>
+	<s:select label="%{_('language')}" name="language" list="{}"></s:select>
+	<s:textarea label="%{_('source_code')}" name="source_code" />
+</s:form>
+</j:dialog>
+
 <s:include value="../include/footer.jsp"></s:include>
 <script>
 $(function(){

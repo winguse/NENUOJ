@@ -16,6 +16,7 @@ import cn.edu.nenu.acm.oj.actions.AbstractAction;
 import cn.edu.nenu.acm.oj.actions.AbstractJsonAction;
 import cn.edu.nenu.acm.oj.dao.GenericDAO;
 import cn.edu.nenu.acm.oj.entitybeans.Judger;
+import cn.edu.nenu.acm.oj.eto.NotSupportJudgeSourceException;
 import cn.edu.nenu.acm.oj.service.impl.JudgeService;
 
 @ParentPackage("json-default")
@@ -35,15 +36,21 @@ public class AddRemoteProblemAction extends AbstractJsonAction {
 	private JudgeService judgeService;
 
 	@Override
-	public String execute() throws Exception {
+	public String execute(){
 		List<Judger> lstJudger = dao.findByColumn("source", judgerSource, Judger.class);
 		if (lstJudger.size() == 0) {
-			message = _("Unsupported OJ: ") + judgerSource;
+			message = _("Unsupported OJ, no database definition: ") + judgerSource;
 			code = STATUS_ERROR;
 		} else {
-			judgeService.putCrawlJob(judgerSource, problemNumber);
-			message = _("problem_crawling_added");
-			code = STATUS_SUCCESS;
+			try {
+				judgeService.putCrawlJob(judgerSource, problemNumber);
+				message = _("problem_crawling_added");
+				code = STATUS_SUCCESS;
+			} catch (NotSupportJudgeSourceException e) {
+				message = _("Unsupported OJ, no backend information: ") + judgerSource;
+				code = STATUS_ERROR;
+				e.printStackTrace();
+			}
 		}
 		return SUCCESS;
 	}

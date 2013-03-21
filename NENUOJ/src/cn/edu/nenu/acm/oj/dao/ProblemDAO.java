@@ -73,10 +73,13 @@ public class ProblemDAO extends AbstractDAO<Problem> {
 					problemDescription.isLocked(), problemDescription.getVote(), problemDescription.getTitle(),"System",problemDescription.getLastUpdateTime().getTime(),(String)problemDescription.getRemark().get("versionMark"),
 					problemDescription.getDescription(), problemDescription.getInput(), problemDescription.getOutput(),
 					problemDescription.getSampleIn(), problemDescription.getSampleOut(), problemDescription.getHint());
+		String[] supportedLanguage = null;
+		if(problem.getJudger().getRemark().get("supportedLanguage") instanceof String[])
+			supportedLanguage=(String[]) problem.getJudger().getRemark().get("supportedLanguage");
 		return new ProblemDTO(problem.getId(), problem.isLocked(), problem.getTitle(), problem.getJudger().getSource(),
 				problem.getNumber(), problem.getAccepted(), problem.getSubmitted(), problem.getSource(),
 				problem.getTimeLimit(), problem.getMemoryLimit(), (String) problem.getJudger().getRemark()
-						.get("longIntFormat"), problem.getJudgingType(), problemDescriptionDTO, lstPDS);
+						.get("longIntFormat"), problem.getJudgingType(), problemDescriptionDTO, lstPDS,supportedLanguage);
 	}
 
 	/**
