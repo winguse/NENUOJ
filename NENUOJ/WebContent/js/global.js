@@ -4,7 +4,7 @@
 "use strict";
 
 function WinguseAjaxForm(form, successCallback) {
-	var sj = jQuery.struts2_jquery, $form = typeof (form) == "string" ? $(form)
+	var $form = typeof (form) == "string" ? $(form)
 			: form, params = {
 		type : "POST",
 		data : {
@@ -25,8 +25,6 @@ function WinguseAjaxForm(form, successCallback) {
 		},
 		dataType : "json"
 	};
-	if (!$form.ajaxSubmit)
-		sj.require("js/plugins/jquery.form" + sj.minSuffix + ".js");
 	$form.submit(function() {
 		$form.ajaxSubmit(params);
 		return false;
@@ -100,6 +98,11 @@ OJ.prototype.loadProblem=function(problemId,descriptionId){
 			I.setPageTitle($.t("invalid_parameter"));
 		}else{
 			var $pdl=$("#description_list"),p = d.problem;
+			var langHtml = "";
+			for(var i in p.supprotedLanguage){
+				langHtml += "<option value='"+p.supprotedLanguage[i]+"'>"+p.supprotedLanguage[i]+"</option>";
+			}
+			$("#language").html(langHtml);
 			$pdl.html("");
 			for(var i in p.descriptionList){
 				var pd=p.descriptionList[i];
@@ -207,6 +210,6 @@ OJ.prototype.loadProblemList=function(){
 		"bJQueryUI": true
 	} );
 };
-
-var oj = new OJ();
+var oj;
+oj = new OJ();
 i18n.init();

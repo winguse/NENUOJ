@@ -2,7 +2,6 @@
 <%@ taglib uri="http://htmlcompressor.googlecode.com/taglib/compressor" prefix="c"%>
 <c:html enabled="${site.enableHtmlCompress}" removeIntertagSpaces="true">
 <%@ taglib uri="/struts-tags" prefix="s"%>
-<%@ taglib uri="/struts-jquery-tags" prefix="j"%>
 <%@ taglib uri="/struts-bootstrap-tags" prefix="b"%>
 <s:include value="../include/init.jsp"></s:include>
 <s:set var="pageTitle" value="getText('problem-detial')"/>
@@ -28,9 +27,9 @@
 	<section class="hint"><h2><s:text name="hint"/></h2><div class="well"></div></section>
 	<section class="control pagination-centered">
 		<div class="btn-group">
-			<j:a cssClass="btn" openDialog="problem_submit" href="#"><s:text name="submit" /></j:a>
-			<j:a cssClass="btn" href="#"><s:text name="status" /></j:a>
-			<j:a cssClass="btn" href="#"><s:text name="discuss" /></j:a>
+			<a class="btn" href="#" id="submit_btn"><s:text name="submit" /></a>
+			<a class="btn" href="#"><s:text name="status" /></a>
+			<a class="btn" href="#"><s:text name="discuss" /></a>
 		</div>
 	</section>
 </div>
@@ -40,30 +39,40 @@
 	</ul>
 </div>
 </div>
-<j:dialog
-	id="problem_submit"
-	buttons="{'%{_('submit')}':function(){$(this).find('form').submit();},'%{_('cancle')}':function() {$(this).find('p.validateTips').html('');$(this).dialog('close');}}/*Hack here*/"
-	autoOpen="false"
-	modal="true"
-	title="%{_('submit_your_solution')}"
-	resizable="true"
-	draggable="true"
-	cssClass="hide"
->
-<s:form id="problem_submit_form" namespace="/problem/json" action="submit" theme="bootstrap" cssClass="form">
+<div id="problem_submit" title="<s:text name="submit_your_solution" />" class="hide">
+<s:form id="problem_submit_form" namespace="/problems/json" action="submit" theme="bootstrap" cssClass="form">
 	<p class="validateTips"></p>
-	<s:select label="%{_('language')}" name="language" list="{}"></s:select>
+	<s:select label="%{_('language')}" id="language" name="language" list="{}"></s:select>
 	<s:textarea label="%{_('source_code')}" name="source_code" />
 </s:form>
-</j:dialog>
-
-<s:include value="../include/footer.jsp"></s:include>
+</div>
 <script>
 $(function(){
 	oj.loadProblem();
 	$(window).hashchange(function(){
 		oj.loadProblem();
 	});
+	$("#problem_submit").dialog({
+		modal:true,
+		autoOpen: false,
+		buttons:{
+			'<s:text name="submit"/>':function(){
+				$(this).find('form').submit();
+			},'<s:text name="cancle"/>':function() {
+				$(this).find('p.validateTips').html('');
+				$(this).dialog('close');
+			}
+		}
+	});
+	$("#submit_btn").click(function(){
+	<s:if test="#session.user==null">
+		$("#login_dialog").dialog("open");
+	</s:if><s:else>
+		$("#problem_submit").dialog("open");
+	</s:else>
+		return false;
+	});
 });
 </script>
+<s:include value="../include/footer.jsp"></s:include>
 </c:html>
