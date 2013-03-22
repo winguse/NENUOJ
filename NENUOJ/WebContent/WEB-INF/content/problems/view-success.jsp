@@ -42,8 +42,9 @@
 <div id="problem_submit" title="<s:text name="submit_your_solution" />" class="hide">
 <s:form id="problem_submit_form" namespace="/problems/json" action="submit" theme="bootstrap" cssClass="form">
 	<p class="validateTips"></p>
+	<input type="hidden" id="problemId" name="problemId" value=""/>
 	<s:select label="%{_('language')}" id="language" name="language" list="{}"></s:select>
-	<s:textarea label="%{_('source_code')}" name="source_code" />
+	<s:textarea label="%{_('source_code')}" name="sourceCode" />
 </s:form>
 </div>
 <script>
@@ -52,6 +53,7 @@ $(function(){
 	$(window).hashchange(function(){
 		oj.loadProblem();
 	});
+	<s:if test="#session.user!=null">
 	$("#problem_submit").dialog({
 		modal:true,
 		autoOpen: false,
@@ -64,6 +66,16 @@ $(function(){
 			}
 		}
 	});
+	var $form=$("#problem_submit_form");
+	WinguseAjaxForm($form, function(data) {
+		$form.find("p.validateTips").text(data.message);
+		if (data.code == 0)
+			setTimeout(function() {
+			//	window.location.reload(); TODO
+				alert(d.message);
+			}, 1000);
+	});
+	</s:if>
 	$("#submit_btn").click(function(){
 	<s:if test="#session.user==null">
 		$("#login_dialog").dialog("open");

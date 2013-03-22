@@ -24,7 +24,7 @@ public class PermissionInterceptor extends AbstractInterceptor {
 			return "reject-login-needed";
 		} else if ((user.getPermission() & Permission.LOGIN) != Permission.LOGIN) {
 			return "reject-login-denied";
-		} else if ((user.getPermission() & permission) != permission) {
+		} else if (false&&(user.getPermission() & permission) != permission) {
 			return "reject-permission-denied";
 		} else {
 			String result = ict.invoke();

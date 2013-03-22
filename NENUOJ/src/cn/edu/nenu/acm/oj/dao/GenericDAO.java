@@ -16,6 +16,12 @@ public class GenericDAO {
 	@PersistenceContext
 	protected EntityManager em;
 
+	/**
+	 * @see EntityManager#find(Class, Object)
+	 * @param id
+	 * @param clazz
+	 * @return
+	 */
 	public <T extends Serializable> T findById(final Integer id, final Class<T> clazz) {
 		return em.find(clazz, id);
 	}

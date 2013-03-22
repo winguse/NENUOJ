@@ -10,10 +10,13 @@ import javax.persistence.PersistenceContext;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import cn.edu.nenu.acm.oj.dao.GenericDAO;
+import cn.edu.nenu.acm.oj.dao.SolutionDAO;
 import cn.edu.nenu.acm.oj.entitybeans.Solution;
 import cn.edu.nenu.acm.oj.eto.LoginException;
 import cn.edu.nenu.acm.oj.eto.NetworkException;
@@ -28,13 +31,13 @@ public class SubmitWorker extends Thread {
 	private static int activeWorkerCount = 0;
 	private static HashMap<Long, SubmitWorker> us = new HashMap<Long, SubmitWorker>();
 
-	@PersistenceContext
-	private EntityManager em;
+	@Autowired
+	private SolutionDAO dao;
+	
 	private IProblemSubmitter submitter;
-	private LinkedBlockingQueue<Solution> queue;
+	private LinkedBlockingQueue<Integer> queue;
 	private LinkedBlockingQueue<String[]> accountQueue;
 	private String[] account;
-	private Solution currentSolution = null;
 	private boolean canRunning = true;
 
 	/**
@@ -50,7 +53,7 @@ public class SubmitWorker extends Thread {
 	 * @param account
 	 * @param accountQueue
 	 */
-	public void init(IProblemSubmitter submitter, LinkedBlockingQueue<Solution> queue, String[] account,
+	public void init(IProblemSubmitter submitter, LinkedBlockingQueue<Integer> queue, String[] account,
 			LinkedBlockingQueue<String[]> accountQueue) {
 		this.submitter = submitter;
 		this.queue = queue;
@@ -68,27 +71,32 @@ public class SubmitWorker extends Thread {
 				return;
 			log.info("Login #" + account[0]);
 			submitter.login();
-			while (null != (currentSolution = queue.poll())) {
+			Integer solutionId = null;
+			while (null != (solutionId = queue.poll())) {
 				if (!canRunning)
 					return;
 				int interval = 500, intervalStep = 500, maxTry = 50, tried = 0;
-				log.info("Submit #" + currentSolution.getId());
+				Solution solution = null;
+				String problemNumber = dao.getProblemNumber(solutionId);
+				log.info("Submit #" + solutionId);
 				try {
-					currentSolution.setStatusDescription("Submitting");
-					currentSolution.setStatus(Solution.STATUS_PROCESSING);
-					updateSolution();
+					solution = dao.findById(solutionId);
+					solution.setStatusDescription("Submitting");
+					solution.setStatus(Solution.STATUS_PROCESSING);
+					dao.merge(solution);
 					if (!canRunning)
 						return;
-					submitter.submit(currentSolution.getProblem().getNumber(), currentSolution.getSourceCode(),
-							currentSolution.getLanguage());
+					submitter.submit(problemNumber, solution.getSourceCode(),
+							solution.getLanguage());
 					Thread.sleep(interval);
 					while (submitter.getResult()) {
 						tried++;
 						if (maxTry >= tried) {
-							currentSolution.setStatusDescription(submitter.getStatusDescription() + " #try:" + tried
+							solution = dao.findById(solutionId);
+							solution.setStatusDescription(submitter.getStatusDescription() + " #try:" + tried
 									+ "/" + maxTry);
-							currentSolution.setStatus(Solution.STATUS_PROCESSING);
-							updateSolution();
+							solution.setStatus(Solution.STATUS_PROCESSING);
+							dao.merge(solution);
 						} else {
 							break;
 						}
@@ -97,30 +105,39 @@ public class SubmitWorker extends Thread {
 							return;
 						interval += intervalStep;
 					}
-					currentSolution.setJudgeTime(new Date());
+					solution = dao.findById(solutionId);
+					solution.setJudgeTime(new Date());
 					if (tried <= maxTry) {
-						currentSolution.setStatus(submitter.getStatus());
-						currentSolution.setStatusDescription(submitter.getStatusDescription());
-						currentSolution.setRunMemory(submitter.getMemory());
-						currentSolution.setRunTime(submitter.getTime());
+						solution.setStatus(submitter.getStatus());
+						solution.setStatusDescription(submitter.getStatusDescription());
+						solution.setRunMemory(submitter.getMemory());
+						solution.setRunTime(submitter.getTime());
 						if (submitter.getStatus() == Solution.STATUS_COMPLIE_ERROR) {
-							currentSolution.getRemark().set("AdditionalInformation",
+							solution.getRemark().set("AdditionalInformation",
 									submitter.getAdditionalInformation());
 						} else {
-							currentSolution.getRemark().remove("AdditionalInformation");
+							solution.getRemark().remove("AdditionalInformation");
 						}
-						currentSolution.getRemark().set("RemoteRunId", submitter.getRemoteRunId());
+						solution.getRemark().set("RemoteRunId", submitter.getRemoteRunId());
 					} else {
-						currentSolution.setStatusDescription(submitter.getStatusDescription()
+						solution.setStatusDescription(submitter.getStatusDescription()
 								+ " #Remote Judge Timeout.");
-						currentSolution.setStatus(Solution.STATUS_JUDGE_ERROR);
+						solution.setStatus(Solution.STATUS_JUDGE_ERROR);
 					}
-					updateSolution();
+					dao.merge(solution);
 				} catch (SubmitException e) {
 					e.printStackTrace();
 					log.error("SubmitException: " + e.getMessage());
+					solution = dao.findById(solutionId);
+					solution.setStatusDescription("Judge Error: #"+ e.getMessage());
+					solution.setStatus(Solution.STATUS_JUDGE_ERROR);
+					dao.merge(solution);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
+					solution = dao.findById(solutionId);
+					solution.setStatusDescription("Judge Interrupted: #"+ e.getMessage());
+					solution.setStatus(Solution.STATUS_JUDGE_ERROR);
+					dao.merge(solution);
 				}
 			}
 		} catch (NetworkException e) {
@@ -133,11 +150,6 @@ public class SubmitWorker extends Thread {
 			setDisactive(this);
 			accountQueue.add(account);// remember to return account
 		}
-	}
-
-	@Transactional
-	public void updateSolution() {
-		currentSolution = em.merge(currentSolution);
 	}
 
 	public static synchronized int getActiveWorkerCount() {

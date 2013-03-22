@@ -39,7 +39,7 @@ public class JudgeService extends Thread {
 	private JudgerDAO judgerDAO;
 
 	private ApplicationContext applicationContext;
-	private Map<String, LinkedBlockingQueue<Solution>> judgeQueue;
+	private Map<String, LinkedBlockingQueue<Integer>> judgeQueue;
 	private Map<String, LinkedBlockingQueue<String>> crawlQueue;
 	private Map<String, LinkedBlockingQueue<String[]>> accounts;
 
@@ -50,7 +50,7 @@ public class JudgeService extends Thread {
 
 	public JudgeService() {
 		System.out.println("Judge Service init");
-		judgeQueue = new HashMap<String, LinkedBlockingQueue<Solution>>();
+		judgeQueue = new HashMap<String, LinkedBlockingQueue<Integer>>();
 		crawlQueue = new HashMap<String, LinkedBlockingQueue<String>>();
 	}
 
@@ -75,7 +75,7 @@ public class JudgeService extends Thread {
 					log.error("CrawlerNotExistException:" + e1.getMessage());
 				}
 			}
-			for (Map.Entry<String, LinkedBlockingQueue<Solution>> e : judgeQueue.entrySet()) {
+			for (Map.Entry<String, LinkedBlockingQueue<Integer>> e : judgeQueue.entrySet()) {
 				if (SubmitWorker.getActiveWorkerCount() >= maxActiveSubmitter)
 					continue;
 				if (e.getValue().isEmpty())
@@ -85,7 +85,8 @@ public class JudgeService extends Thread {
 					continue;
 				}
 				String[] account = null;
-				if (null == (account = accounts.get(e.getKey()).poll())) {
+				account = accounts.get(e.getKey()).poll();
+				if (null == account) {
 					log.info("Submitter #" + e.getKey() + " is not enough, if judging too slow, add more accounts.");
 					continue;
 				}
@@ -96,6 +97,7 @@ public class JudgeService extends Thread {
 					// resource (especially account)
 					// are available.
 					submitWorker.init(submitter, e.getValue(), account, accounts.get(e.getKey()));
+					submitWorker.start();
 				} catch (SubmitterNotExistException e1) {
 					e1.printStackTrace();
 					log.error("SubmitterNotExistException:" + e1.getMessage());
@@ -184,14 +186,13 @@ public class JudgeService extends Thread {
 						} else {
 							judger = lstJudger.get(0);
 						}
-						judger.getRemark().set("supportedLanguage",
-								getSubmitter(segment[0]).getSupportedLanguage());
+						judger.getRemark().set("supportedLanguage", getSubmitter(segment[0]).getSupportedLanguage());
 						judger.setRemark(judger.getRemark());
 						judgerDAO.merge(judger);
 						LinkedBlockingQueue<String[]> accountQueue = new LinkedBlockingQueue<String[]>();
 						accountQueue.add(account);
 						accounts.put(segment[0], accountQueue);
-						log.info("Dectected new judgerSource, added account" + segment[1] + " of " + segment[0] + " .");
+						log.info("Dectected new judgerSource, added account " + segment[1] + " of " + segment[0] + " .");
 					} else {
 						log.error("Crawler or Submitter of #" + segment[0] + " not found.");
 					}
@@ -233,15 +234,15 @@ public class JudgeService extends Thread {
 	 * @throws NotSupportJudgeSourceException
 	 */
 	public synchronized void putJudgeJob(Solution solution) throws NotSupportJudgeSourceException {
-		String judgeSource = solution.getProblem().getJudger().getSource();
+		String judgeSource = solutionDAO.getJudgerSource(solution.getId());
 		if (accounts.get(judgeSource) == null)
 			throw new NotSupportJudgeSourceException(judgeSource);
 		if (judgeQueue.get(judgeSource) == null) {
-			LinkedBlockingQueue<Solution> solutionQueue = new LinkedBlockingQueue<Solution>();
-			solutionQueue.add(solution);
+			LinkedBlockingQueue<Integer> solutionQueue = new LinkedBlockingQueue<Integer>();
+			solutionQueue.add(solution.getId());
 			judgeQueue.put(judgeSource, solutionQueue);
 		} else {
-			judgeQueue.get(judgeSource).add(solution);
+			judgeQueue.get(judgeSource).add(solution.getId());
 		}
 	}
 

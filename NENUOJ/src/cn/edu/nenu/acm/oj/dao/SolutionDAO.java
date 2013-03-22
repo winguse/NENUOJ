@@ -24,4 +24,17 @@ public class SolutionDAO extends AbstractDAO<Solution> {
 		query.setParameter("newStatus", Solution.STATUS_JUDGE_ERROR);
 		query.executeUpdate();
 	}
+	
+	
+	@Transactional(readOnly=true)
+	public String getJudgerSource(Integer solutionId){
+		Solution solution = this.findById(solutionId);
+		return solution.getProblem().getJudger().getSource();
+	}
+
+	@Transactional(readOnly=true)
+	public String getProblemNumber(Integer solutionId) {
+		Solution solution = this.findById(solutionId);
+		return solution.getProblem().getNumber();
+	}
 }

@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.opensymphony.xwork2.validator.annotations.RequiredStringValidator;
 
-import cn.edu.nenu.acm.oj.actions.AbstractAction;
 import cn.edu.nenu.acm.oj.actions.AbstractJsonAction;
 import cn.edu.nenu.acm.oj.dao.GenericDAO;
 import cn.edu.nenu.acm.oj.entitybeans.Judger;

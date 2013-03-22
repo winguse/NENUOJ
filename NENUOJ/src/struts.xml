@@ -4,7 +4,27 @@
     "http://struts.apache.org/dtds/struts-2.3.dtd">
 
 <struts>
-	<package name="default" extends="struts-default,json-default" namespace="/">
+	<package name="default" extends="struts-default,json-default">
+		<interceptors>
+			<interceptor name="permissionInterceptor"
+				class="cn.edu.nenu.acm.oj.interceptors.PermissionInterceptor" />
+		</interceptors>
+		<global-results>
+			<result name="reject-login-denied" type="redirect">error.action?type=reject-login-denied</result>
+			<result name="reject-login-needed" type="redirect">error.action?type=reject-login-needed</result>
+		</global-results>
+	</package>
+	<package name="winguse-json-default" extends="json-default">
+		<interceptors>
+			<interceptor name="permissionInterceptor"
+				class="cn.edu.nenu.acm.oj.interceptors.PermissionInterceptor" />
+		</interceptors>
+		<global-results>
+			<result name="reject-login-denied" type="redirect">error.action?type=reject-login-denied</result>
+			<result name="reject-login-needed" type="redirect">error.action?type=reject-login-needed</result>
+		</global-results>
+	</package>
+	<package name="winguse-struts-default" extends="struts-default">
 		<interceptors>
 			<interceptor name="permissionInterceptor"
 				class="cn.edu.nenu.acm.oj.interceptors.PermissionInterceptor" />

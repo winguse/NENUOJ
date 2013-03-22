@@ -87,6 +87,7 @@ OJ.prototype.loadProblem=function(problemId,descriptionId){
 	}
 	if(isNaN(descriptionId))
 		descriptionId=0;
+	$("#problemId").attr("value",problemId);
 	$progress.animate({width:"40%"});
 	$.get(baseUrl + "/problems/json/view.action",{
 		problemId:problemId,
