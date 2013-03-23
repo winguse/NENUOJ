@@ -35,7 +35,7 @@ import cn.edu.nenu.acm.oj.util.Remark;
     @NamedQuery(name = "Judger.findById", query = "SELECT j FROM Judger j WHERE j.id = :id"),
     @NamedQuery(name = "Judger.findBySource", query = "SELECT j FROM Judger j WHERE j.source = :source"),
     @NamedQuery(name = "Judger.findByLastUpdateTime", query = "SELECT j FROM Judger j WHERE j.lastUpdateTime = :lastUpdateTime")})
-public class Judger implements java.io.Serializable {
+public class Judger implements Serializable {
 
 	private static final long serialVersionUID = -3539076244150999982L;
 	private Integer id;
