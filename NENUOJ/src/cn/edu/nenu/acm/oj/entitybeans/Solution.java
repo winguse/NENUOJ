@@ -44,6 +44,7 @@ import cn.edu.nenu.acm.oj.util.Remark;
 		@NamedQuery(name = "Solution.findBySubmitTime", query = "SELECT s FROM Solution s WHERE s.submitTime = :submitTime"),
 		@NamedQuery(name = "Solution.findByJudgeTime", query = "SELECT s FROM Solution s WHERE s.judgeTime = :judgeTime"),
 		@NamedQuery(name = "Solution.findByPassRate", query = "SELECT s FROM Solution s WHERE s.passRate = :passRate"),
+		@NamedQuery(name = "Solution.findDistinctLanguage", query = "SELECT DISTINCT s.language FROM Solution s"),
 		@NamedQuery(name = "Solution.updateAllStatusTo", query = "UPDATE Solution s SET s.status = :newStatus WHERE s.status = :oldStatus"),
 		@NamedQuery(name = "Solution.findByLastUpdateTime", query = "SELECT s FROM Solution s WHERE s.lastUpdateTime = :lastUpdateTime") })
 public class Solution implements java.io.Serializable, ISolutionStatusCode {

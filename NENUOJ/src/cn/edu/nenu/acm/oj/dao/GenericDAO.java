@@ -47,14 +47,14 @@ public class GenericDAO {
 		return query.getResultList();
 	}
 
-	public <T extends Serializable> List<T> namedQuery(final String namedQuery, String[] names, Object[] values,
+	public <T extends Serializable> List<T> namedQuery(final String namedQuery, String[] prarmNames, Object[] prarmValues,
 			final Class<T> clazz) {
 		TypedQuery<T> query = em.createNamedQuery(namedQuery, clazz);
 		int parameterLength = 0;
-		if (names != null && values != null)
-			parameterLength = names.length > values.length ? names.length : values.length;
+		if (prarmNames != null && prarmValues != null)
+			parameterLength = prarmNames.length > prarmValues.length ? prarmNames.length : prarmValues.length;
 		for (int i = 0; i < parameterLength; i++) {
-			query.setParameter(names[i], values[i]);
+			query.setParameter(prarmNames[i], prarmValues[i]);
 		}
 		return query.getResultList();
 	}

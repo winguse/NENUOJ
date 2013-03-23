@@ -211,6 +211,9 @@ OJ.prototype.loadProblemList=function(){
 		"bJQueryUI": true
 	} );
 };
+OJ.prototype.loadStatus=function(){
+	
+};
 var oj;
 oj = new OJ();
 i18n.init();

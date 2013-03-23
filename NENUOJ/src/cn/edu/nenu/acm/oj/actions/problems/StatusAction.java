@@ -1,5 +1,6 @@
 package cn.edu.nenu.acm.oj.actions.problems;
 
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -12,20 +13,28 @@ import cn.edu.nenu.acm.oj.dao.GenericDAO;
 import cn.edu.nenu.acm.oj.entitybeans.Judger;
 
 @ParentPackage("struts-default")
-@Result(name="success",location="list-success.jsp")
-public class ListAction extends AbstractAction {
+@Result(name = "success", location = "status-success.jsp")
+public class StatusAction extends AbstractAction {
 
 	private static final long serialVersionUID = -8077897542384482842L;
-	
+	private static List<String> languageList;
+	private static long cacheTimestamp = 0L;
+
 	@Autowired
 	private GenericDAO dao;
-	
+
 	private List<String> judgerSourceList;
-	
+
 	@Override
 	public String execute() throws Exception {
+		long nowTimestamp = new Date().getTime();
+		if (nowTimestamp - cacheTimestamp > 1000 * 3600) {
+			languageList = dao.namedQuery("Solution.findDistinctLanguage", null, null, String.class);
+			cacheTimestamp = nowTimestamp;
+		}
 		judgerSourceList = new LinkedList<String>();
-		for(Judger j :dao.findAll(Judger.class)){
+		judgerSourceList.add(_("All"));
+		for (Judger j : dao.findAll(Judger.class)) {
 			judgerSourceList.add(j.getSource());
 		}
 		return SUCCESS;
@@ -33,5 +42,10 @@ public class ListAction extends AbstractAction {
 
 	public List<String> getJudgerSourceList() {
 		return judgerSourceList;
-	}	
+	}
+
+	public static List<String> getLanguageList() {
+		return languageList;
+	}
+
 }
