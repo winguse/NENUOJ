@@ -42,7 +42,7 @@ import cn.edu.nenu.acm.oj.util.Remark;
 		@NamedQuery(name = "Contest.findByEndTime", query = "SELECT c FROM Contest c WHERE c.endTime = :endTime"),
 		@NamedQuery(name = "Contest.findByContestType", query = "SELECT c FROM Contest c WHERE c.contestType = :contestType"),
 		@NamedQuery(name = "Contest.findByLastUpdateTime", query = "SELECT c FROM Contest c WHERE c.lastUpdateTime = :lastUpdateTime") })
-public class Contest implements java.io.Serializable {
+public class Contest implements Serializable {
 
 	private static final long serialVersionUID = 4386374575031447891L;
 	private Integer id;
