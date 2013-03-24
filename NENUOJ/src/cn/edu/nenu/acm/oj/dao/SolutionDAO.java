@@ -7,6 +7,8 @@ import java.util.List;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import cn.edu.nenu.acm.oj.dto.SolutionSimpleDTO;
+import cn.edu.nenu.acm.oj.entitybeans.Contest;
 import cn.edu.nenu.acm.oj.entitybeans.Contest_;
 import cn.edu.nenu.acm.oj.entitybeans.Judger_;
 import cn.edu.nenu.acm.oj.entitybeans.Problem;
@@ -103,10 +106,9 @@ public class SolutionDAO extends AbstractDAO<Solution> {
 		Root<Solution> root = query.from(Solution.class);
 		Predicate predicate = cb.conjunction();
 		if (!includeCurrentContest) {
-			predicate = cb.and(
-					predicate,
-					cb.or(cb.lessThan(root.get(Solution_.contest).get(Contest_.endTime), new Date()),
-							cb.isNull(root.get(Solution_.contest))));
+			Join<Solution, Contest> join = root.join(Solution_.contest, JoinType.LEFT);
+			predicate = cb.and(predicate,
+					cb.or(cb.isNull(join.get(Contest_.id)), cb.lessThan(join.get(Contest_.endTime), new Date())));
 		}
 		if (!"".equals(username)) {
 			predicate = cb.and(predicate, cb.like(root.get(Solution_.user).get(User_.username), "%" + username + "%"));

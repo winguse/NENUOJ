@@ -212,7 +212,88 @@ OJ.prototype.loadProblemList=function(){
 	} );
 };
 OJ.prototype.loadStatus=function(){
-	
+	$('#status').dataTable( {
+		"sDom": '<"H"if>t<"F"plr>',
+		"bProcessing": true,
+		"bServerSide": true,
+		"iDisplayLength": 20,
+		"bStateSave":true,
+		"oLanguage": {
+			"sInfo": "_START_ to _END_ of _TOTAL_ status",//TODO replace to _("xxx")
+			"sInfoEmpty": "No status",
+			"sInfoFiltered": " (filtering from _MAX_ total status)"
+		},
+	//	"aaSorting": [[ 1, "asc" ]],
+		"sAjaxSource": baseUrl + "/problems/json/status.action",
+		"fnServerData": function ( sSource, _aoData, fnCallback ) {
+			var aoData={};
+			for(var i in _aoData){
+				aoData[_aoData[i].name]=_aoData[i].value;
+			}
+			var orderIndex=aoData.iSortCol_0+1;
+			console.log(aoData.sSortDir_0);
+			if(aoData.sSortDir_0=="desc")
+				orderIndex=-orderIndex;
+			$.post( sSource, {
+				orderByIndex:orderIndex,
+				username:$("#username").attr("value"),
+				language:$("#language").attr("value"),
+				problemNumber:$("#problemNumber").attr("value"),
+				statusCode:$("#statusCode").attr("value"),
+				judgerSource:$("#judgerSource").attr("value"),
+				page:aoData.iDisplayStart/aoData.iDisplayLength,
+				pageSize:aoData.iDisplayLength
+			}, function (json) {
+				fnCallback({
+					sEcho:aoData.sEcho,
+					iTotalDisplayRecords:json.totalCount,
+					iTotalRecords:json.allStatusCount,
+					aaData:json.data
+				});
+			},"json" );
+		},
+		"aoColumns": [{
+				"sClass": ""//runId
+			},{
+				"sClass": ""//username
+			},{
+				"fnRender": function ( oObj ) {
+					return "<a href='"+baseUrl + "/problems/view.action#?problemId="+oObj.aData[9]+"'>"+oObj.aData[2].xss()+"</a>";
+				},
+				"sClass": ""//problem
+			},{
+				"sClass": "",//status description,
+				"fnRender": function ( oObj ) {
+					return oObj.aData[3];
+					//TODO if CE then.. and add css
+				}
+			},{
+				"sClass": "",//memory
+				"fnRender": function ( oObj ) {
+					return oObj.aData[4]+"KB";
+				}
+			},{
+				"fnRender": function ( oObj ) {
+					return oObj.aData[5]+"MS";
+				},
+				"sClass": ""//time
+			},{
+				"sClass":""//language
+			},{
+				"fnRender": function ( oObj ) {
+					return oObj.aData[7]+"B";
+				},
+				"sClass":""//code length
+			},{
+				"fnRender": function ( oObj ) {
+					return new Date(oObj.aData[8]);
+				},
+				"sClass":""//submit time
+			}
+		],
+//		"bJQueryUI": true,
+		"sPaginationType": "full_numbers"
+	} );
 };
 var oj;
 oj = new OJ();
