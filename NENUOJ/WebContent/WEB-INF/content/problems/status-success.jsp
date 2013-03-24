@@ -7,13 +7,12 @@
 <s:set var="pageTitle" value="getText('online-status')"/>
 <title><s:property value="#pageTitle"/> - <s:text name="site.title"/></title>
 <s:include value="../include/header.jsp"></s:include>
-<div>
 <form id="status_form" action="<s:url action="status" namespace="/problems/json"/>" class="form-inline">
-<label for="username"><s:text name="username" /></label><input type="text" class="input-small" name="username" id="username" placeholder="<s:text name="username" />">
-<label for="language"><s:text name="language" /></label><s:select list="languageList" cssClass="input-small" id="language" name="languge"></s:select>
-<label for="judgerSource"><s:text name="judgerSource" /></label><s:select cssClass="input-small" list="judgerSourceList" name="judgerSource" id="judgerSource"></s:select>
-<label for="problemId"><s:text name="problemId" /></label><input type="text" class="input-small" name="problemId" id="problemId" placeholder="<s:text name="problemId" />">
-<label for="result"><s:text name="result" /></label><s:select list="statusMapping" cssClass="input-small" id="result" name="result"></s:select>
+<label for="username"><s:text name="username" /></label><input type="text" class="span1" name="username" id="username" placeholder="<s:text name="username" />">
+<label for="language"><s:text name="language" /></label><s:select list="languageList" cssClass="span1" id="language" name="languge"></s:select>
+<label for="judgerSource"><s:text name="judgerSource" /></label><s:select cssClass="span1" list="judgerSourceList" name="judgerSource" id="judgerSource"></s:select>
+<label for="problemId"><s:text name="problemId" /></label><input type="text" class="span2" name="problemId" id="problemId" placeholder="<s:text name="problemId" />">
+<label for="result"><s:text name="result" /></label><s:select list="statusMapping" cssClass="span2" id="result" name="result"></s:select>
 <input type="submit" value="<s:text name="filter" />" class="btn">
 <input type="reset" value="<s:text name="reset" />" class="btn">
 </form>
@@ -42,6 +41,5 @@ $(function(){
 	oj.loadStatus();
 });
 </script>
-</div>
 <s:include value="../include/footer.jsp"></s:include>
 </c:html>

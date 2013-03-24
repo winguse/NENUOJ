@@ -32,6 +32,7 @@ public class StatusAction extends AbstractAction implements ISolutionStatusCode 
 		long nowTimestamp = new Date().getTime();
 		if (nowTimestamp - cacheTimestamp > 1000 * 3600) {
 			languageList = dao.namedQuery("Solution.findDistinctLanguage", null, null, String.class);
+			languageList.add(0, "All");
 			cacheTimestamp = nowTimestamp;
 		}
 		judgerSourceList = new LinkedList<String>();

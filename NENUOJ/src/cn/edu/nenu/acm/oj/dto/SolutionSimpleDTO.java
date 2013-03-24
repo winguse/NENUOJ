@@ -4,10 +4,12 @@ import cn.edu.nenu.acm.oj.statuscode.ISolutionStatusCode;
 
 public class SolutionSimpleDTO implements ISolutionStatusCode {
 
-	private String runId;
+	private int runId;
 	private String username;
+	private String judgerSource;
+	private String prublemNumber;
 	private String problemTitle;
-	private String problemId;
+	private int problemId;
 	private int statusCode;
 	private String statusDescription;
 	private int memory;
@@ -17,12 +19,14 @@ public class SolutionSimpleDTO implements ISolutionStatusCode {
 	private long submitTime;
 	private int contestId;
 
-	public SolutionSimpleDTO(String runId, String username, String problemTitle, String problemId, int statusCode,
-			String statusDescription, int memory, int time, String language, int codeLength, long submitTime,
-			int contestId) {
+	public SolutionSimpleDTO(int runId, String username, String judgerSource, String prublemNumber,
+			String problemTitle, int problemId, int statusCode, String statusDescription, int memory, int time,
+			String language, int codeLength, long submitTime, int contestId) {
 		super();
 		this.runId = runId;
 		this.username = username;
+		this.judgerSource = judgerSource;
+		this.prublemNumber = prublemNumber;
 		this.problemTitle = problemTitle;
 		this.problemId = problemId;
 		this.statusCode = statusCode;
@@ -35,11 +39,11 @@ public class SolutionSimpleDTO implements ISolutionStatusCode {
 		this.contestId = contestId;
 	}
 
-	public String getRunId() {
+	public int getRunId() {
 		return runId;
 	}
 
-	public void setRunId(String runId) {
+	public void setRunId(int runId) {
 		this.runId = runId;
 	}
 
@@ -51,6 +55,22 @@ public class SolutionSimpleDTO implements ISolutionStatusCode {
 		this.username = username;
 	}
 
+	public String getJudgerSource() {
+		return judgerSource;
+	}
+
+	public void setJudgerSource(String judgerSource) {
+		this.judgerSource = judgerSource;
+	}
+
+	public String getPrublemNumber() {
+		return prublemNumber;
+	}
+
+	public void setPrublemNumber(String prublemNumber) {
+		this.prublemNumber = prublemNumber;
+	}
+
 	public String getProblemTitle() {
 		return problemTitle;
 	}
@@ -59,11 +79,11 @@ public class SolutionSimpleDTO implements ISolutionStatusCode {
 		this.problemTitle = problemTitle;
 	}
 
-	public String getProblemId() {
+	public int getProblemId() {
 		return problemId;
 	}
 
-	public void setProblemId(String problemId) {
+	public void setProblemId(int problemId) {
 		this.problemId = problemId;
 	}
 

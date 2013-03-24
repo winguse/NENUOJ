@@ -14,58 +14,61 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import cn.edu.nenu.acm.oj.actions.AbstractJsonAction;
 import cn.edu.nenu.acm.oj.dao.ProblemDAO;
+import cn.edu.nenu.acm.oj.dao.SolutionDAO;
 import cn.edu.nenu.acm.oj.dto.ProblemSimpleDTO;
+import cn.edu.nenu.acm.oj.dto.SolutionSimpleDTO;
 import cn.edu.nenu.acm.oj.util.Pair;
 
 @ParentPackage("json-default")
-@InterceptorRefs({
-	@InterceptorRef("i18n"),
-	@InterceptorRef("jsonValidationWorkflowStack")
-})
+@InterceptorRefs({ @InterceptorRef("i18n"), @InterceptorRef("jsonValidationWorkflowStack") })
 @Results({ @Result(name = "success", type = "json") })
 public class StatusAction extends AbstractJsonAction implements SessionAware {
 
 	private static final long serialVersionUID = -1246689012240563630L;
 
 	@Autowired
-	private ProblemDAO dao;
+	private SolutionDAO dao;
 
+	private String username = "";
+	private String problemNumber = "";
+	private String language = "";
 	private String judgerSource = "";
+	private int statusCode = 0;
 	private int page = 0;
 	private int pageSize = 50;
-	private String filterString = "";
 	private int orderByIndex = 0;
-	private boolean includeLocked = false;
+	private boolean includeCurrentContest = false;
 	private Long totalCount;
 	private LinkedList<Object[]> data;
 	private String[] indexMapping;
-	private static Long allProblemCount;
-	
+	private static Long allStatusCount;
+
 	@Override
 	public String execute() throws Exception {
 		code = 0;
 		message = "success";
-		Pair<Long, List<ProblemSimpleDTO>> result = dao.getProblemList(judgerSource, filterString, page, pageSize,
-				includeLocked, orderByIndex);
-		indexMapping = new String[] { _("judger_source"), _("problem_number"), _("problem_title"), _("accepted"),
-				_("submitted"), _("is_locked"), _("source"),_("id") };
+		Pair<Long, List<SolutionSimpleDTO>> result = dao.getSolutionList(username, language, judgerSource,
+				problemNumber, statusCode, page, pageSize, orderByIndex, includeCurrentContest);
+		indexMapping = new String[] { _("runId"), _("username"), _("judgerSource"), _("problemNumber"),
+				_("statusDescription"), _("memory"), _("time"), _("language"), _("codeLength"), _("submitTime"),
+				_("problemId"), _("problemTitle"), _("statusCode"), _("contestId") };
 		data = new LinkedList<Object[]>();
-		for (ProblemSimpleDTO p : result.second) {
-			data.push(new Object[] { p.getJudgerSource(), p.getNumber(), p.getTitle(), p.getAccepted(),
-					p.getSubmitted(), p.getLocked(), p.getSource(), p.getId() });
+		for (SolutionSimpleDTO s : result.second) {
+			data.push(new Object[] { s.getRunId(), s.getUsername(), s.getJudgerSource() + " " + s.getPrublemNumber(),
+					s.getStatusDescription(), s.getMemory(), s.getTime(), s.getLanguage(), s.getCodeLength(),
+					s.getSubmitTime(), s.getProblemId(), s.getProblemTitle(), s.getStatusCode(), s.getContestId() });
 		}
 		totalCount = result.first;
-		if("".equals(judgerSource)&&"".equals(filterString)){
-			allProblemCount = result.first;
+		if ("".equals(judgerSource) && "".equals(username) && "".equals(language) && "".equals(problemNumber)
+				&& statusCode == 0) {
+			allStatusCount = result.first;
 		}
 		return SUCCESS;
 	}
 
 	public void setJudgerSource(String judgerSource) {
-		if (judgerSource == null)
-			return;
-		if (judgerSource.length() > 10)
-			judgerSource = judgerSource.substring(0, 10);
+		if ("All".equals(judgerSource))
+			judgerSource = "";
 		this.judgerSource = judgerSource;
 	}
 
@@ -79,16 +82,6 @@ public class StatusAction extends AbstractJsonAction implements SessionAware {
 		if (pageSize < 10 || pageSize > 200)
 			page = 50;
 		this.pageSize = pageSize;
-	}
-
-	public void setFilterString(String filterString) {
-		System.out.println(filterString);
-		if (filterString == null)
-			return;
-		if (filterString.length() > 50)
-			filterString = filterString.substring(0, 50);
-		System.out.println(filterString);
-		this.filterString = filterString;
 	}
 
 	public void setOrderByIndex(int orderByIndex) {
@@ -109,7 +102,7 @@ public class StatusAction extends AbstractJsonAction implements SessionAware {
 
 	@Override
 	public void setSession(Map<String, Object> arg0) {
-		// TODO set includeLocked if the user logined and has the permission
+		// TODO set include contest if the user logined and has the permission
 	}
 
 	public LinkedList<Object[]> getData() {
@@ -120,8 +113,26 @@ public class StatusAction extends AbstractJsonAction implements SessionAware {
 		return indexMapping;
 	}
 
-	public Long getAllProblemCount() {
-		return allProblemCount;
+	public static Long getAllStatusCount() {
+		return allStatusCount;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	public void setProblemNumber(String problemNumber) {
+		this.problemNumber = problemNumber;
+	}
+
+	public void setLanguage(String language) {
+		if ("All".equals(language))
+			language = "";
+		this.language = language;
+	}
+
+	public void setStatusCode(int statusCode) {
+		this.statusCode = statusCode;
 	}
 
 }

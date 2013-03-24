@@ -63,8 +63,12 @@ body>*:first-child{
 		margin-bottom: 9px;
 	}
 }
-
-
+@media (max-width: 767px) { /* Remove any padding from the body */
+	/* -- status form -- */
+	.row>input[type="submit"],.row>input[type="reset"]{
+		margin-top:5px;
+	}
+}
 /* -- data table -- */
 .css_right {
 	float: right;

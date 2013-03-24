@@ -1,5 +1,6 @@
 package cn.edu.nenu.acm.oj.dao;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -18,6 +19,7 @@ import cn.edu.nenu.acm.oj.dto.ProblemDescriptionDTO;
 import cn.edu.nenu.acm.oj.dto.ProblemDescriptionSimpleDTO;
 import cn.edu.nenu.acm.oj.dto.ProblemSimpleDTO;
 import cn.edu.nenu.acm.oj.entitybeans.Judger;
+import cn.edu.nenu.acm.oj.entitybeans.Judger_;
 import cn.edu.nenu.acm.oj.entitybeans.Problem;
 import cn.edu.nenu.acm.oj.entitybeans.ProblemDescription;
 import cn.edu.nenu.acm.oj.entitybeans.Problem_;
@@ -62,24 +64,28 @@ public class ProblemDAO extends AbstractDAO<Problem> {
 			if (!includeLocked && pd.isLocked())
 				continue;
 			lstPDS.add(new ProblemDescriptionSimpleDTO(pd.getId(), problem.getId(), pd.isLocked(), pd.getVote(), pd
-					.getTitle(),pd.getUser()!=null?pd.getUser().getUsername():"System",pd.getLastUpdateTime().getTime(),(String)pd.getRemark().get("versionMark")));
-			if(descriptionId==pd.getId()||(descriptionId <= 0 && pd.getUser()==null)){
-				problemDescription=pd;
+					.getTitle(), pd.getUser() != null ? pd.getUser().getUsername() : "System", pd.getLastUpdateTime()
+					.getTime(), (String) pd.getRemark().get("versionMark")));
+			if (descriptionId == pd.getId() || (descriptionId <= 0 && pd.getUser() == null)) {
+				problemDescription = pd;
 			}
 		}
 		ProblemDescriptionDTO problemDescriptionDTO = null;
 		if (problemDescription != null)
 			problemDescriptionDTO = new ProblemDescriptionDTO(problemDescription.getId(), problem.getId(),
-					problemDescription.isLocked(), problemDescription.getVote(), problemDescription.getTitle(),"System",problemDescription.getLastUpdateTime().getTime(),(String)problemDescription.getRemark().get("versionMark"),
-					problemDescription.getDescription(), problemDescription.getInput(), problemDescription.getOutput(),
-					problemDescription.getSampleIn(), problemDescription.getSampleOut(), problemDescription.getHint());
+					problemDescription.isLocked(), problemDescription.getVote(), problemDescription.getTitle(),
+					"System", problemDescription.getLastUpdateTime().getTime(), (String) problemDescription.getRemark()
+							.get("versionMark"), problemDescription.getDescription(), problemDescription.getInput(),
+					problemDescription.getOutput(), problemDescription.getSampleIn(),
+					problemDescription.getSampleOut(), problemDescription.getHint());
 		String[] supportedLanguage = null;
-		if(problem.getJudger().getRemark().get("supportedLanguage") instanceof String[])
-			supportedLanguage=(String[]) problem.getJudger().getRemark().get("supportedLanguage");
+		if (problem.getJudger().getRemark().get("supportedLanguage") instanceof String[])
+			supportedLanguage = (String[]) problem.getJudger().getRemark().get("supportedLanguage");
 		return new ProblemDTO(problem.getId(), problem.isLocked(), problem.getTitle(), problem.getJudger().getSource(),
 				problem.getNumber(), problem.getAccepted(), problem.getSubmitted(), problem.getSource(),
 				problem.getTimeLimit(), problem.getMemoryLimit(), (String) problem.getJudger().getRemark()
-						.get("longIntFormat"), problem.getJudgingType(), problemDescriptionDTO, lstPDS,supportedLanguage);
+						.get("longIntFormat"), problem.getJudgingType(), problemDescriptionDTO, lstPDS,
+				supportedLanguage);
 	}
 
 	/**
@@ -96,54 +102,24 @@ public class ProblemDAO extends AbstractDAO<Problem> {
 	@Transactional(readOnly = true)
 	public Pair<Long, List<ProblemSimpleDTO>> getProblemList(String judgerSource, String filterString, int page,
 			int pageSize, boolean includeLoocked, int orderIndex) {
-	//	System.out.println(orderIndex + "#" + filterString + "#" + judgerSource);
+		// System.out.println(orderIndex + "#" + filterString + "#" +
+		// judgerSource);
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Problem> query = cb.createQuery(Problem.class);
 		CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
-		Root<Problem> problemRoot = query.from(Problem.class);
-		Root<Problem> countProblemRoot = countQuery.from(Problem.class);
-		Predicate predicate = cb.conjunction();
-		Predicate countPredicate = cb.conjunction();
-		if (!includeLoocked) {
-			predicate = cb.and(predicate, cb.equal(problemRoot.get(Problem_.locked), false));
-			countPredicate = cb.and(countPredicate, cb.equal(countProblemRoot.get(Problem_.locked), false));
-		}
-		if (!"".equals(judgerSource)) {
-			TypedQuery<Judger> judgerQuery = em.createNamedQuery("Judger.findBySource", Judger.class);
-			judgerQuery.setParameter("source", judgerSource);
-			Judger judger = null;
-			try {
-				judger = judgerQuery.getSingleResult();
-			} catch (Exception e) {
-			}
-			if (judger != null) {
-				predicate = cb.and(predicate, cb.equal(problemRoot.get(Problem_.judger), judger));
-				countPredicate = cb.and(countPredicate, cb.equal(countProblemRoot.get(Problem_.judger), judger));
-			}
-		}
-		if (!"".equals(filterString)) {
-			filterString = "%" + filterString + "%";
-			System.out.println(filterString);
-			Predicate predicateOr = cb.disjunction();
-			Predicate countPredicateOr = cb.disjunction();
-			predicateOr = cb.or(predicateOr, cb.like(problemRoot.get(Problem_.title), filterString));
-			countPredicateOr = cb.or(countPredicateOr, cb.like(countProblemRoot.get(Problem_.title), filterString));
-			predicateOr = cb.or(predicateOr, cb.like(problemRoot.get(Problem_.source), filterString));
-			countPredicateOr = cb.or(countPredicateOr, cb.like(countProblemRoot.get(Problem_.source), filterString));
-			predicateOr = cb.or(predicateOr, cb.like(problemRoot.get(Problem_.number), filterString));
-			countPredicateOr = cb.or(countPredicateOr, cb.like(countProblemRoot.get(Problem_.number), filterString));
-			predicate = cb.and(predicate, predicateOr);
-			countPredicate = cb.and(countPredicate, countPredicateOr);
-		}
-		countQuery.select(cb.count(countProblemRoot)).where(countPredicate);
+		Pair<Predicate, Root<Problem>> pair = getPredicate(judgerSource, filterString, includeLoocked, query, cb);
+		Pair<Predicate, Root<Problem>> countPair = getPredicate(judgerSource, filterString, includeLoocked, countQuery, cb);
+		Root<Problem> problemRoot = pair.second;
+		Predicate predicate = pair.first;
+		countQuery.select(cb.count(countPair.second)).where(countPair.first);
 		Pair<Long, List<ProblemSimpleDTO>> result = new Pair<Long, List<ProblemSimpleDTO>>();
 		result.first = em.createQuery(countQuery).getSingleResult();
 		switch (orderIndex) {
 		case ORDER_BY_JUDGER_SOURCE:
-			query.orderBy(cb.asc(problemRoot.get(Problem_.judger)));
+			query.orderBy(cb.asc(problemRoot.get(Problem_.judger).get(Judger_.source)));
 			break;
 		case -ORDER_BY_JUDGER_SOURCE:
-			query.orderBy(cb.desc(problemRoot.get(Problem_.judger)));
+			query.orderBy(cb.desc(problemRoot.get(Problem_.judger).get(Judger_.source)));
 			break;
 		case ORDER_BY_NUMBER:
 			query.orderBy(cb.asc(problemRoot.get(Problem_.number)));
@@ -182,7 +158,7 @@ public class ProblemDAO extends AbstractDAO<Problem> {
 			query.orderBy(cb.desc(problemRoot.get(Problem_.source)));
 			break;
 		default:
-		//	System.out.println("Not ordered");
+			// System.out.println("Not ordered");
 			// don't order
 		}
 		query.select(problemRoot).where(predicate);
@@ -195,5 +171,30 @@ public class ProblemDAO extends AbstractDAO<Problem> {
 		}
 		result.second = problemDTOList;
 		return result;
+	}
+
+	private <T> Pair<Predicate, Root<Problem>> getPredicate(String judgerSource, String filterString,
+			boolean includeLoocked, CriteriaQuery<T> query, CriteriaBuilder cb) {
+		Root<Problem> problemRoot = query.from(Problem.class);
+		Predicate predicate = cb.conjunction();
+		if (!includeLoocked) {
+			predicate = cb.and(predicate, cb.equal(problemRoot.get(Problem_.locked), false));
+		}
+		if (!"".equals(judgerSource)) {
+			predicate = cb.and(predicate, cb.equal(problemRoot.get(Problem_.judger).get(Judger_.source), judgerSource));
+		}
+		if (!"".equals(filterString)) {
+			filterString = "%" + filterString + "%";
+			System.out.println(filterString);
+			Predicate predicateOr = cb.disjunction();
+			predicateOr = cb.or(predicateOr, cb.like(problemRoot.get(Problem_.title), filterString));
+			predicateOr = cb.or(predicateOr, cb.like(problemRoot.get(Problem_.source), filterString));
+			predicateOr = cb.or(predicateOr, cb.like(problemRoot.get(Problem_.number), filterString));
+			predicate = cb.and(predicate, predicateOr);
+		}
+		Pair<Predicate, Root<Problem>> ret = new Pair<Predicate, Root<Problem>>();
+		ret.first = predicate;
+		ret.second = problemRoot;
+		return ret;
 	}
 }
