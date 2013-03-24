@@ -27,12 +27,12 @@ public class HDUProblemSubmitter implements IProblemSubmitter {
 	public static final String homePage = "http://acm.hdu.edu.cn";
 	public static final Map<String, String> languageMapping = new HashMap<String, String>() {
 		{
-			put("g++", "0");
-			put("gcc", "1");
-			put("c++", "2");
-			put("c", "3");
-			put("pascal", "4");
-			put("java", "5");
+			put("G++", "0");
+			put("GCC", "1");
+			put("C++", "2");
+			put("C", "3");
+			put("Pascal", "4");
+			put("Java", "5");
 		}
 	};
 	public static final Map<String, Integer> statusMapping = new HashMap<String, Integer>() {
@@ -85,7 +85,7 @@ public class HDUProblemSubmitter implements IProblemSubmitter {
 
 	@Override
 	public void submit(String problem, String sourceCode, String language) throws NetworkException, SubmitException {
-		String strLanguage = languageMapping.get(language.toLowerCase());
+		String strLanguage = languageMapping.get(language);
 		if (strLanguage == null) {
 			throw new SubmitException("Not Supported Language.");
 		}

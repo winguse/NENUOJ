@@ -3,6 +3,7 @@ package cn.edu.nenu.acm.oj.actions.problems;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.struts2.convention.annotation.ParentPackage;
 import org.apache.struts2.convention.annotation.Result;
@@ -11,10 +12,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import cn.edu.nenu.acm.oj.actions.AbstractAction;
 import cn.edu.nenu.acm.oj.dao.GenericDAO;
 import cn.edu.nenu.acm.oj.entitybeans.Judger;
+import cn.edu.nenu.acm.oj.statuscode.ISolutionStatusCode;
 
 @ParentPackage("struts-default")
 @Result(name = "success", location = "status-success.jsp")
-public class StatusAction extends AbstractAction {
+public class StatusAction extends AbstractAction implements ISolutionStatusCode {
 
 	private static final long serialVersionUID = -8077897542384482842L;
 	private static List<String> languageList;
@@ -44,8 +46,12 @@ public class StatusAction extends AbstractAction {
 		return judgerSourceList;
 	}
 
-	public static List<String> getLanguageList() {
+	public List<String> getLanguageList() {
 		return languageList;
+	}
+	
+	public Map<Integer,String> getStatusMapping(){
+		return statusMapping;
 	}
 
 }

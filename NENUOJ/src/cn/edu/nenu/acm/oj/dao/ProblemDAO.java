@@ -96,7 +96,7 @@ public class ProblemDAO extends AbstractDAO<Problem> {
 	@Transactional(readOnly = true)
 	public Pair<Long, List<ProblemSimpleDTO>> getProblemList(String judgerSource, String filterString, int page,
 			int pageSize, boolean includeLoocked, int orderIndex) {
-		System.out.println(orderIndex + "#" + filterString + "#" + judgerSource);
+	//	System.out.println(orderIndex + "#" + filterString + "#" + judgerSource);
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Problem> query = cb.createQuery(Problem.class);
 		CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
@@ -182,7 +182,7 @@ public class ProblemDAO extends AbstractDAO<Problem> {
 			query.orderBy(cb.desc(problemRoot.get(Problem_.source)));
 			break;
 		default:
-			System.out.println("Not ordered");
+		//	System.out.println("Not ordered");
 			// don't order
 		}
 		query.select(problemRoot).where(predicate);
