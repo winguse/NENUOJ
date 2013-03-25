@@ -42,7 +42,13 @@ body>*:first-child{
 .problem_limit>span{
 	margin-right:2em;
 }
-
+/* data table status*/
+#status tbody td{
+	text-align: center;
+}
+#status .progress{
+	margin:0;
+}
 @media ( max-width : 979px) { /* Remove any padding from the body */
 	body>*:first-child{
 		padding-top:0px;

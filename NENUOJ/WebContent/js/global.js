@@ -30,6 +30,11 @@ function WinguseAjaxForm(form, successCallback) {
 		return false;
 	});
 };
+Date.prototype.ojFormat=function(){
+	function _(i){return i<10?"0"+i:""+i;}
+	return this.getFullYear()+"-"+_(this.getMonth()+1)+"-"+_(this.getDate())+" "+_(this.getHours())+":"+_(this.getMinutes())+":"+_(this.getSeconds());
+};
+
 String.prototype.xss=function(){
 	return this.replace(/<script>.*?<\/script>/g,'')
 	.replace(/"/g, '&quot;')
@@ -167,7 +172,6 @@ OJ.prototype.loadProblemList=function(){
 				aoData[_aoData[i].name]=_aoData[i].value;
 			}
 			var orderIndex=aoData.iSortCol_0+1;
-			console.log(aoData.sSortDir_0);
 			if(aoData.sSortDir_0=="desc")
 				orderIndex=-orderIndex;
 			$.post( sSource, {
@@ -211,27 +215,32 @@ OJ.prototype.loadProblemList=function(){
 		"bJQueryUI": true
 	} );
 };
-OJ.prototype.loadStatus=function(){
-	$('#status').dataTable( {
-		"sDom": '<"H"if>t<"F"plr>',
+
+OJ.prototype.rejudge=function(runId){
+	
+};
+OJ.prototype.loadStatus=function(sortable){
+	sortable=false;
+	$('#status').dataTable({
+		"sDom": '<"H">t<"F"pr>',
 		"bProcessing": true,
 		"bServerSide": true,
 		"iDisplayLength": 20,
+		"bSortable": sortable,
 		"bStateSave":true,
 		"oLanguage": {
 			"sInfo": "_START_ to _END_ of _TOTAL_ status",//TODO replace to _("xxx")
 			"sInfoEmpty": "No status",
 			"sInfoFiltered": " (filtering from _MAX_ total status)"
 		},
-	//	"aaSorting": [[ 1, "asc" ]],
+		"aaSorting": [[ 0, "desc" ]],
 		"sAjaxSource": baseUrl + "/problems/json/status.action",
 		"fnServerData": function ( sSource, _aoData, fnCallback ) {
 			var aoData={};
 			for(var i in _aoData){
 				aoData[_aoData[i].name]=_aoData[i].value;
 			}
-			var orderIndex=aoData.iSortCol_0+1;
-			console.log(aoData.sSortDir_0);
+			var orderIndex=aoData.iSortCol_0;
 			if(aoData.sSortDir_0=="desc")
 				orderIndex=-orderIndex;
 			$.post( sSource, {
@@ -253,19 +262,41 @@ OJ.prototype.loadStatus=function(){
 			},"json" );
 		},
 		"aoColumns": [{
+				"bSortable": false,
 				"sClass": ""//runId
 			},{
+
+				"fnRender": function ( oObj ) {
+					return "<a href='"+baseUrl + "/showUser.action#?username="+oObj.aData[1].xss()+"'>"+oObj.aData[1].xss()+"</a>";
+				},
+				"bSortable": false,
 				"sClass": ""//username
 			},{
+				"bSortable": false,
 				"fnRender": function ( oObj ) {
 					return "<a href='"+baseUrl + "/problems/view.action#?problemId="+oObj.aData[9]+"'>"+oObj.aData[2].xss()+"</a>";
 				},
 				"sClass": ""//problem
 			},{
+				"bSortable": false,
 				"sClass": "",//status description,
 				"fnRender": function ( oObj ) {
-					return oObj.aData[3];
-					//TODO if CE then.. and add css
+					var status = oObj.aData[11];
+					console.log();
+					if(status==1){//pedding
+						return '<span class="badge">'+oObj.aData[3].xss()+'</span>';
+					}else if(status==2){//processing
+						return '<div class="progress progress-striped active"><div class="bar" style="width:100%">'+oObj.aData[3].xss()+'</div></div>';
+					}else if(status==3){//judge error
+						return '<span class="badge badge-warning" title="'+$.t("Last Status Description: ")+oObj.aData[3].xss()+'">'+
+						$.t("judgeError")+' <i onclick="oj.rejudge('+oObj.aData[0]+')" class="icon-repeat icon-white" style="cursor: pointer;" title="'+$.t("Click here to rejudge.")+'"></i></span>';
+					}else if(status==4){//accepted
+						return '<span class="badge badge-success">'+oObj.aData[3].xss()+'</span>';
+					}else{
+						//TODO if CE then.. and add css
+						return '<span class="badge badge-important">'+oObj.aData[3].xss()+'</span>';
+					}
+					
 				}
 			},{
 				"sClass": "",//memory
@@ -278,6 +309,7 @@ OJ.prototype.loadStatus=function(){
 				},
 				"sClass": ""//time
 			},{
+				"bSortable": false,
 				"sClass":""//language
 			},{
 				"fnRender": function ( oObj ) {
@@ -285,14 +317,22 @@ OJ.prototype.loadStatus=function(){
 				},
 				"sClass":""//code length
 			},{
+				"bSortable": false,
 				"fnRender": function ( oObj ) {
-					return new Date(oObj.aData[8]);
+					return new Date(oObj.aData[8]).ojFormat();
 				},
 				"sClass":""//submit time
 			}
 		],
 //		"bJQueryUI": true,
-		"sPaginationType": "full_numbers"
+		"sPaginationType": "full_numbers",
+		"fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
+			$(nRow).attr("id", "solution_"+aData[0]);
+			if(aData[11]==2||aData[11]==1){//processing & pedding
+				//TODO add to update list
+			}
+			return nRow;
+		}
 	} );
 };
 var oj;

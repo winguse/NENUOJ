@@ -49,12 +49,12 @@ public class StatusAction extends AbstractJsonAction implements SessionAware {
 		message = "success";
 		Pair<Long, List<SolutionSimpleDTO>> result = dao.getSolutionList(username, language, judgerSource,
 				problemNumber, statusCode, page, pageSize, orderByIndex, includeCurrentContest);
-		indexMapping = new String[] { _("runId"), _("username"), _("judgerSource"), _("problemNumber"),
+		indexMapping = new String[] { _("runId"), _("username"), _("judgerSource")+" "+ _("problemNumber"),
 				_("statusDescription"), _("memory"), _("time"), _("language"), _("codeLength"), _("submitTime"),
 				_("problemId"), _("problemTitle"), _("statusCode"), _("contestId") };
 		data = new LinkedList<Object[]>();
 		for (SolutionSimpleDTO s : result.second) {
-			data.push(new Object[] { s.getRunId(), s.getUsername(), s.getJudgerSource() + " " + s.getPrublemNumber(),
+			data.add(new Object[] { s.getRunId(), s.getUsername(), s.getJudgerSource() + " " + s.getPrublemNumber(),
 					s.getStatusDescription(), s.getMemory(), s.getTime(), s.getLanguage(), s.getCodeLength(),
 					s.getSubmitTime(), s.getProblemId(), s.getProblemTitle(), s.getStatusCode(), s.getContestId() });
 		}

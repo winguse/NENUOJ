@@ -51,7 +51,7 @@ public class ListAction extends AbstractJsonAction implements SessionAware {
 				_("submitted"), _("is_locked"), _("source"),_("id") };
 		data = new LinkedList<Object[]>();
 		for (ProblemSimpleDTO p : result.second) {
-			data.push(new Object[] { p.getJudgerSource(), p.getNumber(), p.getTitle(), p.getAccepted(),
+			data.add(new Object[] { p.getJudgerSource(), p.getNumber(), p.getTitle(), p.getAccepted(),
 					p.getSubmitted(), p.getLocked(), p.getSource(), p.getId() });
 		}
 		totalCount = result.first;

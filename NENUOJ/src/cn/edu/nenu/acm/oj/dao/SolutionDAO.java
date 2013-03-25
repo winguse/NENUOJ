@@ -29,10 +29,9 @@ import cn.edu.nenu.acm.oj.util.Pair;
 @Repository
 public class SolutionDAO extends AbstractDAO<Solution> {
 
-	public static final int ORDER_BY_NONE = 0;
-	public static final int ORDER_BY_MEMORY = 1;
-	public static final int ORDER_BY_RUNTIME = 2;
-	public static final int ORDER_BY_CODE_LENGTH = 3;
+	public static final int ORDER_BY_MEMORY = 5;
+	public static final int ORDER_BY_RUNTIME = 6;
+	public static final int ORDER_BY_CODE_LENGTH = 8;
 
 	public SolutionDAO() {
 		super();
@@ -84,6 +83,7 @@ public class SolutionDAO extends AbstractDAO<Solution> {
 			query.orderBy(cb.desc(root.get(Solution_.codeLength)));
 			break;
 		default:
+			query.orderBy(cb.desc(root.get(Solution_.id)));
 		}
 		query.select(root).where(pair.first);
 		List<Solution> solutionList = em.createQuery(query).setFirstResult(page * pageSize).setMaxResults(pageSize)
