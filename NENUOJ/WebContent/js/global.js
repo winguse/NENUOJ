@@ -44,6 +44,7 @@ String.prototype.xss=function(){
 	.replace(/\r?\n/g, '<br/>');
 };
 function OJ() {
+	this.syncStatus={};
 }
 
 OJ.prototype.loginRequired = function() {
@@ -216,9 +217,16 @@ OJ.prototype.loadProblemList=function(){
 	} );
 };
 
-OJ.prototype.rejudge=function(runId){
-	
+OJ.prototype.addSyncStatus=function(runId){
+	this.syncStatus[runId]=false;
 };
+
+OJ.prototype.rejudge=function(runId){
+	this.addSyncStatus(runId);
+	$("#solution_"+runId);
+};
+
+
 OJ.prototype.loadStatus=function(sortable){
 	sortable=false;
 	$('#status').dataTable({
