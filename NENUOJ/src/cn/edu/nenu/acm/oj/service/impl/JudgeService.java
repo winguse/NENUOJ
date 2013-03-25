@@ -233,16 +233,16 @@ public class JudgeService extends Thread {
 	 * @param solution
 	 * @throws NotSupportJudgeSourceException
 	 */
-	public synchronized void putJudgeJob(Solution solution) throws NotSupportJudgeSourceException {
-		String judgeSource = solutionDAO.getJudgerSource(solution.getId());
+	public synchronized void putJudgeJob(int solutionId) throws NotSupportJudgeSourceException {
+		String judgeSource = solutionDAO.getJudgerSource(solutionId);
 		if (accounts.get(judgeSource) == null)
 			throw new NotSupportJudgeSourceException(judgeSource);
 		if (judgeQueue.get(judgeSource) == null) {
 			LinkedBlockingQueue<Integer> solutionQueue = new LinkedBlockingQueue<Integer>();
-			solutionQueue.add(solution.getId());
+			solutionQueue.add(solutionId);
 			judgeQueue.put(judgeSource, solutionQueue);
 		} else {
-			judgeQueue.get(judgeSource).add(solution.getId());
+			judgeQueue.get(judgeSource).add(solutionId);
 		}
 	}
 

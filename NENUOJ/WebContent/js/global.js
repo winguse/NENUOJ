@@ -2,6 +2,18 @@
  * 
  */
 "use strict";
+var STATUS_ALL = 0
+,STATUS_PEDDING = 1
+,STATUS_PROCESSING = 2
+,STATUS_JUDGE_ERROR = 3
+,STATUS_ACCEPTED = 4
+,STATUS_PRESENTATION_ERROR = 5
+,STATUS_WRONG_ANSWER = 6
+,STATUS_TIME_LIMITED_EXCEED = 7
+,STATUS_MEMORY_LIMITED_EXCEED = 8
+,STATUS_OUTPUT_LIMITED_EXCEED = 9
+,STATUS_RUNTIME_ERROR = 10
+,STATUS_COMPLIE_ERROR = 11;
 
 function WinguseAjaxForm(form, successCallback) {
 	var $form = typeof (form) == "string" ? $(form)
@@ -44,9 +56,9 @@ String.prototype.xss=function(){
 	.replace(/\r?\n/g, '<br/>');
 };
 function OJ() {
-	this.syncStatus={};
+	this.syncStatusList={};
+	this.syncHandle=0;
 }
-
 OJ.prototype.loginRequired = function() {
 	var $form = $("#login_form");
 	WinguseAjaxForm($form, function(data) {
@@ -218,17 +230,81 @@ OJ.prototype.loadProblemList=function(){
 };
 
 OJ.prototype.addSyncStatus=function(runId){
-	this.syncStatus[runId]=false;
+	this.syncStatusList[runId]=false;
 };
 
 OJ.prototype.rejudge=function(runId){
-	this.addSyncStatus(runId);
-	$("#solution_"+runId);
+	var I = this;
+	$("#solution_"+runId+">.statusDescription").html(
+		I.statusDescriptionHTML(STATUS_PEDDING, $.t('Pedding Rejudge'), runId)
+	);
+	$.post(
+		baseUrl + "/problems/json/rejudge.action",{
+			runId:runId
+		},function(d){
+			if(d.code == 0){
+				I.addSyncStatus(runId);
+			}else{
+				I.showMessage(d.message);
+			}
+		},"json"
+	);
+	I.addSyncStatus(runId);
+	I.syncStatus();
 };
-
-
+OJ.prototype.showMessage=function(message,type){
+	//TODO
+};
+OJ.prototype.syncStatus=function(){
+	var I = this,runIdList="";
+	clearTimeout(I.syncHandle);//to avoid to many sync
+	for(var runId in I.syncStatusList){
+		if(runIdList!="")runIdList!=",";
+		runIdList+=runId;
+	}
+	if(runIdList=="")return;
+	$.get(
+		baseUrl + "/problems/json/sync-status.action",{
+			r:Math.random(),
+			runIdList:runIdList
+		},function(d){
+			if(d.code==0){
+				for(var i in d.data){
+					var s = d.data[i];
+					var runId = s[0],status = s[11],statusDescription = s[3].xss();
+					$(".statusDescription","#solution_"+runId).html(
+						I.statusDescriptionHTML(status, statusDescription, runId)
+					);
+					if(status != STATUS_PEDDING  && status != STATUS_PROCESSING)
+						delete I.syncStatusList[runId];
+				}
+				clearTimeout(I.syncHandle);
+				I.syncHandle=setTimeout(function(){I.syncStatus();},500);
+			}else{
+				I.showMessage(d.message);
+			}
+		},"json"
+	);
+};
+OJ.prototype.statusDescriptionHTML=function(status,statusDescription,runId){
+	if(status==STATUS_PEDDING){//pedding
+		return '<span class="badge">'+statusDescription+'</span>';
+	}else if(status==STATUS_PROCESSING){//processing
+		return '<div class="progress progress-striped active"><div class="bar" style="width:100%">'+statusDescription+'</div></div>';
+	}else if(status==STATUS_JUDGE_ERROR){//judge error
+		return '<span class="badge badge-warning" title="'+$.t("Last Status Description: ")+statusDescription+'">'+
+		$.t("judgeError")+' <i onclick="oj.rejudge('+runId+')" class="icon-repeat icon-white" style="cursor: pointer;" title="'+$.t("Click here to rejudge.")+'"></i></span>';
+	}else if(status==STATUS_ACCEPTED){//accepted
+		return '<span class="badge badge-success">'+statusDescription+'</span>';
+	}else{
+		//TODO if CE then.. and add css
+		return '<span class="badge badge-important">'+statusDescription+'</span>';
+	}
+};
 OJ.prototype.loadStatus=function(sortable){
+	var I = this;
 	sortable=false;
+	I.syncStatusList={};
 	$('#status').dataTable({
 		"sDom": '<"H">t<"F"pr>',
 		"bProcessing": true,
@@ -271,43 +347,29 @@ OJ.prototype.loadStatus=function(sortable){
 		},
 		"aoColumns": [{
 				"bSortable": false,
-				"sClass": ""//runId
+				"sClass": "runId"//runId
 			},{
 
 				"fnRender": function ( oObj ) {
 					return "<a href='"+baseUrl + "/showUser.action#?username="+oObj.aData[1].xss()+"'>"+oObj.aData[1].xss()+"</a>";
 				},
 				"bSortable": false,
-				"sClass": ""//username
+				"sClass": "username"//username
 			},{
 				"bSortable": false,
 				"fnRender": function ( oObj ) {
 					return "<a href='"+baseUrl + "/problems/view.action#?problemId="+oObj.aData[9]+"'>"+oObj.aData[2].xss()+"</a>";
 				},
-				"sClass": ""//problem
+				"sClass": "problem"//problem
 			},{
 				"bSortable": false,
-				"sClass": "",//status description,
+				"sClass": "statusDescription",//status description,
 				"fnRender": function ( oObj ) {
-					var status = oObj.aData[11];
-					console.log();
-					if(status==1){//pedding
-						return '<span class="badge">'+oObj.aData[3].xss()+'</span>';
-					}else if(status==2){//processing
-						return '<div class="progress progress-striped active"><div class="bar" style="width:100%">'+oObj.aData[3].xss()+'</div></div>';
-					}else if(status==3){//judge error
-						return '<span class="badge badge-warning" title="'+$.t("Last Status Description: ")+oObj.aData[3].xss()+'">'+
-						$.t("judgeError")+' <i onclick="oj.rejudge('+oObj.aData[0]+')" class="icon-repeat icon-white" style="cursor: pointer;" title="'+$.t("Click here to rejudge.")+'"></i></span>';
-					}else if(status==4){//accepted
-						return '<span class="badge badge-success">'+oObj.aData[3].xss()+'</span>';
-					}else{
-						//TODO if CE then.. and add css
-						return '<span class="badge badge-important">'+oObj.aData[3].xss()+'</span>';
-					}
-					
+					var status = oObj.aData[11],statusDescription = oObj.aData[3].xss(),runId = oObj.aData[0];
+					return I.statusDescriptionHTML(status, statusDescription, runId);
 				}
 			},{
-				"sClass": "",//memory
+				"sClass": "memory",//memory
 				"fnRender": function ( oObj ) {
 					return oObj.aData[4]+"KB";
 				}
@@ -315,21 +377,21 @@ OJ.prototype.loadStatus=function(sortable){
 				"fnRender": function ( oObj ) {
 					return oObj.aData[5]+"MS";
 				},
-				"sClass": ""//time
+				"sClass": "time"//time
 			},{
 				"bSortable": false,
-				"sClass":""//language
+				"sClass":"language"//language
 			},{
 				"fnRender": function ( oObj ) {
 					return oObj.aData[7]+"B";
 				},
-				"sClass":""//code length
+				"sClass":"codeLength"//code length
 			},{
 				"bSortable": false,
 				"fnRender": function ( oObj ) {
 					return new Date(oObj.aData[8]).ojFormat();
 				},
-				"sClass":""//submit time
+				"sClass":"submitTime"//submit time
 			}
 		],
 //		"bJQueryUI": true,
@@ -337,9 +399,12 @@ OJ.prototype.loadStatus=function(sortable){
 		"fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
 			$(nRow).attr("id", "solution_"+aData[0]);
 			if(aData[11]==2||aData[11]==1){//processing & pedding
-				//TODO add to update list
+				I.addSyncStatus(aData[0]);
 			}
 			return nRow;
+		},
+		"fnDrawCallback":function(oSettings){
+			I.syncStatus();
 		}
 	} );
 };

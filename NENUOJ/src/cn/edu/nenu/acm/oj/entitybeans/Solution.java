@@ -46,6 +46,14 @@ import cn.edu.nenu.acm.oj.util.Remark;
 		@NamedQuery(name = "Solution.findByPassRate", query = "SELECT s FROM Solution s WHERE s.passRate = :passRate"),
 		@NamedQuery(name = "Solution.findDistinctLanguage", query = "SELECT DISTINCT s.language FROM Solution s"),
 		@NamedQuery(name = "Solution.updateAllStatusTo", query = "UPDATE Solution s SET s.status = :newStatus WHERE s.status = :oldStatus"),
+//		@NamedQuery(name = "Solution.markJudgerSourceError", query = "UPDATE Solution s SET s.status = "
+//				+ Solution.STATUS_JUDGE_ERROR
+//				+ ",s.statusDescription = :statusDescription + s.statusDescription WHERE (s.status = "
+//				+ Solution.STATUS_PEDDING
+//				+ " OR s.status = "
+//				+ Solution.STATUS_PROCESSING+") AND s.problem.judger.source = :judgerSource"),
+//Hibernate reported an error SQL:
+//Hibernate: update nenuoj.solution cross join  set status=3, status_description=?+status_description where (status=1 or status=2) and source=?
 		@NamedQuery(name = "Solution.findByLastUpdateTime", query = "SELECT s FROM Solution s WHERE s.lastUpdateTime = :lastUpdateTime") })
 public class Solution implements java.io.Serializable, ISolutionStatusCode {
 
@@ -73,9 +81,10 @@ public class Solution implements java.io.Serializable, ISolutionStatusCode {
 	public Solution() {
 	}
 
-	public Solution(User user, Problem problem, String sourceCode, Integer codeLength, String language,
-			Integer runTime, Integer runMemory, Integer status, String ipaddr, boolean shared, float passRate,
-			Date lastUpdateTime) {
+	public Solution(User user, Problem problem, String sourceCode,
+			Integer codeLength, String language, Integer runTime,
+			Integer runMemory, Integer status, String ipaddr, boolean shared,
+			float passRate, Date lastUpdateTime) {
 		this.user = user;
 		this.problem = problem;
 		this.sourceCode = sourceCode;
@@ -90,9 +99,11 @@ public class Solution implements java.io.Serializable, ISolutionStatusCode {
 		this.lastUpdateTime = lastUpdateTime;
 	}
 
-	public Solution(User user, Message message, Problem problem, Contest contest, String sourceCode,
-			Integer codeLength, String language, Integer runTime, Integer runMemory, Integer status, String ipaddr,
-			boolean shared, Date submitTime, Date judgeTime, float passRate, Date lastUpdateTime, Remark remark) {
+	public Solution(User user, Message message, Problem problem,
+			Contest contest, String sourceCode, Integer codeLength,
+			String language, Integer runTime, Integer runMemory,
+			Integer status, String ipaddr, boolean shared, Date submitTime,
+			Date judgeTime, float passRate, Date lastUpdateTime, Remark remark) {
 		this.user = user;
 		this.message = message;
 		this.problem = problem;
@@ -286,8 +297,8 @@ public class Solution implements java.io.Serializable, ISolutionStatusCode {
 
 	@Column(name = "remark")
 	public Remark getRemark() {
-		if(!(remark instanceof Remark)||remark==null){
-			remark=new Remark();
+		if (!(remark instanceof Remark) || remark == null) {
+			remark = new Remark();
 		}
 		return remark;
 	}

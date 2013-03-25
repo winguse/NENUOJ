@@ -49,19 +49,48 @@ public class SolutionDAO extends AbstractDAO<Solution> {
 		query.executeUpdate();
 	}
 
+//	@Transactional
+//	public void markJudgerSourceError(String judgerSource,String statusDescription){
+//		Query query = em.createNamedQuery("Solution.markJudgerSourceError");
+//		query.setParameter("judgerSource", judgerSource);
+//		query.setParameter("statusDescription", statusDescription);
+//		query.executeUpdate();
+//NamedQuery reported a bug? or my fault? changed the solution into criteria query
+//	}
+	
+	
 	@Transactional(readOnly = true)
-	public Pair<Long, List<SolutionSimpleDTO>> getSolutionList(String username, String language, String judgerSource,
-			String number, int status, int page, int pageSize, int orderIndex, boolean includeCurrentContest) {
+	public List<SolutionSimpleDTO> getSolutionList(List<Integer> runIds, boolean includeCurrentContest) {
+		List<SolutionSimpleDTO> result = new LinkedList<SolutionSimpleDTO>();
+		long nowTimestamp = new Date().getTime();
+		for (Integer runId : runIds) {
+			Solution s = em.find(Solution.class, runId);
+			if(!includeCurrentContest){
+				if(s.getContest()!=null&&s.getContest().getEndTime().getTime()>nowTimestamp){
+					continue;
+				}
+			}
+			result.add(solutionSimpleDTOAssembler(s));
+		}
+		return result;
+	}
+
+	@Transactional(readOnly = true)
+	public Pair<Long, List<SolutionSimpleDTO>> getSolutionList(String username,
+			String language, String judgerSource, String number, int status,
+			int page, int pageSize, int orderIndex,
+			boolean includeCurrentContest) {
 		Pair<Long, List<SolutionSimpleDTO>> result = new Pair<Long, List<SolutionSimpleDTO>>();
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
-		Pair<Predicate, Root<Solution>> countPair = getPredicate(username, language, judgerSource, number, status,
-				includeCurrentContest, countQuery, cb);
+		Pair<Predicate, Root<Solution>> countPair = getPredicate(username,
+				language, judgerSource, number, status, includeCurrentContest,
+				countQuery, cb);
 		countQuery.select(cb.count(countPair.second)).where(countPair.first);
 		result.first = em.createQuery(countQuery).getSingleResult();
 		CriteriaQuery<Solution> query = cb.createQuery(Solution.class);
-		Pair<Predicate, Root<Solution>> pair = getPredicate(username, language, judgerSource, number, status,
-				includeCurrentContest, query, cb);
+		Pair<Predicate, Root<Solution>> pair = getPredicate(username, language,
+				judgerSource, number, status, includeCurrentContest, query, cb);
 		Root<Solution> root = pair.second;
 		switch (orderIndex) {
 		case ORDER_BY_MEMORY:
@@ -86,45 +115,53 @@ public class SolutionDAO extends AbstractDAO<Solution> {
 			query.orderBy(cb.desc(root.get(Solution_.id)));
 		}
 		query.select(root).where(pair.first);
-		List<Solution> solutionList = em.createQuery(query).setFirstResult(page * pageSize).setMaxResults(pageSize)
+		List<Solution> solutionList = em.createQuery(query)
+				.setFirstResult(page * pageSize).setMaxResults(pageSize)
 				.getResultList();
 		List<SolutionSimpleDTO> solutionDTOList = new LinkedList<SolutionSimpleDTO>();
 		for (Solution s : solutionList) {
-			solutionDTOList
-					.add(new SolutionSimpleDTO(s.getId(), s.getUser().getUsername(), s.getProblem().getJudger()
-							.getSource(), s.getProblem().getNumber(), s.getProblem().getTitle(),
-							s.getProblem().getId(), s.getStatus(), s.getStatusDescription(), s.getRunMemory(), s
-									.getRunTime(), s.getLanguage(), s.getCodeLength(), s.getSubmitTime().getTime(), s
-									.getContest() == null ? 0 : s.getContest().getId()));
+			solutionDTOList.add(solutionSimpleDTOAssembler(s));
 		}
 		result.second = solutionDTOList;
 		return result;
 	}
 
-	private <T> Pair<Predicate, Root<Solution>> getPredicate(String username, String language, String judgerSource,
-			String number, int status, boolean includeCurrentContest, CriteriaQuery<T> query, CriteriaBuilder cb) {
+	private <T> Pair<Predicate, Root<Solution>> getPredicate(String username,
+			String language, String judgerSource, String number, int status,
+			boolean includeCurrentContest, CriteriaQuery<T> query,
+			CriteriaBuilder cb) {
 		Root<Solution> root = query.from(Solution.class);
 		Predicate predicate = cb.conjunction();
 		if (!includeCurrentContest) {
-			Join<Solution, Contest> join = root.join(Solution_.contest, JoinType.LEFT);
-			predicate = cb.and(predicate,
-					cb.or(cb.isNull(join.get(Contest_.id)), cb.lessThan(join.get(Contest_.endTime), new Date())));
+			Join<Solution, Contest> join = root.join(Solution_.contest,
+					JoinType.LEFT);
+			predicate = cb.and(predicate, cb.or(
+					cb.isNull(join.get(Contest_.id)),
+					cb.lessThan(join.get(Contest_.endTime), new Date())));
 		}
 		if (!"".equals(username)) {
-			predicate = cb.and(predicate, cb.like(root.get(Solution_.user).get(User_.username), "%" + username + "%"));
+			predicate = cb.and(
+					predicate,
+					cb.like(root.get(Solution_.user).get(User_.username), "%"
+							+ username + "%"));
 		}
 		if (!"".equals(language)) {
-			predicate = cb.and(predicate, cb.equal(root.get(Solution_.language), language));
+			predicate = cb.and(predicate,
+					cb.equal(root.get(Solution_.language), language));
 		}
 		if (!"".equals(judgerSource)) {
-			predicate = cb.and(predicate,
-					cb.equal(root.get(Solution_.problem).get(Problem_.judger).get(Judger_.source), judgerSource));
+			predicate = cb.and(
+					predicate,
+					cb.equal(root.get(Solution_.problem).get(Problem_.judger)
+							.get(Judger_.source), judgerSource));
 		}
 		if (!"".equals(number)) {
-			predicate = cb.and(predicate, cb.equal(root.get(Solution_.problem).get(Problem_.number), number));
+			predicate = cb.and(predicate, cb.equal(root.get(Solution_.problem)
+					.get(Problem_.number), number));
 		}
 		if (status > 0) {
-			predicate = cb.and(predicate, cb.equal(root.get(Solution_.status), status));
+			predicate = cb.and(predicate,
+					cb.equal(root.get(Solution_.status), status));
 		}
 		Pair<Predicate, Root<Solution>> ret = new Pair<Predicate, Root<Solution>>();
 		ret.first = predicate;
@@ -142,5 +179,16 @@ public class SolutionDAO extends AbstractDAO<Solution> {
 	public String getProblemNumber(Integer solutionId) {
 		Solution solution = this.findById(solutionId);
 		return solution.getProblem().getNumber();
+	}
+
+	private static SolutionSimpleDTO solutionSimpleDTOAssembler(Solution s) {
+		return new SolutionSimpleDTO(s.getId(), s.getUser().getUsername(), s
+				.getProblem().getJudger().getSource(), s.getProblem()
+				.getNumber(), s.getProblem().getTitle(),
+				s.getProblem().getId(), s.getStatus(),
+				s.getStatusDescription(), s.getRunMemory(), s.getRunTime(),
+				s.getLanguage(), s.getCodeLength(),
+				s.getSubmitTime().getTime(), s.getContest() == null ? 0 : s
+						.getContest().getId());
 	}
 }

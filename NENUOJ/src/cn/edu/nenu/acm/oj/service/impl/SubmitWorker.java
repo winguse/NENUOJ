@@ -66,17 +66,17 @@ public class SubmitWorker extends Thread {
 	@Override
 	public void run() {
 		setActive(this);
+		Integer solutionId = null;
+		Solution solution = null;
 		try {
 			if (!canRunning)
 				return;
 			log.info("Login #" + account[0]);
 			submitter.login();
-			Integer solutionId = null;
 			while (null != (solutionId = queue.poll())) {
 				if (!canRunning)
 					return;
 				int interval = 500, intervalStep = 500, maxTry = 50, tried = 0;
-				Solution solution = null;
 				String problemNumber = dao.getProblemNumber(solutionId);
 				log.info("Submit #" + solutionId);
 				try {
@@ -129,23 +129,40 @@ public class SubmitWorker extends Thread {
 					e.printStackTrace();
 					log.error("SubmitException: " + e.getMessage());
 					solution = dao.findById(solutionId);
-					solution.setStatusDescription("Judge Error: #"+ e.getMessage());
+					solution.setStatusDescription("Judge Error: #"+ e.getMessage().substring(0,20));
 					solution.setStatus(Solution.STATUS_JUDGE_ERROR);
 					dao.merge(solution);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 					solution = dao.findById(solutionId);
-					solution.setStatusDescription("Judge Interrupted: #"+ e.getMessage());
+					solution.setStatusDescription("Judge Interrupted: #"+ e.getMessage().substring(0,20));
+					solution.setStatus(Solution.STATUS_JUDGE_ERROR);
+					dao.merge(solution);
+				}catch (NetworkException e) {
+					e.printStackTrace();
+					solution = dao.findById(solutionId);
+					solution.setStatusDescription("NetworkException: #"+ e.getMessage().substring(0,20));
+					solution.setStatus(Solution.STATUS_JUDGE_ERROR);
+					dao.merge(solution);
+				}catch (Exception e){
+					e.printStackTrace();
+					solution = dao.findById(solutionId);
+					solution.setStatusDescription("UnknowException: #"+ e.getMessage().substring(0,20));
 					solution.setStatus(Solution.STATUS_JUDGE_ERROR);
 					dao.merge(solution);
 				}
 			}
-		} catch (NetworkException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
-			log.error("NetworkException:" + e.getMessage());
-		} catch (LoginException e) {
-			e.printStackTrace();
-			log.error("LoginException:" + e.getMessage());
+			String errorDescription = e.getClass().getSimpleName() +":"+ e.getMessage();
+			log.error(errorDescription);
+			while (null != (solutionId = queue.poll())) {
+				solution = dao.findById(solutionId);
+				if(solution==null)continue;
+				solution.setStatusDescription(errorDescription.substring(0, 40));
+				solution.setStatus(Solution.STATUS_JUDGE_ERROR);
+				dao.merge(solution);
+			}
 		} finally {
 			setDisactive(this);
 			accountQueue.add(account);// remember to return account

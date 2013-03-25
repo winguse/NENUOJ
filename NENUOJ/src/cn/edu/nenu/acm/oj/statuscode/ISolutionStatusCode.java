@@ -16,7 +16,7 @@ public interface ISolutionStatusCode {
 	public final static int STATUS_MEMORY_LIMITED_EXCEED = 8;
 	public final static int STATUS_OUTPUT_LIMITED_EXCEED = 9;
 	public final static int STATUS_RUNTIME_ERROR = 10;
-	public final static int STATUS_COMPLIE_ERROR = 1;
+	public final static int STATUS_COMPLIE_ERROR = 11;
 
 	public static final Map<Integer, String> statusMapping = new HashMap<Integer, String>() {
 		{

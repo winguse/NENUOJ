@@ -8,7 +8,6 @@
 <head>
 <meta charset="UTF-8">
 <title>${site.title} - Title</title>
-<j:head />
 <b:head />
 <link href="style/global.css" rel="stylesheet">
 </head>

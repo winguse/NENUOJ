@@ -78,7 +78,7 @@ public class SubmitAction extends AbstractJsonAction implements SessionAware {
 				solution.setStatusDescription("PEDDING");
 				solution.setSubmitTime(new Date());
 				dao.persist(solution);
-				judgeService.putJudgeJob(solution);
+				judgeService.putJudgeJob(solution.getId());
 				message = _("submitted.");
 				code = STATUS_SUCCESS;
 			}
