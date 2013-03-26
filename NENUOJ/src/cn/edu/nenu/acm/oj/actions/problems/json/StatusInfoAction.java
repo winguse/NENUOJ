@@ -19,32 +19,28 @@ import cn.edu.nenu.acm.oj.service.impl.JudgeService;
 @InterceptorRefs({ @InterceptorRef("i18n"),
 		@InterceptorRef("jsonValidationWorkflowStack") })
 @Results({ @Result(name = "success", type = "json") })
-public class RejudgeAction extends AbstractJsonAction implements SessionAware {
+public class StatusInfoAction extends AbstractJsonAction implements SessionAware {
 
 	private static final long serialVersionUID = -4232142407810838082L;
 	@Autowired
 	private SolutionDAO dao;
-	@Autowired
-	private JudgeService judgeService;
 
 	private int runId = 0;
-	private boolean rejudgeNotErrorSolution = false;
-
+	private String additionalInformation;
+	
 	@Override
 	public String execute() throws Exception {
 		Solution solution = dao.findById(runId);
 		if (solution == null) {
 			code = STATUS_ERROR;
 			message = _("Solution not found.");
-		} else if (solution.getStatus() != Solution.STATUS_JUDGE_ERROR
-				&& !rejudgeNotErrorSolution) {
-			code = STATUS_ERROR;
-			message = _("You don't have the permission to rejudge this solution. #"+solution.getStatus());
 		} else {
-			solution.setStatus(Solution.STATUS_PEDDING);
-			solution.setStatusDescription("Pedding Rejudge");
-			dao.merge(solution);
-			judgeService.putJudgeJob(solution.getId());
+			Object tmp = solution.getRemark().get("AdditionalInformation");
+			if(tmp==null||!(tmp instanceof String)){
+				additionalInformation = "Information not found!" ;
+			}else{
+				additionalInformation = (String) tmp;
+			}
 			code = STATUS_SUCCESS;
 			message = "success";
 		}
@@ -67,6 +63,10 @@ public class RejudgeAction extends AbstractJsonAction implements SessionAware {
 
 	public void setRunId(int runId) {
 		this.runId = runId;
+	}
+
+	public String getAdditionalInformation() {
+		return additionalInformation;
 	}
 
 }

@@ -243,24 +243,42 @@ OJ.prototype.rejudge=function(runId){
 			runId:runId
 		},function(d){
 			if(d.code == 0){
-				I.addSyncStatus(runId);
 			}else{
 				I.showMessage(d.message);
 			}
+			I.addSyncStatus(runId);
+			I.syncStatus();
 		},"json"
 	);
-	I.addSyncStatus(runId);
-	I.syncStatus();
 };
 OJ.prototype.showMessage=function(message,type){
-	//TODO
+	var I = this;
+	if(!I.messageDialogLoaded){
+		I.messageDialogLoaded = true;
+		$("body").append('<div id="messageDialog" class="hide"></div>');
+		$("#messageDialog").dialog({
+			modal:true,
+			buttons:{
+				OK : function(){
+					$(this).dialog("close");
+				}
+			},
+			height:"auto",
+			width:"auto"
+		});
+	}
+	var $m = $("#messageDialog");
+	$m.html(message);
+	$m.dialog({title:type});//TODO type
+	$m.dialog("open");
 };
 OJ.prototype.syncStatus=function(){
-	var I = this,runIdList="";
+	var I = this,runIdList="",queryCount = 0;
 	clearTimeout(I.syncHandle);//to avoid to many sync
 	for(var runId in I.syncStatusList){
-		if(runIdList!="")runIdList!=",";
+		if(runIdList!="")runIdList+=",";
 		runIdList+=runId;
+		queryCount++;
 	}
 	if(runIdList=="")return;
 	$.get(
@@ -269,17 +287,25 @@ OJ.prototype.syncStatus=function(){
 			runIdList:runIdList
 		},function(d){
 			if(d.code==0){
+				var responseCount = 0;
 				for(var i in d.data){
+					responseCount++;
 					var s = d.data[i];
 					var runId = s[0],status = s[11],statusDescription = s[3].xss();
-					$(".statusDescription","#solution_"+runId).html(
+					$("#solution_"+runId+">.statusDescription").html(
 						I.statusDescriptionHTML(status, statusDescription, runId)
 					);
+					$("#solution_"+runId+">.memory").text(s[4]+"KB");
+					$("#solution_"+runId+">.time").text(s[5]+"MS");
 					if(status != STATUS_PEDDING  && status != STATUS_PROCESSING)
 						delete I.syncStatusList[runId];
 				}
 				clearTimeout(I.syncHandle);
-				I.syncHandle=setTimeout(function(){I.syncStatus();},500);
+				if(responseCount!=queryCount){
+					I.showMessage("Server response and local query does not match!");
+				}else{
+					I.syncHandle=setTimeout(function(){I.syncStatus();},500);
+				}
 			}else{
 				I.showMessage(d.message);
 			}
@@ -296,10 +322,26 @@ OJ.prototype.statusDescriptionHTML=function(status,statusDescription,runId){
 		$.t("judgeError")+' <i onclick="oj.rejudge('+runId+')" class="icon-repeat icon-white" style="cursor: pointer;" title="'+$.t("Click here to rejudge.")+'"></i></span>';
 	}else if(status==STATUS_ACCEPTED){//accepted
 		return '<span class="badge badge-success">'+statusDescription+'</span>';
+	}else if(status==STATUS_COMPLIE_ERROR){
+		return '<span class="badge badge-info" onclick="oj.loadSolutionInfo('+runId+')" style="cursor: pointer;" >'+statusDescription+'</span>';
 	}else{
-		//TODO if CE then.. and add css
 		return '<span class="badge badge-important">'+statusDescription+'</span>';
 	}
+};
+OJ.prototype.loadSolutionInfo=function(runId){
+	var I = this;
+	$.post(
+		baseUrl + "/problems/json/status-info.action",{
+			runId:runId
+		},function(d){
+			if(d.code==0){
+				I.showMessage("<pre>"+d.additionalInformation+"</pre>");
+			}else{
+				I.showMessage(d.message);
+			}
+		},"json"
+	);
+	
 };
 OJ.prototype.loadStatus=function(sortable){
 	var I = this;
@@ -311,13 +353,13 @@ OJ.prototype.loadStatus=function(sortable){
 		"bServerSide": true,
 		"iDisplayLength": 20,
 		"bSortable": sortable,
-		"bStateSave":true,
+	//	"bStateSave":true,
 		"oLanguage": {
 			"sInfo": "_START_ to _END_ of _TOTAL_ status",//TODO replace to _("xxx")
 			"sInfoEmpty": "No status",
 			"sInfoFiltered": " (filtering from _MAX_ total status)"
 		},
-		"aaSorting": [[ 0, "desc" ]],
+		//"aaSorting": [[ 0, "desc" ]],
 		"sAjaxSource": baseUrl + "/problems/json/status.action",
 		"fnServerData": function ( sSource, _aoData, fnCallback ) {
 			var aoData={};
@@ -351,7 +393,7 @@ OJ.prototype.loadStatus=function(sortable){
 			},{
 
 				"fnRender": function ( oObj ) {
-					return "<a href='"+baseUrl + "/showUser.action#?username="+oObj.aData[1].xss()+"'>"+oObj.aData[1].xss()+"</a>";
+					return "<a href='"+baseUrl + "/show-user.action#?username="+oObj.aData[1].xss()+"'>"+oObj.aData[1].xss()+"</a>";
 				},
 				"bSortable": false,
 				"sClass": "username"//username
@@ -369,11 +411,13 @@ OJ.prototype.loadStatus=function(sortable){
 					return I.statusDescriptionHTML(status, statusDescription, runId);
 				}
 			},{
+				"bSortable": sortable,
 				"sClass": "memory",//memory
 				"fnRender": function ( oObj ) {
 					return oObj.aData[4]+"KB";
 				}
 			},{
+				"bSortable": sortable,
 				"fnRender": function ( oObj ) {
 					return oObj.aData[5]+"MS";
 				},
@@ -382,6 +426,7 @@ OJ.prototype.loadStatus=function(sortable){
 				"bSortable": false,
 				"sClass":"language"//language
 			},{
+				"bSortable": sortable,
 				"fnRender": function ( oObj ) {
 					return oObj.aData[7]+"B";
 				},
