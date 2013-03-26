@@ -45,4 +45,6 @@
 </div>
 </header>
 <div class="container">
+<s:if test="%{ #pageTitle != null && #pageTitle != '' }">
 <h1><s:property value="#pageTitle"/></h1>
+</s:if>

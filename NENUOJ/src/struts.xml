@@ -10,8 +10,11 @@
 				class="cn.edu.nenu.acm.oj.interceptors.PermissionInterceptor" />
 		</interceptors>
 		<global-results>
+			<result name="404">/WEB-INF/content/404.jsp</result>
 			<result name="reject-login-denied" type="redirect">error.action?type=reject-login-denied</result>
 			<result name="reject-login-needed" type="redirect">error.action?type=reject-login-needed</result>
+			<result name="reject-permission-denied" type="redirect">error.action?type=reject-permission-denied</result>
+			<result name="reject-view-source-code-after-contest" type="redirect">error.action?type=reject-view-source-code-after-contest</result>
 		</global-results>
 	</package>
 	<package name="winguse-json-default" extends="json-default">

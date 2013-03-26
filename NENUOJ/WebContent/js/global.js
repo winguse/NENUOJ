@@ -347,7 +347,7 @@ OJ.prototype.loadStatus=function(sortable){
 	var I = this;
 	sortable=false;
 	I.syncStatusList={};
-	$('#status').dataTable({
+	var $statusTable = $('#status').dataTable({
 		"sDom": '<"H">t<"F"pr>',
 		"bProcessing": true,
 		"bServerSide": true,
@@ -369,13 +369,14 @@ OJ.prototype.loadStatus=function(sortable){
 			var orderIndex=aoData.iSortCol_0;
 			if(aoData.sSortDir_0=="desc")
 				orderIndex=-orderIndex;
+			var $form=$("#status_form")[0];
 			$.post( sSource, {
 				orderByIndex:orderIndex,
-				username:$("#username").attr("value"),
-				language:$("#language").attr("value"),
-				problemNumber:$("#problemNumber").attr("value"),
-				statusCode:$("#statusCode").attr("value"),
-				judgerSource:$("#judgerSource").attr("value"),
+				username:$form.username.value,
+				language:$form.language.value,
+				problemNumber:$form.problemNumber.value,
+				statusCode:$form.statusCode.value,
+				judgerSource:$form.judgerSource.value,
 				page:aoData.iDisplayStart/aoData.iDisplayLength,
 				pageSize:aoData.iDisplayLength
 			}, function (json) {
@@ -424,7 +425,10 @@ OJ.prototype.loadStatus=function(sortable){
 				"sClass": "time"//time
 			},{
 				"bSortable": false,
-				"sClass":"language"//language
+				"sClass":"language",//language
+				"fnRender":function(oObj){
+					return "<a href='"+baseUrl+"/show-source-code.action?runId="+oObj.aData[0]+"'>"+oObj.aData[6]+"</a>";
+				}
 			},{
 				"bSortable": sortable,
 				"fnRender": function ( oObj ) {
@@ -452,6 +456,10 @@ OJ.prototype.loadStatus=function(sortable){
 			I.syncStatus();
 		}
 	} );
+	$("#status_form").submit(function(){
+		$statusTable.fnDraw();
+		return false;
+	});
 };
 var oj;
 oj = new OJ();

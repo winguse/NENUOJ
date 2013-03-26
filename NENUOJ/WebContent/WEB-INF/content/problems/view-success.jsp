@@ -72,7 +72,7 @@ $(function(){
 		if (data.code == 0)
 			setTimeout(function() {
 			//	window.location.reload(); TODO
-				alert(d.message);
+				alert(data.message);
 			}, 1000);
 	});
 	</s:if>
