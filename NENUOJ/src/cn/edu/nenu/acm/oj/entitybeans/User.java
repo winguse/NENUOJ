@@ -1,6 +1,5 @@
 package cn.edu.nenu.acm.oj.entitybeans;
 
-import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -72,6 +71,7 @@ public class User implements java.io.Serializable {
 	private Set<Contest> hostedContests = new HashSet<Contest>(0);
 	private Set<LoginLog> loginLogs = new HashSet<LoginLog>(0);
 	private Set<Message> messages = new HashSet<Message>(0);
+	private Set<ContestRegister> contestRegisters = new HashSet<ContestRegister>(0);
 
 	public User() {
 	}
@@ -94,7 +94,7 @@ public class User implements java.io.Serializable {
 	public User(Message message, String username, String password, String salt, String email, String school,
 			String grade, String major, Integer sloved, Integer submitted, Long permission, Date lastUpdateTime,
 			Remark remark, Set<ProblemDescription> problemDescriptions, Set<Solution> solutions,
-			Set<Contest> contests, Set<Contest> contests_1, Set<LoginLog> loginLogs, Set<Message> messages) {
+			Set<Contest> contests, Set<Contest> contests_1, Set<LoginLog> loginLogs, Set<Message> messages,Set<ContestRegister> contestRegisters) {
 		this.message = message;
 		this.username = username;
 		this.password = password;
@@ -114,6 +114,7 @@ public class User implements java.io.Serializable {
 		this.hostedContests = contests_1;
 		this.loginLogs = loginLogs;
 		this.messages = messages;
+		this.contestRegisters = contestRegisters;
 	}
 
 	@Id
@@ -304,5 +305,13 @@ public class User implements java.io.Serializable {
 	public void setMessages(Set<Message> messages) {
 		this.messages = messages;
 	}
+	
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+	public Set<ContestRegister> getContestRegisters() {
+		return this.contestRegisters;
+	}
 
+	public void setContestRegisters(Set<ContestRegister> contestRegisters) {
+		this.contestRegisters = contestRegisters;
+	}
 }

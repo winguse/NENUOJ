@@ -56,6 +56,7 @@ public class Contest implements Serializable {
 	private Date lastUpdateTime;
 	private Remark remark;
 	private Set<Solution> solutions = new HashSet<Solution>(0);
+	private Set<ContestRegister> contestRegisters = new HashSet<ContestRegister>(0);
 	private Set<User> enteredUsers = new HashSet<User>(0);
 	private Set<ProblemDescription> problemDescriptions = new HashSet<ProblemDescription>(0);
 	private Set<Contest> contests = new HashSet<Contest>(0);
@@ -71,7 +72,7 @@ public class Contest implements Serializable {
 	}
 
 	public Contest(Contest contest, Message message, User user, String title, Date startTime, Date endTime,
-			Integer contestType, Date lastUpdateTime, Remark remark, Set<Solution> solutions, Set<User> users,
+			Integer contestType, Date lastUpdateTime, Remark remark, Set<Solution> solutions,Set<ContestRegister> contestRegisters, Set<User> users,
 			Set<ProblemDescription> problemDescriptions, Set<Contest> contests) {
 		this.contest = contest;
 		this.message = message;
@@ -83,6 +84,7 @@ public class Contest implements Serializable {
 		this.lastUpdateTime = lastUpdateTime;
 		this.remark = remark;
 		this.solutions = solutions;
+		this.contestRegisters = contestRegisters;
 		this.enteredUsers = users;
 		this.problemDescriptions = problemDescriptions;
 		this.contests = contests;
@@ -199,6 +201,15 @@ public class Contest implements Serializable {
 		this.solutions = solutions;
 	}
 
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "contest")
+	public Set<ContestRegister> getContestRegisters() {
+		return this.contestRegisters;
+	}
+
+	public void setContestRegisters(Set<ContestRegister> contestRegisters) {
+		this.contestRegisters = contestRegisters;
+	}
+	
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(name = "contest_has_user", catalog = "nenuoj", joinColumns = { @JoinColumn(name = "contest_id", nullable = false, updatable = false) }, inverseJoinColumns = { @JoinColumn(name = "user_id", nullable = false, updatable = false) })
 	public Set<User> getEnteredUsers() {
