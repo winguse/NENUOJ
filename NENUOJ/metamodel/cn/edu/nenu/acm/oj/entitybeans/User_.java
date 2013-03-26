@@ -13,6 +13,7 @@ public abstract class User_ {
 
 	public static volatile SetAttribute<User, Solution> solutions;
 	public static volatile SingularAttribute<User, Remark> remark;
+	public static volatile SetAttribute<User, ContestRegister> contestRegisters;
 	public static volatile SingularAttribute<User, Date> lastUpdateTime;
 	public static volatile SingularAttribute<User, Integer> submitted;
 	public static volatile SetAttribute<User, ProblemDescription> problemDescriptions;

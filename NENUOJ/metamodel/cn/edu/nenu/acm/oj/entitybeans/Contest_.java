@@ -12,8 +12,9 @@ import javax.persistence.metamodel.StaticMetamodel;
 public abstract class Contest_ {
 
 	public static volatile SetAttribute<Contest, Contest> contests;
-	public static volatile SingularAttribute<Contest, Remark> remark;
 	public static volatile SetAttribute<Contest, Solution> solutions;
+	public static volatile SetAttribute<Contest, ContestRegister> contestRegisters;
+	public static volatile SingularAttribute<Contest, Remark> remark;
 	public static volatile SingularAttribute<Contest, Date> lastUpdateTime;
 	public static volatile SingularAttribute<Contest, Contest> contest;
 	public static volatile SetAttribute<Contest, ProblemDescription> problemDescriptions;
