@@ -50,7 +50,7 @@ public class SyncStatusAction extends AbstractJsonAction implements
 				_("judgerSource") + " " + _("problemNumber"),
 				_("statusDescription"), _("memory"), _("time"), _("language"),
 				_("codeLength"), _("submitTime"), _("problemId"),
-				_("problemTitle"), _("statusCode"), _("contestId") };
+				_("problemTitle"), _("statusCode"), _("contestId"),_("remoteRunId"),_("shared") };
 		data = new LinkedList<Object[]>();
 		for (SolutionSimpleDTO s : result) {
 			data.add(new Object[] { s.getRunId(), s.getUsername(),
@@ -58,7 +58,7 @@ public class SyncStatusAction extends AbstractJsonAction implements
 					s.getStatusDescription(), s.getMemory(), s.getTime(),
 					s.getLanguage(), s.getCodeLength(), s.getSubmitTime(),
 					s.getProblemId(), s.getProblemTitle(), s.getStatusCode(),
-					s.getContestId() });
+					s.getContestId(),s.getRemoteRunId(),s.isShared() });
 		}
 		return SUCCESS;
 	}

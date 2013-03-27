@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import cn.edu.nenu.acm.oj.dao.GenericDAO;
 import cn.edu.nenu.acm.oj.dao.SolutionDAO;
+import cn.edu.nenu.acm.oj.entitybeans.Problem;
 import cn.edu.nenu.acm.oj.entitybeans.Solution;
 import cn.edu.nenu.acm.oj.eto.LoginException;
 import cn.edu.nenu.acm.oj.eto.NetworkException;
@@ -33,6 +34,7 @@ public class SubmitWorker extends Thread {
 
 	@Autowired
 	private SolutionDAO dao;
+	
 	
 	private IProblemSubmitter submitter;
 	private LinkedBlockingQueue<Integer> queue;
@@ -68,6 +70,7 @@ public class SubmitWorker extends Thread {
 		setActive(this);
 		Integer solutionId = null;
 		Solution solution = null;
+		int oldStatus = -1;
 		try {
 			if (!canRunning)
 				return;
@@ -81,6 +84,7 @@ public class SubmitWorker extends Thread {
 				log.info("Submit #" + solutionId);
 				try {
 					solution = dao.findById(solutionId);
+					oldStatus = solution.getStatus();
 					solution.setStatusDescription("Submitting");
 					solution.setStatus(Solution.STATUS_PROCESSING);
 					dao.merge(solution);
@@ -124,7 +128,7 @@ public class SubmitWorker extends Thread {
 								+ " #Remote Judge Timeout.");
 						solution.setStatus(Solution.STATUS_JUDGE_ERROR);
 					}
-					dao.merge(solution);
+					dao.merge(solution,oldStatus);
 				} catch (SubmitException e) {
 					e.printStackTrace();
 					log.error("SubmitException: " + e.getMessage());

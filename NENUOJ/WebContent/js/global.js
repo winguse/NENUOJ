@@ -216,7 +216,7 @@ OJ.prototype.loadProblemList=function(){
 				"sClass": ""//submitted
 			},{
 				"fnRender": function ( oObj ) {
-					var t=oObj.aData[4]==0?1:0;
+					var t=oObj.aData[4]==0?1:oObj.aData[4];
 					return (oObj.aData[3]/t*100).toFixed(2)+"%";
 				},
 				"sClass": ""//rate
@@ -297,6 +297,8 @@ OJ.prototype.syncStatus=function(){
 					);
 					$("#solution_"+runId+">.memory").text(s[4]+"KB");
 					$("#solution_"+runId+">.time").text(s[5]+"MS");
+					$("#solution_"+runId+">.remoteRunId").text(s[13]);
+					$("#solution_"+runId+">.judgeTime").text(new Date().ojFormat());
 					if(status != STATUS_PEDDING  && status != STATUS_PROCESSING)
 						delete I.syncStatusList[runId];
 				}
@@ -323,7 +325,7 @@ OJ.prototype.statusDescriptionHTML=function(status,statusDescription,runId){
 	}else if(status==STATUS_ACCEPTED){//accepted
 		return '<span class="badge badge-success">'+statusDescription+'</span>';
 	}else if(status==STATUS_COMPLIE_ERROR){
-		return '<span class="badge badge-info" onclick="oj.loadSolutionInfo('+runId+')" style="cursor: pointer;" >'+statusDescription+'</span>';
+		return '<span class="badge badge-info" onclick="oj.loadSolutionInfo('+runId+')" style="cursor: pointer;"  title="'+$.t("Click here see detail.")+'">'+statusDescription+' <i class="icon-white icon-info-sign"></i></span>';
 	}else{
 		return '<span class="badge badge-important">'+statusDescription+'</span>';
 	}
@@ -392,7 +394,6 @@ OJ.prototype.loadStatus=function(sortable){
 				"bSortable": false,
 				"sClass": "runId"//runId
 			},{
-
 				"fnRender": function ( oObj ) {
 					return "<a href='"+baseUrl + "/show-user.action#?username="+oObj.aData[1].xss()+"'>"+oObj.aData[1].xss()+"</a>";
 				},
@@ -427,7 +428,13 @@ OJ.prototype.loadStatus=function(sortable){
 				"bSortable": false,
 				"sClass":"language",//language
 				"fnRender":function(oObj){
-					return "<a href='"+baseUrl+"/show-source-code.action?runId="+oObj.aData[0]+"'>"+oObj.aData[6]+"</a>";
+					var cssClass="";
+					if(oObj.aData[14]){
+						cssClass="shared";
+					}
+					if(oObj.aData[1].replace(/^.+?>(.+?)<.+?$/,"$1") == LOGIN_USERNAME || oObj.aData[14])
+						return "<a class='"+cssClass+"' href='"+baseUrl+"/show-source-code.action?runId="+oObj.aData[0]+"'>"+oObj.aData[6]+"</a>";
+					return oObj.aData[6];
 				}
 			},{
 				"bSortable": sortable,

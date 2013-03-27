@@ -195,6 +195,11 @@ public class SolutionDAO extends AbstractDAO<Solution> {
 	}
 
 	private static SolutionSimpleDTO solutionSimpleDTOAssembler(Solution s) {
+		int remoteRunId = 0;
+		try {
+			remoteRunId = (int) s.getRemark().get("RemoteRunId");
+		} catch (Exception e) {
+		}
 		return new SolutionSimpleDTO(s.getId(), s.getUser().getUsername(), s
 				.getProblem().getJudger().getSource(), s.getProblem()
 				.getNumber(), s.getProblem().getTitle(),
@@ -202,7 +207,7 @@ public class SolutionDAO extends AbstractDAO<Solution> {
 				s.getStatusDescription(), s.getRunMemory(), s.getRunTime(),
 				s.getLanguage(), s.getCodeLength(),
 				s.getSubmitTime().getTime(), s.getContest() == null ? 0 : s
-						.getContest().getId(), s.isShared());
+						.getContest().getId(), s.isShared(),remoteRunId);
 	}
 
 	private static SolutionDTO solutionDTOAssembler(Solution s) {
@@ -242,5 +247,21 @@ public class SolutionDAO extends AbstractDAO<Solution> {
 		return new ContestSimpleDTO(c.getId(), c.getTitle(), c.getStartTime()
 				.getTime(), c.getEndTime().getTime(), c.getHostUser()
 				.getUsername(), c.getContestType());
+	}
+	
+	@Transactional
+	public Solution merge(Solution solution,int oldStatus) {
+		solution = em.merge(solution);
+		if(solution.getStatus()!=oldStatus){
+			Problem problem = solution.getProblem();
+			if(oldStatus == Solution.STATUS_ACCEPTED){
+				problem.setAccepted(problem.getAccepted()-1);
+			}
+			if(solution.getStatus() == Solution.STATUS_ACCEPTED){
+				problem.setAccepted(problem.getAccepted()+1);
+			}
+			em.merge(problem);
+		}
+		return solution;
 	}
 }

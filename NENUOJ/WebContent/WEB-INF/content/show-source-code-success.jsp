@@ -3,10 +3,10 @@
 <c:html enabled="${site.enableHtmlCompress}" removeIntertagSpaces="true">
 <%@ taglib uri="/struts-tags" prefix="s"%>
 <%@ taglib uri="/struts-bootstrap-tags" prefix="b"%>
-<s:include value="include/init.jsp"></s:include>
+<s:include value="include/init.jsp" />
 <title><s:text name="showSourceCode" /> - <s:text name="site.title"/></title>
 <s:set var="pageTitle" value=""/>
-<s:include value="include/header.jsp"></s:include>
+<s:include value="include/header.jsp"/>
 <h1><s:property value="solution.username"/> <s:text name="solution for"/>
 <a href="problems/view.action#?problemId=<s:property value="solution.problemId"/>" title="<s:property value="solution.problemTitle"/>">
 <s:property value="solution.judgerSource"/> <s:property value="solution.prublemNumber"/></a>
@@ -23,7 +23,7 @@
 		<td><s:text name="codelength"/></td>
 		<td><s:text name="submittime"/></td>
 		<td><s:text name="judgetime"/></td>
-		<td><s:text name="passrate"/></td>
+<!-- 	<td><s:text name="passrate"/></td> -->
 		<s:if test="solution.contestId!=0">
 		<td><s:text name="contest"/></td>
 		</s:if>
@@ -34,17 +34,17 @@
 	</tr>
 </thead>
 <tbody>
-	<tr>
-		<td><s:property value="soltion.runId"/></td>
-		<td><s:property value="solution.remoteRunId"/></td>
-		<td><s:property value="solution.statusDescription"/></td><!-- TODO use javascript to display css -->
-		<td><s:property value="solution.time"/>MS</td>
-		<td><s:property value="solution.memory"/>KB</td>
+	<tr id="solution_${solution.runId}">
+		<td><s:property value="solution.runId"/></td>
+		<td class="remoteRunId"><s:property value="solution.remoteRunId"/></td>
+		<td class="statusDescription"><s:property value="solution.statusDescription"/></td>
+		<td class="time"><s:property value="solution.time"/>MS</td>
+		<td class="memory"><s:property value="solution.memory"/>KB</td>
 		<td><s:property value="soluton.language"/></td>
 		<td><s:property value="solution.codeLength"/></td>
-		<td><s:property value="solution.submitTime"/></td>
-		<td><s:property value="solution.judgeTime"/></td>
-		<td><s:property value="solution.passrate"/></td>
+		<td class="date_time"><s:property value="solution.submitTime"/></td>
+		<td class="date_time judgeTime"><s:property value="solution.judgeTime"/></td>
+<!--	<td><s:property value="solution.passrate"/></td> -->
 		<s:if test="solution.contestId!=0">
 		<td><s:property value="solution.contest.title "/></td><%-- TODO contest information --%>
 		</s:if>
@@ -61,6 +61,13 @@
 <pre class="prettyprint linenums"><s:property value="solution.additionalInformation"/></pre>
 </s:if>
 <s:text name="discuss" /> <s:property value="solution.message.replyCount"/> TODO load discuss
-<script>$(function(){window.prettyPrint && prettyPrint();});</script>
+<script>$(function(){
+	window.prettyPrint && prettyPrint();
+	$(".date_time").each(function(){
+		$this = $(this);
+		$this.text(new Date(parseInt($this.text())).ojFormat());
+	});
+	$(".statusDescription").html(oj.statusDescriptionHTML(<s:property value="solution.statusCode"/>,'<s:property value="solution.statusDescription"/>',<s:property value="solution.runId"/>));
+});</script>
 <s:include value="include/footer.jsp"></s:include>
 </c:html>

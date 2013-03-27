@@ -20,6 +20,7 @@
 					<li><s:a namespace="/problems" action="status"><s:text name="status" /></s:a></li>
 					<li><s:a namespace="/contests" action="list"><s:text name="contests" /></s:a></li>
 					<s:if test="#session.user==null">
+						<script>var LOGIN_USERNAME="";</script>
 						<li><s:a namespace="/" action="register"><s:text name="register" /></s:a></li>
 						<div id="login_dialog" title="<s:text name="login"/>" class="hide">
 						<s:form id="login_form" namespace="/" action="login" theme="bootstrap" cssClass="form">
@@ -31,6 +32,7 @@
 						<li><a id="login" href="#"><s:text name="login" /></a></li>
 					</s:if>
 					<s:else>
+						<script>var LOGIN_USERNAME="<s:property value="#session.user.username"/>";</script>
 						<li><s:a namespace="/" action="user-profiles">
 							<s:text name="welcome" />
 							<s:property value="#session.user.username"/>

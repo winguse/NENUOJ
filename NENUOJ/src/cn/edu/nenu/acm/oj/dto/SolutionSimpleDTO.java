@@ -19,6 +19,7 @@ public class SolutionSimpleDTO implements ISolutionStatusCode {
 	private long submitTime;
 	private int contestId;
 	private boolean shared;
+	private int remoteRunId;
 	public int getRunId() {
 		return runId;
 	}
@@ -109,11 +110,17 @@ public class SolutionSimpleDTO implements ISolutionStatusCode {
 	public void setShared(boolean shared) {
 		this.shared = shared;
 	}
+	public int getRemoteRunId() {
+		return remoteRunId;
+	}
+	public void setRemoteRunId(int remoteRunId) {
+		this.remoteRunId = remoteRunId;
+	}
 	public SolutionSimpleDTO(int runId, String username, String judgerSource,
 			String prublemNumber, String problemTitle, int problemId,
 			int statusCode, String statusDescription, int memory, int time,
 			String language, int codeLength, long submitTime, int contestId,
-			boolean shared) {
+			boolean shared, int remoteRunId) {
 		super();
 		this.runId = runId;
 		this.username = username;
@@ -130,5 +137,7 @@ public class SolutionSimpleDTO implements ISolutionStatusCode {
 		this.submitTime = submitTime;
 		this.contestId = contestId;
 		this.shared = shared;
+		this.remoteRunId = remoteRunId;
 	}
+	
 }
