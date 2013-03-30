@@ -7,14 +7,19 @@
 <s:set var="pageTitle" value="getText('Add Contest')"/>
 <title><s:text name="site.title"/> - <s:property value="#pageTitle"/></title>
 <s:include value="../include/header.jsp"></s:include>
-<form>
+<s:actionerror theme="bootstrap"/>
+<s:actionmessage theme="bootstrap"/>
+<s:fielderror theme="bootstrap"/>
+<s:form id="contest_add_form" action="add" namespace="/contest/json" theme="bootstrap" cssClass="form-inline">
 <div class="row">
+<div class="span6">
+	<s:textfield label="%{getText('Contest Title')}" name="contestTitle" tooltip="%{getText('tooltip.Contest Title')}" />
+</div>
 <div class="span6">
 	
 </div>
-<div class="span6"></div>
 </div>
-</form>
+</s:form>
 
 
 <s:include value="../include/footer.jsp"></s:include>

@@ -13,8 +13,6 @@ import cn.edu.nenu.acm.oj.actions.AbstractJsonAction;
 		@Result(name = "input", type = "redirectAction", params = { "actionName", "add", "namespace", "/contests" }) })
 public class AddAction extends AbstractJsonAction {
 	
-	
-	
 	@Override
 	public String execute(){
 		
