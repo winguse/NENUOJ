@@ -11,6 +11,7 @@
 <script src="${pageContext.request.contextPath}/js/jquery.form.js"></script>
 <script src="${pageContext.request.contextPath}/js/jquery.ba-hashchange.min.js"></script>
 <script src="${pageContext.request.contextPath}/js/prettify.js"></script>
+<script src="${pageContext.request.contextPath}/js/jquery-ui-timepicker-addon.js"></script>
 <script src="${pageContext.request.contextPath}/js/global.js"></script>
 <script>
 <s:if test="#session.user==null">
