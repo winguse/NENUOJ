@@ -9,10 +9,19 @@ body {
 body>*:first-child{
 	padding-top:40px;
 }
+*{
+	outline:none !important;
+}
+.pointer{
+	cursor:pointer;
+}
 .container{
 	min-height:-webkit-calc(100% - 211px);
 	min-height:-moz-calc(100% - 211px);
 	min-height:calc(100% - 211px);
+}
+.row>input[class*="span"],.row>select[class*="span"]{
+	margin:2px!important;
 }
 .footer {
 	text-align: center;

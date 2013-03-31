@@ -2,6 +2,7 @@ package cn.edu.nenu.acm.oj.service.impl;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
@@ -43,6 +44,8 @@ public class JudgeService extends Thread {
 	private Map<String, LinkedBlockingQueue<String>> crawlQueue;
 	private Map<String, LinkedBlockingQueue<String[]>> accounts;
 
+	private List<String> judgerSourceList;
+	
 	private int maxActiveCrawler = 5;
 	private int maxActiveSubmitter = 5;
 
@@ -164,6 +167,7 @@ public class JudgeService extends Thread {
 			accounts = new HashMap<String, LinkedBlockingQueue<String[]>>();
 			Resource accountResource = applicationContext.getResource("WEB-INF/accounts.conf");
 			Scanner accountInfo = new Scanner(accountResource.getInputStream());
+			judgerSourceList = new LinkedList<String>();
 			while (accountInfo.hasNext()) {
 				String line = accountInfo.nextLine();
 				if (line.startsWith("#"))
@@ -192,6 +196,7 @@ public class JudgeService extends Thread {
 						LinkedBlockingQueue<String[]> accountQueue = new LinkedBlockingQueue<String[]>();
 						accountQueue.add(account);
 						accounts.put(segment[0], accountQueue);
+						judgerSourceList.add(segment[0]);
 						log.info("Dectected new judgerSource, added account " + segment[1] + " of " + segment[0] + " .");
 					} else {
 						log.error("Crawler or Submitter of #" + segment[0] + " not found.");
@@ -263,6 +268,10 @@ public class JudgeService extends Thread {
 		} else {
 			crawlQueue.get(judgeSource).add(problem);
 		}
+	}
+
+	public List<String> getJudgerSourceList() {
+		return judgerSourceList;
 	}
 
 }

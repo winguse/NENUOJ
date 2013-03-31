@@ -14,6 +14,7 @@
 <form id="contest_add_form" action="add" class="form-horizontal">
 <div class="row">
 <div class="span6">
+	<h3><s:text name="Contest Basic Information"/></h3>
 	<div class="control-group">
 		<label class="control-label" for="contestTitle"><s:text name="Contest Title"/></label>
 		<div class="controls">
@@ -55,27 +56,63 @@
 		</div>
 	</div>
 </div>
-<div class="span6">
-	<div class="row">
-		<div class="span1"><s:text name="Judger Source"/></div>
-		<div class="span1"><s:text name="Problem Number"/></div>
-		<div class="span4"><s:text name="Description"/></div>
-	</div>
-	<div class="row">
-		<div class="span1"><s:text name="Judger Source"/></div>
-		<div class="span1"><s:text name="Problem Number"/></div>
-		<div class="span4"><s:text name="Description"/></div>
-	</div>
-	<div class="row">
-		<div class="span1"><s:text name="Judger Source"/></div>
-		<div class="span1"><s:text name="Problem Number"/></div>
-		<div class="span4"><s:text name="Description"/></div>
-	</div>
+<div class="span6" id="addProblemList">
+	<h3><s:text name="Contest Problems"/> <i class="icon-plus-sign pointer" title="<s:text name="Add A Problem Field"/>"></i></h3>
 </div>
 </div>
 </form>
 <script>
+function AddProblem(judgerList,elementId){
+	this.judgerList = judgerList;
+	elementId = elementId || "addProblemList";
+	this.$container = $("#"+elementId);
+}
+AddProblem.prototype.$container = null;
+AddProblem.prototype.getJudger = function(){
+	
+};
+AddProblem.prototype.getProblemNumber = function(){
+	
+};
+AddProblem.prototype.getDescription = function(){
+	
+};
+AddProblem.prototype.problemNumberOnchange = function(){
+	
+};
+AddProblem.prototype.destory = function(){
+	this.$element.remove();
+};
+AddProblem.prototype.init = function(){
+	var I = this,opt="";
+	I.id="problem_"+parseInt(Math.random()*(1<<31));
+	for(var i in I.judgerList){
+		opt += '<option value="'+I.judgerList[i]+'">'+I.judgerList[i]+'</option>';
+	}
+	I.$container.append('<div class="row" id="'+I.id+'"><select class="span1 inline" name="judgerSource">'+
+			opt+'</select><input type="text" class="span1 inline" name="problemNumber" placeholder="<s:text name="Problem Number"/>">'+
+			'<select class="span4 inline" name="problemDescription"><option value=""><s:text name="Enter Problem Number First"/></option></select> <i class="icon-trash pointer"></i></div>');
+	I.$element = $("#"+I.id);
+	I.$judgerSource = I.$element.find("select[name='judgerSource']");
+	I.$problemNumber = I.$element.find("input[name='problemNumber']");
+	I.$problemDescription = I.$element.find("select[name='problemDescription']");
+	I.$delete = I.$element.find("i[class*='icon-trash']");
+	I.$delete.click(function(){I.destory();return false;});
+};
 $(function(){
+	var judgerList=[];
+	$.get(baseUrl+"/json/supported-judger.action",{},function(d){
+		judgerList = d.judgerSourceList;
+		var addProblem = new AddProblem(judgerList);
+		addProblem.init();
+	},"json");
+	$("#addProblemList .icon-plus-sign").click(function(){
+		var addProblem = new AddProblem(judgerList);
+		addProblem.init();
+		return false;
+	});
+	
+	//-----------------
 	var $startTime = $('#startTime');
 	var $endTime = $('#endTime');
 
