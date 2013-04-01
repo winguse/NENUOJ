@@ -60,6 +60,11 @@
 	<h3><s:text name="Contest Problems"/> <i class="icon-plus-sign pointer" title="<s:text name="Add A Problem Field"/>"></i></h3>
 </div>
 </div>
+<div class="row">
+	<div class="form-actions">
+		<input type="submit" value="<s:text name="Submit"/>" class="btn btn-primary">
+	</div>
+</div>
 </form>
 <script>
 function AddProblem(judgerList,elementId){

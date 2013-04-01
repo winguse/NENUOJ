@@ -1,11 +1,9 @@
 package cn.edu.nenu.acm.oj.dao;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
@@ -18,7 +16,6 @@ import cn.edu.nenu.acm.oj.dto.ProblemDTO;
 import cn.edu.nenu.acm.oj.dto.ProblemDescriptionDTO;
 import cn.edu.nenu.acm.oj.dto.ProblemDescriptionSimpleDTO;
 import cn.edu.nenu.acm.oj.dto.ProblemSimpleDTO;
-import cn.edu.nenu.acm.oj.entitybeans.Judger;
 import cn.edu.nenu.acm.oj.entitybeans.Judger_;
 import cn.edu.nenu.acm.oj.entitybeans.Problem;
 import cn.edu.nenu.acm.oj.entitybeans.ProblemDescription;
