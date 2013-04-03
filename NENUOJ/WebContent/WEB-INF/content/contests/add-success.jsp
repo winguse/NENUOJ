@@ -11,10 +11,35 @@
 <s:actionerror theme="bootstrap"/>
 <s:actionmessage theme="bootstrap"/>
 <s:fielderror theme="bootstrap"/>
-<form id="contest_add_form" action="add" class="form-horizontal">
+<form id="contest_add_form" action="json/add.action" class="form-horizontal" enctype="multipart/form-data" method="post">
 <div class="row">
 <div class="span6">
 	<h3><s:text name="Contest Basic Information"/></h3>
+	<div class="control-group">
+		<label class="control-label" for="contestType"><s:text name="Contest Type"/></label>
+		<div class="controls">
+			<div class="btn-group" data-toggle="buttons-radio" id="contestTypeRadio">
+				<div class="btn active"><s:text name="Real Contest"/></div>
+				<div class="btn"><s:text name="Replay Contest"/></div>
+			</div>
+		</div>
+	</div>
+	<div class="control-group" id="realContestTypeSection">
+		<div class="controls">
+			<select name="contestType" class="span3" id="contestType">
+				<option value="<s:property value="@vs@CONTEST_TYPE_PUBLIC"/>"><s:text name="Public"/></option>
+				<option value="<s:property value="@vs@CONTEST_TYPE_PRIVATE"/>"><s:text name="Private"/></option>
+				<option value="<s:property value="@vs@CONTEST_TYPE_REGISTRATION_NEEDED"/>"><s:text name="Registration Needed"/></option>
+				<option value="<s:property value="-1"/>" hidden="hidden"></option>
+			</select>
+		</div>
+	</div>
+	<div class="control-group hide" id="replayDataSection">
+		<label class="control-label" for="replayData"><s:text name="Replay Data"/></label>
+		<div class="controls">
+			<input type="file" name="replayData" id="replayData">
+		</div>
+	</div>
 	<div class="control-group">
 		<label class="control-label" for="contestTitle"><s:text name="Contest Title"/></label>
 		<div class="controls">
@@ -24,23 +49,15 @@
 	<div class="control-group">
 		<label class="control-label" for="startTime"><s:text name="Start Time"/></label>
 		<div class="controls">
-			<input type="datetime" class="span3" name="startTime" id="startTime" placeholder="<s:text name="Start Time"/>">
+			<input type="datetime" class="span3" id="startTime" placeholder="<s:text name="Start Time"/>">
+			<input type="hidden" value="0" name="startTime">
 		</div>
 	</div>
 	<div class="control-group">
 		<label class="control-label" for="endTime"><s:text name="End Time"/></label>
 		<div class="controls">
-			<input type="datetime" class="span3" name="endTime" id="endTime" placeholder="<s:text name="End Time"/>">
-		</div>
-	</div>
-	<div class="control-group">
-		<label class="control-label" for="contestType"><s:text name="Contest Type"/></label>
-		<div class="controls">
-			<select name="contestType" class="span3" id="contestType">
-				<option value="<s:property value="@vs@CONTEST_TYPE_PUBLIC"/>"><s:text name="Public"/></option>
-				<option value="<s:property value="@vs@CONTEST_TYPE_PRIVATE"/>"><s:text name="Private"/></option>
-				<option value="<s:property value="@vs@CONTEST_TYPE_REGISTRATION_NEEDED"/>"><s:text name="Registration Needed"/></option>
-			</select>
+			<input type="datetime" class="span3" id="endTime" placeholder="<s:text name="End Time"/>">
+			<input type="hidden" value="0" name="endTime">
 		</div>
 	</div>
 	<div class="control-group">
@@ -166,7 +183,12 @@ $(function(){
 	var $startTime = $('#startTime');
 	var $endTime = $('#endTime');
 
-	$startTime.datetimepicker({ 
+	$startTime.datetimepicker({
+	    beforeShow: function(input, inst) { 
+	        setTimeout(function(){
+	        	inst.dpDiv.css({"z-index":1031});
+	        },60);
+	    },
 		onClose: function(dateText, inst) {
 			if ($endTime.val() != '') {
 				var testStartDate = $startTime.datetimepicker('getDate');
@@ -176,15 +198,21 @@ $(function(){
 			} else {
 				$endTime.val(dateText);
 			}
+			$("input[name='startTime']")[0].value = new Date($startTime.datetimepicker('getDate')).getTime();
+			$("input[name='endTime']")[0].value = new Date($endTime.datetimepicker('getDate')).getTime();
 		},
 		onSelect: function (selectedDateTime){
 			$endTime.datetimepicker('option', 'minDate', $startTime.datetimepicker('getDate') );
 		},
 		dateFormat:"yy-mm-dd",
 		timeFormat:"HH:mm:ss",
-		separator:"T"
+		separator:"T",
+		defaultValue:""
 	});
-	$endTime.datetimepicker({ 
+	$endTime.datetimepicker({
+	    beforeShow: function(input, inst) { 
+	        setTimeout(function(){inst.dpDiv.css({"z-index":1031});},60);
+	    },
 		onClose: function(dateText, inst) {
 			if ($startTime.val() != '') {
 				var testStartDate = $startTime.datetimepicker('getDate');
@@ -194,6 +222,8 @@ $(function(){
 			} else {
 				$startTime.val(dateText);
 			}
+			$("input[name='startTime']")[0].value = new Date($startTime.datetimepicker('getDate')).getTime();
+			$("input[name='endTime']")[0].value = new Date($endTime.datetimepicker('getDate')).getTime();
 		},
 		onSelect: function (selectedDateTime){
 			$startTime.datetimepicker('option', 'maxDate', $endTime.datetimepicker('getDate') );
@@ -201,7 +231,23 @@ $(function(){
 		dateFormat:"yy-mm-dd",
 		timeFormat:"HH:mm:ss",
 		separator:"T",
-		defaultValue:"Now"
+		defaultValue:""
+	});
+	$("#contestTypeRadio>*").click(function(){
+		if($(this).text() == "<s:text name="Real Contest"/>"){
+			$("select[name='contestType']")[0].value = "0";
+			$("#realContestTypeSection").slideDown();
+			$("#replayDataSection").slideUp();
+		}else{
+			$("select[name='contestType']")[0].value = "-1";
+			$("#realContestTypeSection").slideUp();
+			$("#replayDataSection").slideDown();
+		}
+	});
+	WinguseAjaxForm($("#contest_add_form"),function(d){
+		if(d.code == 0){
+			
+		}
 	});
 });
 </script>

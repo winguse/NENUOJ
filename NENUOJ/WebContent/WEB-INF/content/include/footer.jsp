@@ -5,7 +5,9 @@
 	<p><s:text name="footer.copyright"/> <s:text name="footer.servertime" /><span id="servertime"></span></p>
 	<p>&copy;2012 <s:text name="association"/></p>
 </footer>
+<script src="${pageContext.request.contextPath}/js/validation.js"></script>
 <script src="${pageContext.request.contextPath}/js/jquery-ui-1.10.2.custom.min.js"></script>
+<script src="${pageContext.request.contextPath}/js/bootstrap.min.js"></script>
 <script src="${pageContext.request.contextPath}/js/jquery.dataTables.min.js"></script>
 <script src="${pageContext.request.contextPath}/js/i18next.min.js"></script>
 <script src="${pageContext.request.contextPath}/js/jquery.form.js"></script>
