@@ -68,34 +68,16 @@
 </form>
 <script>
 function AddProblem(judgerList,elementId){
-	this.judgerList = judgerList;
-	elementId = elementId || "addProblemList";
-	this.$container = $("#"+elementId);
-}
-AddProblem.prototype.$container = null;
-AddProblem.prototype.getJudger = function(){
-	
-};
-AddProblem.prototype.getProblemNumber = function(){
-	
-};
-AddProblem.prototype.getDescription = function(){
-	
-};
-AddProblem.prototype.problemNumberOnchange = function(){
-	
-};
-AddProblem.prototype.destory = function(){
-	this.$element.remove();
-};
-AddProblem.prototype.init = function(){
 	var I = this,opt="";
-	I.id="problem_"+parseInt(Math.random()*(1<<31));
+	I.judgerList = judgerList;
+	elementId = elementId || "addProblemList";
+	I.$container = $("#"+elementId);
+	I.id="problem_"+parseInt(Math.random()*(1<<30));
 	for(var i in I.judgerList){
 		opt += '<option value="'+I.judgerList[i]+'">'+I.judgerList[i]+'</option>';
 	}
 	I.$container.append('<div class="row" id="'+I.id+'"><select class="span1 inline" name="judgerSource">'+
-			opt+'</select><input type="text" class="span1 inline" name="problemNumber" placeholder="<s:text name="Problem Number"/>">'+
+			opt+'</select><input value="" type="text" class="span1 inline" name="problemNumber" placeholder="<s:text name="Problem Number"/>">'+
 			'<select class="span4 inline" name="problemDescription"><option value=""><s:text name="Enter Problem Number First"/></option></select> <i class="icon-trash pointer"></i></div>');
 	I.$element = $("#"+I.id);
 	I.$judgerSource = I.$element.find("select[name='judgerSource']");
@@ -103,17 +85,80 @@ AddProblem.prototype.init = function(){
 	I.$problemDescription = I.$element.find("select[name='problemDescription']");
 	I.$delete = I.$element.find("i[class*='icon-trash']");
 	I.$delete.click(function(){I.destory();return false;});
+	var keyUpTimeoutHandle = 0;
+	I.$problemNumber.keyup(function(){
+		clearTimeout(keyUpTimeoutHandle);
+		keyUpTimeoutHandle = setTimeout(function(){
+			I.problemNumberOnchange();
+		},500);
+	});
+	I.list[I.id] = I;
+	I.problemNumerValide = false;
+}
+AddProblem.prototype.$container = null;
+AddProblem.prototype.getJudgerSource = function(){
+	return this.$judgerSource[0].value;
 };
+AddProblem.prototype.getProblemNumber = function(){
+	if(this.problemNumerValide)
+		return I.$problemNumber[0].value;
+	return "";
+};
+AddProblem.prototype.getDescription = function(){
+	if(this.problemNumerValide)
+		return I.$problemDescription[0].value;
+	return "";
+	
+};
+AddProblem.prototype.problemNumberOnchange = function(){
+	var I = this;
+	I.problemNumerValide = false;
+	var problemNumber = I.$problemNumber[0].value,judgerSource =  I.$judgerSource[0].value;
+	if(problemNumber == ""){
+		I.$problemDescription.html('<option value=""><s:text name="Enter Problem Number First"/></option>');
+		return;
+	}
+	$.post(baseUrl+"/contests/json/problem-description-list.action",{
+		problemNumber:problemNumber,
+		judgerSource:judgerSource
+		},function(d){
+			var l = d.problemDescriptionList;
+			if(l.length == 0){
+				I.$problemDescription.html('<option value=""><s:text name="Problem Not Found.."/></option>');
+				//TODO add crawl
+			}else{
+				var optHtml = "",lockedHtml ="";
+				for(var i = 0; i<l.length; i++){
+					var html = '<option value="'+l[i].id+'" title="Version Mark:'+l[i].versionMark+'\nLast update:'
+						+new Date(l[i].lastupdate).ojFormat()+'">'+l[i].title+' @'+l[i].username+'</option>';
+					if(l[i].locked)
+						lockedHtml += html;
+					else
+						optHtml += html;
+						
+				}
+				if(lockedHtml!="")
+					I.$problemDescription.html('<optgroup label="<s:text name="Normal Descriptions"/>">'+optHtml+
+							'</optgroup><optgroup label="<s:text name="Locked Descriptions"/>">'+lockedHtml+'</optgroup>');
+				else
+					I.$problemDescription.html(optHtml);
+			}
+		},"json"
+	);
+};
+AddProblem.prototype.destory = function(){
+	delete this.list[this.id];
+	this.$element.remove();
+};
+AddProblem.prototype.list = {};
 $(function(){
 	var judgerList=[];
 	$.get(baseUrl+"/json/supported-judger.action",{},function(d){
 		judgerList = d.judgerSourceList;
-		var addProblem = new AddProblem(judgerList);
-		addProblem.init();
+		new AddProblem(judgerList);
 	},"json");
 	$("#addProblemList .icon-plus-sign").click(function(){
-		var addProblem = new AddProblem(judgerList);
-		addProblem.init();
+		new AddProblem(judgerList);
 		return false;
 	});
 	

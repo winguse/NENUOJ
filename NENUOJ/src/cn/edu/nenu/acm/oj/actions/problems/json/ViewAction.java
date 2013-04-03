@@ -1,6 +1,5 @@
 package cn.edu.nenu.acm.oj.actions.problems.json;
 
-
 import java.util.Map;
 
 import org.apache.struts2.convention.annotation.InterceptorRef;
@@ -19,31 +18,42 @@ import com.opensymphony.xwork2.validator.annotations.RequiredStringValidator;
 import cn.edu.nenu.acm.oj.actions.AbstractJsonAction;
 import cn.edu.nenu.acm.oj.dao.ProblemDAO;
 import cn.edu.nenu.acm.oj.dto.ProblemDTO;
+import cn.edu.nenu.acm.oj.dto.UserSimpleDTO;
 
 @ParentPackage("json-default")
-@InterceptorRefs({
-	@InterceptorRef("i18n"),
-	@InterceptorRef("jsonValidationWorkflowStack")
-})
-@Results({ 
-	@Result(name = "success", type = "json"),
-	@Result(name = "input", type = "redirectAction", params = { "actionName", "view", "namespace", "/problems" })
-})
+@InterceptorRefs({ @InterceptorRef("i18n"), @InterceptorRef("jsonValidationWorkflowStack") })
+@Results({ @Result(name = "success", type = "json"),
+		@Result(name = "input", type = "redirectAction", params = { "actionName", "view", "namespace", "/problems" }) })
 public class ViewAction extends AbstractJsonAction implements SessionAware {
 
 	private static final long serialVersionUID = -8077897542384482842L;
-	private boolean includeLocked = false;
 	private int problemId;
 	private int problemDescriptionId = 0;
-	
+	private Map<String, Object> session;
+
 	@Autowired
 	private ProblemDAO dao;
-	
+
 	private ProblemDTO problem;
-	
+
 	@Override
 	public String execute() throws Exception {
-		problem = dao.getProblemAndDescription(problemId, problemDescriptionId, includeLocked);
+		int userId = 0;
+		boolean includeLockedDescription = false, includeLockedProblem = false;
+		if (session.containsKey("user")) {
+			UserSimpleDTO user = (UserSimpleDTO) session.get("user");
+			userId = user.getId();
+			if ((user.getPermission() & UserSimpleDTO.PERMISSION_SEE_LOCKED_DESCRIPTION) == UserSimpleDTO.PERMISSION_SEE_LOCKED_DESCRIPTION
+					|| (user.getPermission() & UserSimpleDTO.PERMISSION_ADMIN_PRIVILEGE) == UserSimpleDTO.PERMISSION_ADMIN_PRIVILEGE) {
+				includeLockedDescription = true;
+			}
+			if ((user.getPermission() & UserSimpleDTO.PERMISSION_SEE_LOCKED_PROBLEM) == UserSimpleDTO.PERMISSION_SEE_LOCKED_PROBLEM
+					|| (user.getPermission() & UserSimpleDTO.PERMISSION_ADMIN_PRIVILEGE) == UserSimpleDTO.PERMISSION_ADMIN_PRIVILEGE) {
+				includeLockedProblem = true;
+			}
+		}
+		problem = dao.getProblemAndDescription(problemId, includeLockedProblem, problemDescriptionId,
+				includeLockedDescription, userId);
 		return SUCCESS;
 	}
 
@@ -58,7 +68,7 @@ public class ViewAction extends AbstractJsonAction implements SessionAware {
 		this.problemId = problemId;
 	}
 
-	@JSON(serialize=false)
+	@JSON(serialize = false)
 	public int getProblemId() {
 		return problemId;
 	}
@@ -69,8 +79,7 @@ public class ViewAction extends AbstractJsonAction implements SessionAware {
 
 	@Override
 	public void setSession(Map<String, Object> arg0) {
-		// TODO set includeLocked according to user's level
+		session = arg0;
 	}
-	
 
 }

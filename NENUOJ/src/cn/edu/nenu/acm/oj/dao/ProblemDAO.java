@@ -45,20 +45,33 @@ public class ProblemDAO extends AbstractDAO<Problem> {
 	 * 
 	 * @param problemId
 	 * @param descriptionId
-	 * @param includeLocked
+	 * @param includeLockedProblem if the problem is locked and includeLockedProblem is false, return null
+	 * @param includeLockedDescription
 	 *            if true return the description is locked, be aware of
 	 *            permission
-	 * @return
+	 * @userId the current userId, if the description is belonged to him, event
+	 *         it's locked, return to the owner.
+	 * @return ProblemDTO with a selected description and a list of other description.
+	 * 
+	 * NOTE: Here the restriction is better to write them into database query.
+	 * but write it in java will be easier.
+	 * @see ProblemDescriptionDAO#getDescriptionList(String, String, boolean, int)
 	 */
 	@Transactional(readOnly = true)
-	public ProblemDTO getProblemAndDescription(int problemId, int descriptionId, boolean includeLocked) {
+	public ProblemDTO getProblemAndDescription(int problemId,boolean includeLockedProblem, int descriptionId, boolean includeLockedDescription, int userId) {
 		Problem problem = em.find(Problem.class, problemId);
 		if (problem == null)
 			return null;
+		if(!includeLockedProblem&&problem.isLocked()){
+			return null;
+		}
 		ProblemDescription problemDescription = null;
 		List<ProblemDescriptionSimpleDTO> lstPDS = new ArrayList<ProblemDescriptionSimpleDTO>();
 		for (ProblemDescription pd : problem.getProblemDescriptions()) {
-			if (!includeLocked && pd.isLocked())
+			int pdUserId = Integer.MIN_VALUE;
+			if (pd.getUser() != null)
+				pdUserId = pd.getUser().getId();
+			if (!includeLockedDescription && pd.isLocked() && pdUserId != userId)
 				continue;
 			lstPDS.add(new ProblemDescriptionSimpleDTO(pd.getId(), problem.getId(), pd.isLocked(), pd.getVote(), pd
 					.getTitle(), pd.getUser() != null ? pd.getUser().getUsername() : "System", pd.getLastUpdateTime()
@@ -105,7 +118,8 @@ public class ProblemDAO extends AbstractDAO<Problem> {
 		CriteriaQuery<Problem> query = cb.createQuery(Problem.class);
 		CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
 		Pair<Predicate, Root<Problem>> pair = getPredicate(judgerSource, filterString, includeLoocked, query, cb);
-		Pair<Predicate, Root<Problem>> countPair = getPredicate(judgerSource, filterString, includeLoocked, countQuery, cb);
+		Pair<Predicate, Root<Problem>> countPair = getPredicate(judgerSource, filterString, includeLoocked, countQuery,
+				cb);
 		Root<Problem> problemRoot = pair.second;
 		Predicate predicate = pair.first;
 		countQuery.select(cb.count(countPair.second)).where(countPair.first);
