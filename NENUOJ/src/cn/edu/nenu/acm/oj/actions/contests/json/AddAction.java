@@ -15,7 +15,8 @@ import com.opensymphony.xwork2.validator.annotations.RequiredStringValidator;
 
 import cn.edu.nenu.acm.oj.actions.AbstractJsonAction;
 import cn.edu.nenu.acm.oj.statuscode.IPermissionCode;
-@ParentPackage("json-default")
+
+@ParentPackage("winguse-json-default")
 @InterceptorRefs({
 	@InterceptorRef("i18n"), 
 	@InterceptorRef("jsonValidationWorkflowStack")
