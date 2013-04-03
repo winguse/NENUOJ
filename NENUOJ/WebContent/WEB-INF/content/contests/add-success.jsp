@@ -139,7 +139,7 @@ AddProblem.prototype.problemNumberOnchange = function(){
 				}
 				if(lockedHtml!="")
 					I.$problemDescription.html('<optgroup label="<s:text name="Normal Descriptions"/>">'+optHtml+
-							'</optgroup><optgroup label="<s:text name="Locked Descriptions"/>">'+lockedHtml+'</optgroup>');
+						'</optgroup><optgroup label="<s:text name="Locked Descriptions"/>">'+lockedHtml+'</optgroup>');
 				else
 					I.$problemDescription.html(optHtml);
 			}
