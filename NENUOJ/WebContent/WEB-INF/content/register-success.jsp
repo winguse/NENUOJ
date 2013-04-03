@@ -10,7 +10,7 @@
 <s:actionerror theme="bootstrap"/>
 <s:actionmessage theme="bootstrap"/>
 <s:fielderror theme="bootstrap"/>
-<s:form id="register_form" action="register-operating" theme="bootstrap" cssClass="form-inline">
+<s:form id="register_form" action="register-operating" theme="bootstrap" cssClass="form-horizontal">
 	<s:textfield label="%{getText('username')}" name="username" tooltip="%{getText('tooltip.username')}" />
 	<s:password label="%{getText('password')}" name="password" tooltip="%{getText('tooltip.password')}" />
 	<s:password label="%{getText('password2')}" name="password2" tooltip="%{getText('tooltip.password2')}" />

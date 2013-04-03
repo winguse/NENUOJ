@@ -85,7 +85,9 @@ public class RegisterOperatingAction extends AbstractAction implements SessionAw
 	}
 
 	@RequiredStringValidator(key = "username_required")
-	@FieldExpressionValidator(expression = "!isUsernameExist()", key = "username_exist")
+	@Validations(fieldExpressions = {
+	@FieldExpressionValidator(expression = "username.length()<45", key = "Username must not longer than 45."),
+	@FieldExpressionValidator(expression = "!isUsernameExist()", key = "username_exist")})
 	public void setUsername(String username) {
 		this.username = username;
 	}
@@ -108,23 +110,28 @@ public class RegisterOperatingAction extends AbstractAction implements SessionAw
 	}
 
 	@RequiredStringValidator(key = "email_required")
+	@FieldExpressionValidator(expression = "email.length()<64", key = "Email must not longer than 64.")
 	@EmailValidator(key = "email_required")
 	public void setEmail(String email) {
 		this.email = email;
 	}
 
+	@FieldExpressionValidator(expression = "school.length()<64", key = "School must not longer than 64.")
 	public void setSchool(String school) {
 		this.school = school;
 	}
 
+	@FieldExpressionValidator(expression = "grade.length()<64", key = "Grade must not longer than 64.")
 	public void setGrade(String grade) {
 		this.grade = grade;
 	}
-
+	
+	@FieldExpressionValidator(expression = "nickname.length()<64", key = "Nickname must not longer than 64.")
 	public void setNickname(String nickname) {
 		this.nickname = nickname;
 	}
 
+	@FieldExpressionValidator(expression = "major.length()<64", key = "Major must not longer than 64.")
 	public void setMajor(String major) {
 		this.major = major;
 	}
