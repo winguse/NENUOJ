@@ -6,4 +6,5 @@ public interface IPermissionCode {
 	public static final long PERMISSION_ADMIN_PRIVILEGE = 4L;
 	public static final long PERMISSION_SEE_LOCKED_DESCRIPTION = 8L; 
 	public static final long PERMISSION_SEE_LOCKED_PROBLEM = 16L; 
+	public static final long PERMISSION_ADD_CONTEST = 32L; 
 }

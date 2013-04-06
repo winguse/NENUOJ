@@ -1,5 +1,6 @@
 package cn.edu.nenu.acm.oj.entitybeans;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -25,6 +26,7 @@ import javax.persistence.Version;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
+import cn.edu.nenu.acm.oj.statuscode.IPermissionCode;
 import cn.edu.nenu.acm.oj.util.Remark;
 
 /**
@@ -48,7 +50,7 @@ import cn.edu.nenu.acm.oj.util.Remark;
 		@NamedQuery(name = "User.findBySubmitted", query = "SELECT u FROM User u WHERE u.submitted = :submitted"),
 		@NamedQuery(name = "User.findByPermission", query = "SELECT u FROM User u WHERE u.permission = :permission"),
 		@NamedQuery(name = "User.findByLastUpdateTime", query = "SELECT u FROM User u WHERE u.lastUpdateTime = :lastUpdateTime") })
-public class User implements java.io.Serializable {
+public class User implements Serializable,IPermissionCode {
 
 	private static final long serialVersionUID = -2468070911644628921L;
 	private Integer id;

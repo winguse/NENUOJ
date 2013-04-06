@@ -33,7 +33,8 @@ public class ProblemDescriptionListAction extends AbstractJsonAction implements 
 	@Override
 	public String execute() {
 		int userId = 0;
-		boolean includeLocked = false;
+		boolean includeLockedDescription = false;
+		boolean includeLockedProblem = false;
 		if (session.containsKey("user")) {
 			UserSimpleDTO user = (UserSimpleDTO) session.get("user");
 			userId = user.getId();
@@ -41,10 +42,16 @@ public class ProblemDescriptionListAction extends AbstractJsonAction implements 
 					(user.getPermission() & UserSimpleDTO.PERMISSION_SEE_LOCKED_DESCRIPTION) == UserSimpleDTO.PERMISSION_SEE_LOCKED_DESCRIPTION||
 					(user.getPermission() & UserSimpleDTO.PERMISSION_ADMIN_PRIVILEGE) == UserSimpleDTO.PERMISSION_ADMIN_PRIVILEGE
 				) {
-				includeLocked = true;
+				includeLockedDescription = true;
+			}
+			if (
+					(user.getPermission() & UserSimpleDTO.PERMISSION_SEE_LOCKED_PROBLEM) == UserSimpleDTO.PERMISSION_SEE_LOCKED_PROBLEM||
+					(user.getPermission() & UserSimpleDTO.PERMISSION_ADMIN_PRIVILEGE) == UserSimpleDTO.PERMISSION_ADMIN_PRIVILEGE
+				) {
+				includeLockedProblem = true;
 			}
 		}
-		problemDescriptionList = dao.getDescriptionList(problemNumber, judgerSource, includeLocked, userId);
+		problemDescriptionList = dao.getDescriptionList(problemNumber,includeLockedProblem, judgerSource, includeLockedDescription, userId);
 
 		return SUCCESS;
 	}

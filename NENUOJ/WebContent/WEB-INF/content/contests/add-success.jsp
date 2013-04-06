@@ -30,7 +30,7 @@
 				<option value="<s:property value="@vs@CONTEST_TYPE_PUBLIC"/>"><s:text name="Public"/></option>
 				<option value="<s:property value="@vs@CONTEST_TYPE_PRIVATE"/>"><s:text name="Private"/></option>
 				<option value="<s:property value="@vs@CONTEST_TYPE_REGISTRATION_NEEDED"/>"><s:text name="Registration Needed"/></option>
-				<option value="<s:property value="-1"/>" hidden="hidden"></option>
+				<option value="<s:property value="@vs@CONTEST_TYPE_REPLAY"/>" hidden="hidden"></option>
 			</select>
 		</div>
 	</div>
@@ -235,11 +235,11 @@ $(function(){
 	});
 	$("#contestTypeRadio>*").click(function(){
 		if($(this).text() == "<s:text name="Real Contest"/>"){
-			$("select[name='contestType']")[0].value = "0";
+			$("select[name='contestType']")[0].value = "<s:property value="@vs@CONTEST_TYPE_PUBLIC"/>";
 			$("#realContestTypeSection").slideDown();
 			$("#replayDataSection").slideUp();
 		}else{
-			$("select[name='contestType']")[0].value = "-1";
+			$("select[name='contestType']")[0].value = "<s:property value="@vs@CONTEST_TYPE_REPLAY"/>";
 			$("#realContestTypeSection").slideUp();
 			$("#replayDataSection").slideDown();
 		}
