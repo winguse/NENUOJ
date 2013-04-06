@@ -1,10 +1,12 @@
 package cn.edu.nenu.acm.oj.actions.contests.json;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.struts2.convention.annotation.InterceptorRef;
@@ -30,6 +32,10 @@ import cn.edu.nenu.acm.oj.dto.UserSimpleDTO;
 import cn.edu.nenu.acm.oj.entitybeans.Contest;
 import cn.edu.nenu.acm.oj.entitybeans.ProblemDescription;
 import cn.edu.nenu.acm.oj.statuscode.IPermissionCode;
+import cn.edu.nenu.acm.oj.util.ExcelTools;
+import cn.edu.nenu.acm.oj.util.Pair;
+import cn.edu.nenu.acm.oj.util.RankListCellExpression;
+import cn.edu.nenu.acm.oj.util.RankListCellParser;
 import cn.edu.nenu.acm.oj.util.Remark;
 
 @ParentPackage("winguse-json-default")
@@ -57,14 +63,14 @@ public class AddAction extends AbstractJsonAction implements SessionAware {
 	private List<Integer> problemDescription;
 	private Map<String, Object> session;
 	private File replayData;
-	
+
 	@Autowired
 	private ProblemDescriptionDAO pdDao;
 	@Autowired
 	private ContestDAO cDao;
 	@Autowired
 	private UserDAO uDao;
-	
+
 	@Override
 	public String execute() {
 		code = CODE_ERROR;
@@ -72,30 +78,26 @@ public class AddAction extends AbstractJsonAction implements SessionAware {
 		Set<ProblemDescription> pdSet = new HashSet<ProblemDescription>();
 		boolean includeLockedDescription = false;
 		boolean includeLockedProblem = false;
-		if (
-				(user.getPermission() & UserSimpleDTO.PERMISSION_SEE_LOCKED_DESCRIPTION) == UserSimpleDTO.PERMISSION_SEE_LOCKED_DESCRIPTION||
-				(user.getPermission() & UserSimpleDTO.PERMISSION_ADMIN_PRIVILEGE) == UserSimpleDTO.PERMISSION_ADMIN_PRIVILEGE
-			) {
+		if ((user.getPermission() & UserSimpleDTO.PERMISSION_SEE_LOCKED_DESCRIPTION) == UserSimpleDTO.PERMISSION_SEE_LOCKED_DESCRIPTION
+				|| (user.getPermission() & UserSimpleDTO.PERMISSION_ADMIN_PRIVILEGE) == UserSimpleDTO.PERMISSION_ADMIN_PRIVILEGE) {
 			includeLockedDescription = true;
 		}
-		if (
-				(user.getPermission() & UserSimpleDTO.PERMISSION_SEE_LOCKED_PROBLEM) == UserSimpleDTO.PERMISSION_SEE_LOCKED_PROBLEM||
-				(user.getPermission() & UserSimpleDTO.PERMISSION_ADMIN_PRIVILEGE) == UserSimpleDTO.PERMISSION_ADMIN_PRIVILEGE
-			) {
+		if ((user.getPermission() & UserSimpleDTO.PERMISSION_SEE_LOCKED_PROBLEM) == UserSimpleDTO.PERMISSION_SEE_LOCKED_PROBLEM
+				|| (user.getPermission() & UserSimpleDTO.PERMISSION_ADMIN_PRIVILEGE) == UserSimpleDTO.PERMISSION_ADMIN_PRIVILEGE) {
 			includeLockedProblem = true;
 		}
-		for(Integer pdId : problemDescription){
+		for (Integer pdId : problemDescription) {
 			ProblemDescription pd = pdDao.findById(pdId);
-			if(pd == null){
-				message = _("One of the problem description you have submitted is not exist.")+" pdId = "+pdId;
+			if (pd == null) {
+				message = _("One of the problem description you have submitted is not exist.") + " pdId = " + pdId;
 				return SUCCESS;
 			}
-			if(!includeLockedProblem&&pd.getProblem().isLocked()){
-				message = _("One of the problem you do not have permission to access.")+" pdId = "+pdId;
+			if (!includeLockedProblem && pd.getProblem().isLocked()) {
+				message = _("One of the problem you do not have permission to access.") + " pdId = " + pdId;
 				return SUCCESS;
 			}
-			if(pd.isLocked()&&!includeLockedDescription){
-				message = _("One of the problem description you do not have permission to access.")+" pdId = "+pdId;
+			if (pd.isLocked() && !includeLockedDescription) {
+				message = _("One of the problem description you do not have permission to access.") + " pdId = " + pdId;
 				return SUCCESS;
 			}
 			pdSet.add(pd);
@@ -111,6 +113,36 @@ public class AddAction extends AbstractJsonAction implements SessionAware {
 		contest.setRemark(remark);
 		contest.setStartTime(new Date(startTime));
 		cDao.persist(contest);
+
+		if (replayData != null && replayData.exists()) {
+			if (contestType == Contest.CONTEST_TYPE_REPLAY) {
+				String cells[][] = null;
+				try {
+					if (replayData.getName().toLowerCase().endsWith(".xls")) {
+						cells = ExcelTools.splitCellsFromExcel(replayData);
+					} else if (replayData.getName().toLowerCase().endsWith(".csv")) {
+						cells = ExcelTools.splitCellsFromCsv(replayData);
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				if(cells != null){
+					RankListCellParser cellParser = new RankListCellParser();
+					for(int i=0;i<cells.length;i++){
+						for(int j=0;j<cells[i].length;j++){
+							cellParser.recognize(cells[i][j]);
+						}
+					}
+					for(Entry<String, Pair<String, List<RankListCellExpression>>> e: cellParser.getPatterns().entrySet() ){
+						String pattern = e.getKey();
+						String example = e.getValue().first;
+						List<RankListCellExpression> lstExpression = e.getValue().second;
+					}
+				}
+			}
+			replayData.delete();
+		}
+
 		code = CODE_SUCCESS;
 		message = _("Contest added successfully.");
 		return SUCCESS;
@@ -134,9 +166,8 @@ public class AddAction extends AbstractJsonAction implements SessionAware {
 
 	@RequiredFieldValidator(key = "Contest ending time Is Requried!")
 	@Validations(fieldExpressions = {
-			@FieldExpressionValidator(expression = "endTime >= startTime+3600", key = "Contest ending time must 1hr later then starting time.")
-,			@FieldExpressionValidator(expression = "contestType == cn.edu.nenu.acm.oj.statuscode.IContestType.CONTEST_TYPE_REPLAY && endTime < new Date().getTime()", key = "Contest ending time must 1hr later then starting time.")
-	})
+			@FieldExpressionValidator(expression = "endTime >= startTime+3600", key = "Contest ending time must 1hr later then starting time."),
+			@FieldExpressionValidator(expression = "contestType == cn.edu.nenu.acm.oj.statuscode.IContestType.CONTEST_TYPE_REPLAY && endTime < new Date().getTime()", key = "Contest ending time must 1hr later then starting time.") })
 	public void setEndTime(Long endTime) {
 		this.endTime = endTime;
 	}

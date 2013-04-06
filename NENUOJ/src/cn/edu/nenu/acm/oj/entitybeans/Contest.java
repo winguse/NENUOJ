@@ -25,6 +25,7 @@ import javax.persistence.Version;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
+import cn.edu.nenu.acm.oj.statuscode.IContestType;
 import cn.edu.nenu.acm.oj.util.Remark;
 
 /**
@@ -42,7 +43,7 @@ import cn.edu.nenu.acm.oj.util.Remark;
 		@NamedQuery(name = "Contest.findByEndTime", query = "SELECT c FROM Contest c WHERE c.endTime = :endTime"),
 		@NamedQuery(name = "Contest.findByContestType", query = "SELECT c FROM Contest c WHERE c.contestType = :contestType"),
 		@NamedQuery(name = "Contest.findByLastUpdateTime", query = "SELECT c FROM Contest c WHERE c.lastUpdateTime = :lastUpdateTime") })
-public class Contest implements Serializable {
+public class Contest implements Serializable,IContestType {
 
 	private static final long serialVersionUID = 4386374575031447891L;
 	private Integer id;
