@@ -51,7 +51,7 @@ public class RejudgeAction extends AbstractJsonAction implements SessionAware {
 		return SUCCESS;
 	}
 
-	public int getCode() {
+	public Integer getCode() {
 		return code;
 	}
 

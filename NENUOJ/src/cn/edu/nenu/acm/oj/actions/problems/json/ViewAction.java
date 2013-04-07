@@ -82,4 +82,14 @@ public class ViewAction extends AbstractJsonAction implements SessionAware {
 		session = arg0;
 	}
 
+	@Override
+	public String getMessage() {
+		return message;
+	}
+
+	@Override
+	public Integer getCode() {
+		return code;
+	}
+
 }

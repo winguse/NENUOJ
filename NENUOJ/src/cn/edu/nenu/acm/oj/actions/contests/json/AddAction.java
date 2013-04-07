@@ -3,11 +3,14 @@ package cn.edu.nenu.acm.oj.actions.contests.json;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.struts2.convention.annotation.InterceptorRef;
 import org.apache.struts2.convention.annotation.InterceptorRefs;
@@ -31,6 +34,7 @@ import cn.edu.nenu.acm.oj.dao.UserDAO;
 import cn.edu.nenu.acm.oj.dto.UserSimpleDTO;
 import cn.edu.nenu.acm.oj.entitybeans.Contest;
 import cn.edu.nenu.acm.oj.entitybeans.ProblemDescription;
+import cn.edu.nenu.acm.oj.statuscode.IContestType;
 import cn.edu.nenu.acm.oj.statuscode.IPermissionCode;
 import cn.edu.nenu.acm.oj.util.ExcelTools;
 import cn.edu.nenu.acm.oj.util.Pair;
@@ -39,17 +43,14 @@ import cn.edu.nenu.acm.oj.util.RankListCellParser;
 import cn.edu.nenu.acm.oj.util.Remark;
 
 @ParentPackage("winguse-json-default")
-@InterceptorRefs({
-		@InterceptorRef("i18n"),
-		@InterceptorRef("jsonValidationWorkflowStack"),
-		@InterceptorRef(value = "permissionInterceptor", params = { "permission",
-				"" + IPermissionCode.PERMISSION_ADD_CONTEST }) })
+@InterceptorRefs({ @InterceptorRef("i18n"),
+// @InterceptorRef(value = "permissionInterceptor", params = { "permission","" +
+// IPermissionCode.PERMISSION_ADD_CONTEST }),
+		@InterceptorRef("jsonValidationWorkflowStack") })
 @Results({ @Result(name = "success", type = "json"),
 		@Result(name = "input", type = "redirectAction", params = { "actionName", "add", "namespace", "/contests" }) })
-@Validations(requiredStrings = {}, expressions = {
-		@ExpressionValidator(expression = "judgerSource!=null&&problemNumber!=null&&problemDescription!=null", message = "Empty problem set of the contest!"),
-		@ExpressionValidator(expression = "judgerSource.length()>0&&judgerSource.length()==problemNumber.length()&&judgerSource.length()==problemDescription.length()", message = "Problem set is invalid!") }, fieldExpressions = {})
-public class AddAction extends AbstractJsonAction implements SessionAware {
+@Validations(requiredStrings = {}, expressions = { @ExpressionValidator(expression = "isProblemSetValid()", message = "Problem set is invalid!") }, fieldExpressions = {})
+public class AddAction extends AbstractJsonAction implements SessionAware, IContestType {
 
 	private static final long serialVersionUID = 6201478464197183393L;
 	private int contestType;
@@ -63,6 +64,7 @@ public class AddAction extends AbstractJsonAction implements SessionAware {
 	private List<Integer> problemDescription;
 	private Map<String, Object> session;
 	private File replayData;
+	private Map<String, Map<String, Integer>> selections;
 
 	@Autowired
 	private ProblemDescriptionDAO pdDao;
@@ -87,6 +89,10 @@ public class AddAction extends AbstractJsonAction implements SessionAware {
 			includeLockedProblem = true;
 		}
 		for (Integer pdId : problemDescription) {
+			if(pdId == null){
+				message = _("One of the problem description you have submitted is valid.") + " pdId = " + pdId;
+				return SUCCESS;
+			}
 			ProblemDescription pd = pdDao.findById(pdId);
 			if (pd == null) {
 				message = _("One of the problem description you have submitted is not exist.") + " pdId = " + pdId;
@@ -126,17 +132,30 @@ public class AddAction extends AbstractJsonAction implements SessionAware {
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-				if(cells != null){
+				if (cells != null) {
 					RankListCellParser cellParser = new RankListCellParser();
-					for(int i=0;i<cells.length;i++){
-						for(int j=0;j<cells[i].length;j++){
+					for (int i = 0; i < cells.length; i++) {
+						for (int j = 0; j < cells[i].length; j++) {
 							cellParser.recognize(cells[i][j]);
 						}
 					}
-					for(Entry<String, Pair<String, List<RankListCellExpression>>> e: cellParser.getPatterns().entrySet() ){
-						String pattern = e.getKey();
+					Map<Integer, RankListCellExpression> numberedExpression = new HashMap<Integer, RankListCellExpression>();
+					int idx = 0;
+					selections = new HashMap<String, Map<String, Integer>>();
+					for (Entry<String, Pair<String, List<RankListCellExpression>>> e : cellParser.getPatterns()
+							.entrySet()) {
+						Pattern pattern = Pattern.compile(e.getKey());
 						String example = e.getValue().first;
+						Matcher matcher = pattern.matcher(example);
 						List<RankListCellExpression> lstExpression = e.getValue().second;
+						Map<String, Integer> options = new HashMap<String, Integer>();
+						for (RankListCellExpression exp : lstExpression) {
+							String display = matcher.replaceAll(exp.getDescription());
+							numberedExpression.put(idx, exp);
+							options.put(display, idx);
+							idx++;
+						}
+						selections.put(e.getKey(), options);
 					}
 				}
 			}
@@ -146,6 +165,10 @@ public class AddAction extends AbstractJsonAction implements SessionAware {
 		code = CODE_SUCCESS;
 		message = _("Contest added successfully.");
 		return SUCCESS;
+	}
+
+	public Map<String, Map<String, Integer>> getSelections() {
+		return selections;
 	}
 
 	@RequiredFieldValidator(key = "Contest type is requried!")
@@ -160,16 +183,27 @@ public class AddAction extends AbstractJsonAction implements SessionAware {
 	}
 
 	@RequiredFieldValidator(key = "Contest starting time is requried!")
+	@FieldExpressionValidator(expression = "isRealContestValid()", key = "Real Contest must start latter than now.")
 	public void setStartTime(Long startTime) {
 		this.startTime = startTime;
 	}
 
 	@RequiredFieldValidator(key = "Contest ending time Is Requried!")
 	@Validations(fieldExpressions = {
-			@FieldExpressionValidator(expression = "endTime >= startTime+3600", key = "Contest ending time must 1hr later then starting time."),
-			@FieldExpressionValidator(expression = "contestType == cn.edu.nenu.acm.oj.statuscode.IContestType.CONTEST_TYPE_REPLAY && endTime < new Date().getTime()", key = "Contest ending time must 1hr later then starting time.") })
+			@FieldExpressionValidator(expression = "endTime >= startTime + 3600000L", key = "Contest ending time must 1hr later then starting time."),
+			@FieldExpressionValidator(expression = "isReplayValid()", key = "Replay Contest must ended.") })
 	public void setEndTime(Long endTime) {
 		this.endTime = endTime;
+	}
+	@JSON(serialize = false)
+	public boolean isRealContestValid() {
+		return contestType == CONTEST_TYPE_REPLAY
+				|| (contestType != CONTEST_TYPE_REPLAY && startTime > new Date().getTime());
+	}
+	@JSON(serialize = false)
+	public boolean isReplayValid() {
+		return contestType != CONTEST_TYPE_REPLAY
+				|| (contestType == CONTEST_TYPE_REPLAY && endTime < new Date().getTime());
 	}
 
 	@FieldExpressionValidator(expression = "description.length()<1024", key = "Contest description must not longer than 1024.")
@@ -227,25 +261,29 @@ public class AddAction extends AbstractJsonAction implements SessionAware {
 	public String getAnnouncement() {
 		return announcement;
 	}
-
+	
 	@JSON(serialize = false)
-	public List<String> getJudgerSource() {
-		return judgerSource;
-	}
-
-	@JSON(serialize = false)
-	public List<String> getProblemNumber() {
-		return problemNumber;
-	}
-
-	@JSON(serialize = false)
-	public List<Integer> getProblemDescription() {
-		return problemDescription;
+	public boolean isProblemSetValid() {
+		for(String j:judgerSource)System.out.println(j);
+		for(String j:problemNumber)System.out.println(j);
+		for(Integer j:problemDescription)System.out.println(j);
+		return judgerSource != null && problemNumber != null && problemDescription != null && judgerSource.size() > 0
+				&& judgerSource.size() == problemNumber.size() && judgerSource.size() == problemDescription.size();
 	}
 
 	@Override
 	public void setSession(Map<String, Object> arg0) {
 		session = arg0;
+	}
+
+	@Override
+	public String getMessage() {
+		return message;
+	}
+
+	@Override
+	public Integer getCode() {
+		return code;
 	}
 
 }

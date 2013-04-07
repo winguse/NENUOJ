@@ -98,7 +98,7 @@ public class StatusAction extends AbstractJsonAction implements SessionAware {
 		return totalCount;
 	}
 
-	public int getCode() {
+	public Integer getCode() {
 		return code;
 	}
 

@@ -63,7 +63,7 @@ public class SyncStatusAction extends AbstractJsonAction implements
 		return SUCCESS;
 	}
 
-	public int getCode() {
+	public Integer getCode() {
 		return code;
 	}
 

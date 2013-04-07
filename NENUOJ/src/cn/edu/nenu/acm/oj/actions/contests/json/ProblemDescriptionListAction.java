@@ -73,4 +73,14 @@ public class ProblemDescriptionListAction extends AbstractJsonAction implements 
 		session = arg0;
 	}
 
+	@Override
+	public String getMessage() {
+		return message;
+	}
+
+	@Override
+	public Integer getCode() {
+		return code;
+	}
+
 }
