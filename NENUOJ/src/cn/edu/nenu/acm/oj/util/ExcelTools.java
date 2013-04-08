@@ -12,7 +12,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.Ostermiller.util.CSVParser;
 
@@ -23,16 +28,19 @@ import jxl.read.biff.BiffException;
 public class ExcelTools {
 	/**
 	 * Get the first sheet from an excel file. thanks to Isun's virtual-judge.
+	 * 
 	 * @author Isun
 	 * @param xls
-	 * @throws IndexOutOfBoundsException,BiffException,FileNotFoundException,IOException
+	 * @throws IndexOutOfBoundsException
+	 *             ,BiffException,FileNotFoundException,IOException
 	 * @return a two dimension of String array.
 	 */
-	public static String[][] splitCellsFromExcel(File xls) throws IndexOutOfBoundsException, BiffException, FileNotFoundException, IOException {
+	public static String[][] splitCellsFromExcel(File xls) throws IndexOutOfBoundsException, BiffException,
+			FileNotFoundException, IOException {
 		Sheet rs = Workbook.getWorkbook(new FileInputStream(xls)).getSheet(0);
 		ArrayList<String[]> tmpContent = new ArrayList<String[]>();
 		for (int i = 0; i < rs.getRows(); i++) {
-			List<String> row = new ArrayList<String>(); 
+			List<String> row = new ArrayList<String>();
 			for (int j = 0; j < rs.getColumns(); j++) {
 				row.add(rs.getCell(j, i).getContents().trim());
 			}
@@ -43,14 +51,15 @@ public class ExcelTools {
 
 	/**
 	 * Get the first sheet from an csv file. thanks to Isun's virtual-judge.
+	 * 
 	 * @author Isun
 	 * @param csv
-	 * @return 
+	 * @return
 	 * @throws IOException
 	 */
 	public static String[][] splitCellsFromCsv(File csv) throws IOException {
-		CodepageDetectorProxy detector = CodepageDetectorProxy.getInstance();  
-		detector.add(JChardetFacade.getInstance());  
+		CodepageDetectorProxy detector = CodepageDetectorProxy.getInstance();
+		detector.add(JChardetFacade.getInstance());
 		Charset charset = Charset.forName("GB2312");
 		InputStream inputStream = new BufferedInputStream(new FileInputStream(csv));
 		int length = 100000;
@@ -66,4 +75,48 @@ public class ExcelTools {
 		CSVParser shredder = new CSVParser(new InputStreamReader(inputStream, charset));
 		return shredder.getAllValues();
 	}
+
+	public static Pair<Map<String, Map<String, Integer>>, Map<Integer, RankListCellExpression>> getParseInfo(
+			File replayData) {
+		String cells[][] = null;
+		Map<String, Map<String, Integer>> selections = null;
+		Map<Integer, RankListCellExpression> indexedExpression = null;
+		try {
+			if (replayData.getName().toLowerCase().endsWith(".xls")) {
+				cells = ExcelTools.splitCellsFromExcel(replayData);
+			} else if (replayData.getName().toLowerCase().endsWith(".csv")) {
+				cells = ExcelTools.splitCellsFromCsv(replayData);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		if (cells != null) {
+			RankListCellParser cellParser = new RankListCellParser();
+			for (int i = 0; i < cells.length; i++) {
+				for (int j = 0; j < cells[i].length; j++) {
+					cellParser.recognize(cells[i][j]);
+				}
+			}
+			indexedExpression = new HashMap<Integer, RankListCellExpression>();
+			int idx = 0;
+			selections = new HashMap<String, Map<String, Integer>>();
+			for (Entry<String, Pair<String, List<RankListCellExpression>>> e : cellParser.getPatterns().entrySet()) {
+				Pattern pattern = Pattern.compile(e.getKey());
+				String example = e.getValue().first;
+				Matcher matcher = pattern.matcher(example);
+				List<RankListCellExpression> lstExpression = e.getValue().second;
+				Map<String, Integer> options = new HashMap<String, Integer>();
+				for (RankListCellExpression exp : lstExpression) {
+					String display = matcher.replaceAll(exp.getDescription());
+					indexedExpression.put(idx, exp);
+					options.put(display, idx);
+					idx++;
+				}
+				selections.put(e.getKey(), options);
+			}
+		}
+		return new Pair<Map<String, Map<String, Integer>>, Map<Integer, RankListCellExpression>>(selections,
+				indexedExpression);
+	}
+
 }

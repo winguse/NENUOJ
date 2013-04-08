@@ -152,7 +152,6 @@ AddProblem.prototype.problemNumberOnchange = function(){
 						lockedHtml += html;
 					else
 						optHtml += html;
-						
 				}
 				if(lockedHtml!="")
 					I.$problemDescription.html('<optgroup label="<s:text name="Normal Descriptions"/>">'+optHtml+
@@ -246,7 +245,9 @@ $(function(){
 	});
 	WinguseAjaxForm($("#contest_add_form"),function(d){
 		if(d.code == 0){
-			
+			oj.showMessage(d.message);
+		}else if(d.code == 5){
+			oj.showMessage(d.message);
 		}
 	});
 });

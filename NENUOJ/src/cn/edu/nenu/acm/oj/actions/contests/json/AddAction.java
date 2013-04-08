@@ -89,7 +89,7 @@ public class AddAction extends AbstractJsonAction implements SessionAware, ICont
 			includeLockedProblem = true;
 		}
 		for (Integer pdId : problemDescription) {
-			if(pdId == null){
+			if (pdId == null) {
 				message = _("One of the problem description you have submitted is valid.") + " pdId = " + pdId;
 				return SUCCESS;
 			}
@@ -119,51 +119,25 @@ public class AddAction extends AbstractJsonAction implements SessionAware, ICont
 		contest.setRemark(remark);
 		contest.setStartTime(new Date(startTime));
 		cDao.persist(contest);
-
+		code = CODE_SUCCESS;
+		message = _("Contest added successfully.");
 		if (replayData != null && replayData.exists()) {
 			if (contestType == Contest.CONTEST_TYPE_REPLAY) {
-				String cells[][] = null;
-				try {
-					if (replayData.getName().toLowerCase().endsWith(".xls")) {
-						cells = ExcelTools.splitCellsFromExcel(replayData);
-					} else if (replayData.getName().toLowerCase().endsWith(".csv")) {
-						cells = ExcelTools.splitCellsFromCsv(replayData);
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				if (cells != null) {
-					RankListCellParser cellParser = new RankListCellParser();
-					for (int i = 0; i < cells.length; i++) {
-						for (int j = 0; j < cells[i].length; j++) {
-							cellParser.recognize(cells[i][j]);
-						}
-					}
-					Map<Integer, RankListCellExpression> numberedExpression = new HashMap<Integer, RankListCellExpression>();
-					int idx = 0;
-					selections = new HashMap<String, Map<String, Integer>>();
-					for (Entry<String, Pair<String, List<RankListCellExpression>>> e : cellParser.getPatterns()
-							.entrySet()) {
-						Pattern pattern = Pattern.compile(e.getKey());
-						String example = e.getValue().first;
-						Matcher matcher = pattern.matcher(example);
-						List<RankListCellExpression> lstExpression = e.getValue().second;
-						Map<String, Integer> options = new HashMap<String, Integer>();
-						for (RankListCellExpression exp : lstExpression) {
-							String display = matcher.replaceAll(exp.getDescription());
-							numberedExpression.put(idx, exp);
-							options.put(display, idx);
-							idx++;
-						}
-						selections.put(e.getKey(), options);
-					}
+				Pair<Map<String, Map<String, Integer>>, Map<Integer, RankListCellExpression>> tmp = ExcelTools
+						.getParseInfo(replayData);
+				if (tmp.first == null) {
+					code = CODE_WARNING;
+					message = _("Contest added successfully, but replay data was not recognized.");
+				} else {
+					selections = tmp.first;
+					Map<Integer, RankListCellExpression> indexedExpression = tmp.second;
+					session.put("indexedExpression", indexedExpression);
+					code = CODE_SUCCESS;
+					message = _("Contest added successfully. Now please confirm replay data specification.");
 				}
 			}
 			replayData.delete();
 		}
-
-		code = CODE_SUCCESS;
-		message = _("Contest added successfully.");
 		return SUCCESS;
 	}
 
@@ -195,11 +169,13 @@ public class AddAction extends AbstractJsonAction implements SessionAware, ICont
 	public void setEndTime(Long endTime) {
 		this.endTime = endTime;
 	}
+
 	@JSON(serialize = false)
 	public boolean isRealContestValid() {
 		return contestType == CONTEST_TYPE_REPLAY
 				|| (contestType != CONTEST_TYPE_REPLAY && startTime > new Date().getTime());
 	}
+
 	@JSON(serialize = false)
 	public boolean isReplayValid() {
 		return contestType != CONTEST_TYPE_REPLAY
@@ -261,12 +237,15 @@ public class AddAction extends AbstractJsonAction implements SessionAware, ICont
 	public String getAnnouncement() {
 		return announcement;
 	}
-	
+
 	@JSON(serialize = false)
 	public boolean isProblemSetValid() {
-		for(String j:judgerSource)System.out.println(j);
-		for(String j:problemNumber)System.out.println(j);
-		for(Integer j:problemDescription)System.out.println(j);
+		for (String j : judgerSource)
+			System.out.println(j);
+		for (String j : problemNumber)
+			System.out.println(j);
+		for (Integer j : problemDescription)
+			System.out.println(j);
 		return judgerSource != null && problemNumber != null && problemDescription != null && judgerSource.size() > 0
 				&& judgerSource.size() == problemNumber.size() && judgerSource.size() == problemDescription.size();
 	}
