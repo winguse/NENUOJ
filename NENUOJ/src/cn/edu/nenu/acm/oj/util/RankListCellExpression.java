@@ -21,8 +21,12 @@ public abstract class RankListCellExpression {
 	
 	
 	public boolean isMatch(Integer val[],long contestLength){
-		if(val.length!=range.length)return false;
-		for(int i = 0;i<range.length;i++)
+		int rLength = range.length;
+		if(range.length == 1 && range[0].length == 0){
+			rLength = 0;
+		}
+		if(val.length!=rLength)return false;
+		for(int i = 0;i<rLength;i++)
 			if(val[i]<range[i][0]||range[i][1]<val[i])
 				return false;
 		if(getInfo(val,contestLength)[0]>contestLength)return false;

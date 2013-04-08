@@ -19,6 +19,8 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import cn.edu.nenu.acm.oj.eto.ReplayDataInvalidException;
+
 import com.Ostermiller.util.CSVParser;
 
 import jxl.Sheet;
@@ -77,14 +79,15 @@ public class ExcelTools {
 	}
 
 	public static Pair<Map<String, Map<String, Integer>>, Map<Integer, RankListCellExpression>> getParseInfo(
-			File replayData) {
+			File replayData,String replayDataContentType,String replayDataFileName,int problemCount,long contestLength) throws ReplayDataInvalidException {
 		String cells[][] = null;
 		Map<String, Map<String, Integer>> selections = null;
 		Map<Integer, RankListCellExpression> indexedExpression = null;
 		try {
-			if (replayData.getName().toLowerCase().endsWith(".xls")) {
+			System.out.println(replayData.getName());
+			if (replayDataFileName.toLowerCase().endsWith(".xls")||"application/vnd.ms-excel".endsWith(replayDataContentType)) {
 				cells = ExcelTools.splitCellsFromExcel(replayData);
-			} else if (replayData.getName().toLowerCase().endsWith(".csv")) {
+			} else if (replayDataFileName.toLowerCase().endsWith(".csv")) {
 				cells = ExcelTools.splitCellsFromCsv(replayData);
 			}
 		} catch (Exception e) {
@@ -92,8 +95,12 @@ public class ExcelTools {
 		}
 		if (cells != null) {
 			RankListCellParser cellParser = new RankListCellParser();
+			cellParser.setContestLength(contestLength);
 			for (int i = 0; i < cells.length; i++) {
-				for (int j = 0; j < cells[i].length; j++) {
+				if(cells[i].length<problemCount+1){
+					throw new ReplayDataInvalidException("Replay data file do not cantain enough information.");
+				}
+				for (int j = 1; j < cells[i].length; j++) {
 					cellParser.recognize(cells[i][j]);
 				}
 			}
@@ -112,8 +119,10 @@ public class ExcelTools {
 					options.put(display, idx);
 					idx++;
 				}
-				selections.put(e.getKey(), options);
+				selections.put("<"+example+"><"+e.getKey()+">", options);
 			}
+		}else{
+			throw new ReplayDataInvalidException("Could not read submitted replay data file.");
 		}
 		return new Pair<Map<String, Map<String, Integer>>, Map<Integer, RankListCellExpression>>(selections,
 				indexedExpression);

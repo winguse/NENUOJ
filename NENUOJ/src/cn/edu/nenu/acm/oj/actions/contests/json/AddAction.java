@@ -34,6 +34,7 @@ import cn.edu.nenu.acm.oj.dao.UserDAO;
 import cn.edu.nenu.acm.oj.dto.UserSimpleDTO;
 import cn.edu.nenu.acm.oj.entitybeans.Contest;
 import cn.edu.nenu.acm.oj.entitybeans.ProblemDescription;
+import cn.edu.nenu.acm.oj.eto.ReplayDataInvalidException;
 import cn.edu.nenu.acm.oj.statuscode.IContestType;
 import cn.edu.nenu.acm.oj.statuscode.IPermissionCode;
 import cn.edu.nenu.acm.oj.util.ExcelTools;
@@ -46,6 +47,7 @@ import cn.edu.nenu.acm.oj.util.Remark;
 @InterceptorRefs({ @InterceptorRef("i18n"),
 // @InterceptorRef(value = "permissionInterceptor", params = { "permission","" +
 // IPermissionCode.PERMISSION_ADD_CONTEST }),
+	@InterceptorRef("fileUpload"),
 		@InterceptorRef("jsonValidationWorkflowStack") })
 @Results({ @Result(name = "success", type = "json"),
 		@Result(name = "input", type = "redirectAction", params = { "actionName", "add", "namespace", "/contests" }) })
@@ -64,6 +66,8 @@ public class AddAction extends AbstractJsonAction implements SessionAware, ICont
 	private List<Integer> problemDescription;
 	private Map<String, Object> session;
 	private File replayData;
+	private String replayDataContentType;
+	private String replayDataFileName;
 	private Map<String, Map<String, Integer>> selections;
 
 	@Autowired
@@ -123,17 +127,24 @@ public class AddAction extends AbstractJsonAction implements SessionAware, ICont
 		message = _("Contest added successfully.");
 		if (replayData != null && replayData.exists()) {
 			if (contestType == Contest.CONTEST_TYPE_REPLAY) {
-				Pair<Map<String, Map<String, Integer>>, Map<Integer, RankListCellExpression>> tmp = ExcelTools
-						.getParseInfo(replayData);
-				if (tmp.first == null) {
+				Pair<Map<String, Map<String, Integer>>, Map<Integer, RankListCellExpression>> tmp;
+				try {
+					tmp = ExcelTools
+							.getParseInfo(replayData,replayDataContentType,replayDataFileName,problemDescription.size(),endTime - startTime);
+					if (tmp.first == null) {
+						code = CODE_WARNING;
+						message = _("Contest added successfully, but replay data was not recognized.");
+					} else {
+						selections = tmp.first;
+						Map<Integer, RankListCellExpression> indexedExpression = tmp.second;
+						session.put("indexedExpression", indexedExpression);
+						code = CODE_SUCCESS;
+						message = _("Contest added successfully. Now please confirm replay data specification.");
+					}
+				} catch (ReplayDataInvalidException e) {
 					code = CODE_WARNING;
-					message = _("Contest added successfully, but replay data was not recognized.");
-				} else {
-					selections = tmp.first;
-					Map<Integer, RankListCellExpression> indexedExpression = tmp.second;
-					session.put("indexedExpression", indexedExpression);
-					code = CODE_SUCCESS;
-					message = _("Contest added successfully. Now please confirm replay data specification.");
+					message = _(e.getMessage());
+					e.printStackTrace();
 				}
 			}
 			replayData.delete();
@@ -205,6 +216,7 @@ public class AddAction extends AbstractJsonAction implements SessionAware, ICont
 	}
 
 	public void setReplayData(File replayData) {
+		System.out.println("File .. ");
 		this.replayData = replayData;
 	}
 
@@ -240,12 +252,6 @@ public class AddAction extends AbstractJsonAction implements SessionAware, ICont
 
 	@JSON(serialize = false)
 	public boolean isProblemSetValid() {
-		for (String j : judgerSource)
-			System.out.println(j);
-		for (String j : problemNumber)
-			System.out.println(j);
-		for (Integer j : problemDescription)
-			System.out.println(j);
 		return judgerSource != null && problemNumber != null && problemDescription != null && judgerSource.size() > 0
 				&& judgerSource.size() == problemNumber.size() && judgerSource.size() == problemDescription.size();
 	}
@@ -263,6 +269,17 @@ public class AddAction extends AbstractJsonAction implements SessionAware, ICont
 	@Override
 	public Integer getCode() {
 		return code;
+	}
+
+
+	public void setReplayDataFileName(String replayDataFileName) {
+		this.replayDataFileName = replayDataFileName;
+		System.out.println("File name: "+replayDataFileName);
+	}
+
+	public void setReplayDataContentType(String replayDataContentType) {
+		System.out.println("File type: "+replayDataContentType);
+		this.replayDataContentType = replayDataContentType;
 	}
 
 }

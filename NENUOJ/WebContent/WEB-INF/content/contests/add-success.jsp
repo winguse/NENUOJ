@@ -244,13 +244,42 @@ $(function(){
 		}
 	});
 	WinguseAjaxForm($("#contest_add_form"),function(d){
+		oj.showMessage(d.message);
 		if(d.code == 0){
-			oj.showMessage(d.message);
+			oj.showMessage(d.message,"",function(){
+				var selectHtml = '<form id="chooseReplayPattern" class="form-horizontal" action="<s:url action="choose-replay-pattern" namespace="/contest"/>" method="post">';
+				var idx = 0;
+				for(var i in d.selections){
+					var example = i.replace(/<(.+)><(.+)>/,"$1");
+					var regex = i.replace(/<(.+)><(.+)>/,"$2");
+					var opt = '<div class="control-group"><label class="control-label" for="idx_'+idx+'">'+example+'</label><input type="hidden" name="regex" value="'+
+					regex+'"><div class="controls"><select id="idx_'+idx+'" name="idx">';
+					for(var j in d.selections[i]){
+						opt += '<option value="'+d.selections[i][j]+'">'+j+'</option>';
+					}
+					opt += "</select></div></div>";
+					selectHtml += opt;
+					idx ++;
+				}
+				selectHtml +="</form>";
+				oj.showMessage(selectHtml,$.t("Choose Replay Pattern"),function(){
+					var $crpform = $("#chooseReplayPattern");
+					$crpform.ajaxSubmit({
+						success:function(dd){
+							
+						},
+						dataType : "json"
+					});
+				});
+			});
 		}else if(d.code == 5){
-			oj.showMessage(d.message);
+			oj.showMessage(d.message,"",function(){
+				window.location = "<s:url action="list" namespace="/contest"/>";
+			});
 		}
 	});
 });
 </script>
+
 <s:include value="../include/footer.jsp"></s:include>
 </c:html>

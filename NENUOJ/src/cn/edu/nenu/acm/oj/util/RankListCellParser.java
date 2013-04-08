@@ -345,6 +345,7 @@ public class RankListCellParser {
 	 * @param cellString
 	 */
 	public void recognize(String cellString){
+		if("".equals(cellString))return;
 		String patternString = cellString.trim().replaceAll("([\\$\\^\\|\\[\\]\\{\\}\\(\\)\\.\\*\\?\\+\\\\])", "\\\\$1").replaceAll("\\d+", "(\\\\d+)");
 		Matcher m = numberPattern.matcher(cellString);
 		List<Integer> values = new LinkedList<Integer>();
