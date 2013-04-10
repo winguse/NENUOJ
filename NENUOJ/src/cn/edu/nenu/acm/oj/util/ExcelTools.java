@@ -78,8 +78,8 @@ public class ExcelTools {
 		return shredder.getAllValues();
 	}
 
-	public static Pair<Map<String, Map<String, Integer>>, Map<Integer, RankListCellExpression>> getParseInfo(
-			File replayData,String replayDataContentType,String replayDataFileName,int problemCount,long contestLength) throws ReplayDataInvalidException {
+	public static Map<String, Map<String, Integer>> getParseInfo(
+			File replayData,String replayDataContentType,String replayDataFileName,int problemCount,long contestLength,Map<String, Object> container) throws ReplayDataInvalidException {
 		String cells[][] = null;
 		Map<String, Map<String, Integer>> selections = null;
 		Map<Integer, RankListCellExpression> indexedExpression = null;
@@ -121,11 +121,12 @@ public class ExcelTools {
 				}
 				selections.put("<"+example+"><"+e.getKey()+">", options);
 			}
+			container.put("indexedExpression",indexedExpression);
+			container.put("rankListCells",cells);
 		}else{
 			throw new ReplayDataInvalidException("Could not read submitted replay data file.");
 		}
-		return new Pair<Map<String, Map<String, Integer>>, Map<Integer, RankListCellExpression>>(selections,
-				indexedExpression);
+		return selections;
 	}
 
 }

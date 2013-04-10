@@ -129,17 +129,15 @@ public class AddAction extends AbstractJsonAction implements SessionAware, ICont
 			if (contestType == Contest.CONTEST_TYPE_REPLAY) {
 				Pair<Map<String, Map<String, Integer>>, Map<Integer, RankListCellExpression>> tmp;
 				try {
-					tmp = ExcelTools
-							.getParseInfo(replayData,replayDataContentType,replayDataFileName,problemDescription.size(),endTime - startTime);
-					if (tmp.first == null) {
+					selections = ExcelTools
+							.getParseInfo(replayData,replayDataContentType,replayDataFileName,problemDescription.size(),endTime - startTime,session);
+					if (selections == null) {
 						code = CODE_WARNING;
 						message = _("Contest added successfully, but replay data was not recognized.");
 					} else {
-						selections = tmp.first;
-						Map<Integer, RankListCellExpression> indexedExpression = tmp.second;
-						session.put("indexedExpression", indexedExpression);
 						code = CODE_SUCCESS;
 						message = _("Contest added successfully. Now please confirm replay data specification.");
+						session.put("addedContestId", contest.getId());
 					}
 				} catch (ReplayDataInvalidException e) {
 					code = CODE_WARNING;
