@@ -245,9 +245,9 @@ $(function(){
 	});
 	WinguseAjaxForm($("#contest_add_form"),function(d){
 		oj.showMessage(d.message);
-		if(d.code == 0){
+		if(d.selections){
 			oj.showMessage(d.message,"",function(){
-				var selectHtml = '<form id="chooseReplayPattern" class="form-horizontal" action="<s:url action="choose-replay-pattern" namespace="/contest"/>" method="post">';
+				var selectHtml = '<form id="chooseReplayPattern" class="form-horizontal" action="<s:url action="choose-replay-pattern" namespace="/contests/json"/>" method="post">';
 				var idx = 0;
 				for(var i in d.selections){
 					var example = i.replace(/<(.+)><(.+)>/,"$1");
@@ -266,15 +266,22 @@ $(function(){
 					var $crpform = $("#chooseReplayPattern");
 					$crpform.ajaxSubmit({
 						success:function(dd){
-							//TODO
+							var errMsg = "";
+							if(dd.code != 0){
+								errMsg = $.t("Note: replay data can be added later, may be you need to try it later.");
+							}
+							oj.showMessage(dd.message+" "+errMsg,"",function(){
+								window.location = "<s:url action="list" namespace="/contests"/>";
+							});
 						},
 						dataType : "json"
 					});
 				});
 			});
-		}else if(d.code == 5){
+		}else{
 			oj.showMessage(d.message,"",function(){
-				window.location = "<s:url action="list" namespace="/contest"/>";
+				if(d.code == 0 || d.code ==5)
+					window.location = "<s:url action="list" namespace="/contests"/>";
 			});
 		}
 	});

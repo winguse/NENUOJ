@@ -1,16 +1,11 @@
 package cn.edu.nenu.acm.oj.actions.contests.json;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.struts2.convention.annotation.InterceptorRef;
 import org.apache.struts2.convention.annotation.InterceptorRefs;
@@ -36,11 +31,9 @@ import cn.edu.nenu.acm.oj.entitybeans.Contest;
 import cn.edu.nenu.acm.oj.entitybeans.ProblemDescription;
 import cn.edu.nenu.acm.oj.eto.ReplayDataInvalidException;
 import cn.edu.nenu.acm.oj.statuscode.IContestType;
-import cn.edu.nenu.acm.oj.statuscode.IPermissionCode;
 import cn.edu.nenu.acm.oj.util.ExcelTools;
 import cn.edu.nenu.acm.oj.util.Pair;
 import cn.edu.nenu.acm.oj.util.RankListCellExpression;
-import cn.edu.nenu.acm.oj.util.RankListCellParser;
 import cn.edu.nenu.acm.oj.util.Remark;
 
 @ParentPackage("winguse-json-default")
@@ -62,8 +55,8 @@ public class AddAction extends AbstractJsonAction implements SessionAware, ICont
 	private String description = "";
 	private String announcement = "";
 	private List<String> judgerSource;
-	private List<String> problemNumber;
-	private List<Integer> problemDescription;
+	private Set<String> problemNumber;
+	private Set<Integer> problemDescription;
 	private Map<String, Object> session;
 	private File replayData;
 	private String replayDataContentType;
@@ -122,7 +115,13 @@ public class AddAction extends AbstractJsonAction implements SessionAware, ICont
 		remark.set("announcement", announcement);
 		contest.setRemark(remark);
 		contest.setStartTime(new Date(startTime));
-		cDao.persist(contest);
+		try{
+			cDao.persist(contest);
+		}catch(Exception e){
+			code = CODE_ERROR;
+			message = _("Database error, is your submit ok?");
+			return SUCCESS;
+		}
 		code = CODE_SUCCESS;
 		message = _("Contest added successfully.");
 		if (replayData != null && replayData.exists()) {
@@ -141,7 +140,7 @@ public class AddAction extends AbstractJsonAction implements SessionAware, ICont
 					}
 				} catch (ReplayDataInvalidException e) {
 					code = CODE_WARNING;
-					message = _(e.getMessage());
+					message = _("Contest added successfully. But: ")+_(e.getMessage())+_(" You may add replay data later.");
 					e.printStackTrace();
 				}
 			}
@@ -205,11 +204,11 @@ public class AddAction extends AbstractJsonAction implements SessionAware, ICont
 		this.judgerSource = judgerSource;
 	}
 
-	public void setProblemNumber(List<String> problemNumber) {
+	public void setProblemNumber(Set<String> problemNumber) {
 		this.problemNumber = problemNumber;
 	}
 
-	public void setProblemDescription(List<Integer> problemDescription) {
+	public void setProblemDescription(Set<Integer> problemDescription) {
 		this.problemDescription = problemDescription;
 	}
 

@@ -254,6 +254,7 @@ OJ.prototype.rejudge=function(runId){
 OJ.prototype.showMessage=function(message,title,callback){
 	var I = this;
 	I.messageCallback = callback;
+	if(title=="")title="&nbsp;";
 	if(!I.messageDialogLoaded){
 		I.messageDialogLoaded = true;
 		$("body").append('<div id="messageDialog" class="hide"></div>');
