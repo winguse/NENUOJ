@@ -20,13 +20,6 @@ public class PermissionInterceptor extends AbstractInterceptor {
 	public String intercept(ActionInvocation ict) throws Exception {
 		Map<String, Object> session = ActionContext.getContext().getSession();
 		UserSimpleDTO user = (UserSimpleDTO) session.get("user");
-//		if(user == null){
-//			user = new UserSimpleDTO();
-//			user.setPermission(Long.MAX_VALUE);
-//			user.setId(23);
-//			user.setUsername("winguse");
-//			session.put("user", user);
-//		}
 		if (user == null || !(user instanceof UserSimpleDTO)) {
 			return "reject-login-needed";
 		} else if ((user.getPermission() & Permission.LOGIN) != Permission.LOGIN) {

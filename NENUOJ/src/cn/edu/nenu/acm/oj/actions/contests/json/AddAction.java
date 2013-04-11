@@ -31,6 +31,7 @@ import cn.edu.nenu.acm.oj.entitybeans.Contest;
 import cn.edu.nenu.acm.oj.entitybeans.ProblemDescription;
 import cn.edu.nenu.acm.oj.eto.ReplayDataInvalidException;
 import cn.edu.nenu.acm.oj.statuscode.IContestType;
+import cn.edu.nenu.acm.oj.statuscode.IPermissionCode;
 import cn.edu.nenu.acm.oj.util.ExcelTools;
 import cn.edu.nenu.acm.oj.util.Pair;
 import cn.edu.nenu.acm.oj.util.RankListCellExpression;
@@ -38,8 +39,7 @@ import cn.edu.nenu.acm.oj.util.Remark;
 
 @ParentPackage("winguse-json-default")
 @InterceptorRefs({ @InterceptorRef("i18n"),
-// @InterceptorRef(value = "permissionInterceptor", params = { "permission","" +
-// IPermissionCode.PERMISSION_ADD_CONTEST }),
+ @InterceptorRef(value = "permissionInterceptor", params = { "permission","" + IPermissionCode.PERMISSION_ADD_CONTEST }),
 	@InterceptorRef("fileUpload"),
 		@InterceptorRef("jsonValidationWorkflowStack") })
 @Results({ @Result(name = "success", type = "json"),
