@@ -99,7 +99,7 @@ public class ListAction extends AbstractJsonAction implements SessionAware {
 		return totalCount;
 	}
 
-	public int getCode() {
+	public Integer getCode() {
 		return code;
 	}
 

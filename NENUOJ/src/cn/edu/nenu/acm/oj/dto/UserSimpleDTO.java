@@ -1,9 +1,10 @@
 package cn.edu.nenu.acm.oj.dto;
 
 import cn.edu.nenu.acm.oj.entitybeans.User;
+import cn.edu.nenu.acm.oj.statuscode.IPermissionCode;
 import cn.edu.nenu.acm.oj.util.Remark;
 
-public class UserSimpleDTO {
+public class UserSimpleDTO implements IPermissionCode {
 	private Integer id;
 	private String username;
 	private String nickname;

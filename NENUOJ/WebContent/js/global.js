@@ -251,8 +251,10 @@ OJ.prototype.rejudge=function(runId){
 		},"json"
 	);
 };
-OJ.prototype.showMessage=function(message,type){
+OJ.prototype.showMessage=function(message,title,callback){
 	var I = this;
+	I.messageCallback = callback;
+	if(title=="")title="&nbsp;";
 	if(!I.messageDialogLoaded){
 		I.messageDialogLoaded = true;
 		$("body").append('<div id="messageDialog" class="hide"></div>');
@@ -261,6 +263,8 @@ OJ.prototype.showMessage=function(message,type){
 			buttons:{
 				OK : function(){
 					$(this).dialog("close");
+					if(I.messageCallback)
+						I.messageCallback();
 				}
 			},
 			height:"auto",
@@ -269,7 +273,7 @@ OJ.prototype.showMessage=function(message,type){
 	}
 	var $m = $("#messageDialog");
 	$m.html(message);
-	$m.dialog({title:type});//TODO type
+	$m.dialog({title:title});//TODO type
 	$m.dialog("open");
 };
 OJ.prototype.syncStatus=function(){

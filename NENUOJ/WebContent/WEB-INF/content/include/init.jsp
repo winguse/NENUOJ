@@ -5,9 +5,10 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<script src="${pageContext.request.contextPath}/js/jquery-1.9.1.min.js"></script>
-<b:head includeScripts="true" includeScriptsValidation="true" includeStylesResponsive="true"/>
+<link href="${pageContext.request.contextPath}/css/bootstrap.min.css" rel="stylesheet">
+<link href="${pageContext.request.contextPath}/css/bootstrap-responsive.min.css" rel="stylesheet">
 <link href="${pageContext.request.contextPath}/css/smoothness/jquery-ui-1.10.2.custom.min.css" rel="stylesheet">
 <link href="${pageContext.request.contextPath}/css/jquery.dataTables.css" rel="stylesheet">
 <link href="${pageContext.request.contextPath}/css/global.css" rel="stylesheet">
 <script>var baseUrl='${pageContext.request.contextPath}';</script>
+<script src="${pageContext.request.contextPath}/js/jquery-1.9.1.min.js"></script>

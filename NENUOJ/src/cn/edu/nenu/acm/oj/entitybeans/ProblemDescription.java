@@ -118,7 +118,7 @@ public class ProblemDescription implements java.io.Serializable {
 		this.user = user;
 	}
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)// problem description allways need problem
 	@JoinColumn(name = "problem_id", nullable = false)
 	public Problem getProblem() {
 		return this.problem;
