@@ -15,6 +15,16 @@
 <div class="row">
 <div class="span6">
 	<h3><s:text name="Contest Basic Information"/></h3>
+		<div class="control-group">
+		<label class="control-label" for="contestType">Contest Type</label>
+		<div class="controls">
+			<div class="btn-group" data-toggle="buttons-radio" id="contestTypeRadio">
+				<div class="btn active">Real Contest</div>
+				<div class="btn">Replay Contest</div>
+			</div>
+		</div>
+	</div>
+	
 	<div class="control-group">
 		<label class="control-label" for="contestTitle"><s:text name="Contest Title"/></label>
 		<div class="controls">
