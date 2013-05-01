@@ -15,6 +15,8 @@ var STATUS_ALL = 0
 ,STATUS_RUNTIME_ERROR = 10
 ,STATUS_COMPLIE_ERROR = 11;
 
+var PERMISSION = true; // TODO set permission according to user login status
+
 function WinguseAjaxForm(form, successCallback) {
 	var $form = typeof (form) == "string" ? $(form)
 			: form, params = {
@@ -471,6 +473,99 @@ OJ.prototype.loadStatus=function(sortable){
 		$statusTable.fnDraw();
 		return false;
 	});
+};
+
+OJ.prototype.loadContestList=function(){
+	$('#contestList').dataTable( {
+		"sDom": '<"H"if>t<"F"plr>',
+		"bProcessing": true,
+		"bServerSide": true,
+		"iDisplayLength": 20,
+		"bStateSave":true,
+		"oLanguage": {
+			"sInfo": "_START_ to _END_ of _TOTAL_ contests",//TODO replace to _("xxx")
+			"sInfoEmpty": "No problems",
+			"sInfoFiltered": " (filtering from _MAX_ total contests)"
+		},
+		"aaSorting": [[ 1, "desc" ]],
+		"sAjaxSource": baseUrl + "/contests/json/list.action",
+		"fnServerData": function ( sSource, _aoData, fnCallback ) {
+			var aoData={};
+			for(var i in _aoData){
+				aoData[_aoData[i].name]=_aoData[i].value;
+			}
+			var orderIndex=aoData.iSortCol_0+1;
+			if(aoData.sSortDir_0=="desc")
+				orderIndex=-orderIndex;
+			$.post( sSource, {
+				orderByIndex:orderIndex,
+				filterString:aoData.sSearch,
+				page:aoData.iDisplayStart/aoData.iDisplayLength,
+				pageSize:aoData.iDisplayLength
+			}, function (json) {
+				for(var i = 0;i < json.data.length;i++){
+					json.data[i].push("");
+				}
+				fnCallback({
+					sEcho:aoData.sEcho,
+					iTotalDisplayRecords:json.totalCount,
+					iTotalRecords:json.allContestsCount,
+					aaData:json.data
+				});
+			},"json" );
+		},
+		"aoColumns": [{
+				"sClass": ""//ID
+			},{
+				"fnRender": function ( oObj ) {
+					return "<a href='"+baseUrl + "/contests/view.action#?id="+oObj.aData[0]+"'>"+oObj.aData[1]+"</a>";
+				},
+				"sClass": ""//Title
+			},{
+				"fnRender": function ( oObj ) {
+					return new Date(oObj.aData[2]).ojFormat();
+				},
+				"sClass": ""//Start Time
+			},{
+				"fnRender": function ( oObj ) {
+					var ret = "",length = oObj.aData[3];
+					if(length / (1000*3600*24)>=1){
+						ret += parseInt(length / (1000*3600*24)) + " " + $.t("Days") + " ";
+						length  = length % (1000*3600*24);
+					}
+					ret += parseInt(length / (1000*3600)) + ":";
+					length  = length % (1000*3600);
+					
+					ret += parseInt(length / (1000*60)) + ":";
+					length  = length % (1000*60);
+					
+					ret += parseInt(length / (1000));
+					length  = length % (1000);
+					return ret;
+				},
+				"bSortable": false,
+				"sClass": ""//Length
+			},{
+				"sClass": ""//Type
+			},{
+				"fnRender": function ( oObj ) {
+					return "<a href='"+baseUrl + "/show-user.action#?username="+oObj.aData[5].xss()+"'>"+oObj.aData[5].xss()+"</a>";
+				},
+				"bSortable": false,
+				"sClass": ""//Host User
+			},{
+				"fnRender": function ( oObj ) {
+					if(oObj.aData[1].replace(/^.+?>(.+?)<.+?$/,"$1") == LOGIN_USERNAME || PERMISSION)
+					return "";
+				},
+				"bSortable": false,
+				"sClass": ""// operation
+				
+			}
+		],
+		"sPaginationType": "full_numbers",
+		"bJQueryUI": true
+	} );
 };
 var oj;
 oj = new OJ();

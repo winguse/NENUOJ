@@ -221,13 +221,13 @@ public class JudgeService extends Thread {
 		this.interrupt();
 		SubmitWorker.setAllStop();
 		CrawlWorker.setAllStop();
-		log.info("wait 5s for some threads to stop...");
-		try {
-			Thread.sleep(5000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		log.info("wait 5s passed...");
+//		log.info("wait 5s for some threads to stop...");
+//		try {
+//			Thread.sleep(5000);
+//		} catch (InterruptedException e) {
+//			e.printStackTrace();
+//		}
+//		log.info("wait 5s passed...");
 	}
 
 	/**

@@ -106,6 +106,7 @@ public class AddAction extends AbstractJsonAction implements SessionAware, ICont
 			pdSet.add(pd);
 		}
 		Contest contest = new Contest();
+		contest.setTitle(contestTitle);
 		contest.setContestType(contestType);
 		contest.setEndTime(new Date(endTime));
 		contest.setHostUser(uDao.findById(user.getId()));
@@ -126,7 +127,6 @@ public class AddAction extends AbstractJsonAction implements SessionAware, ICont
 		message = _("Contest added successfully.");
 		if (replayData != null && replayData.exists()) {
 			if (contestType == Contest.CONTEST_TYPE_REPLAY) {
-				Pair<Map<String, Map<String, Integer>>, Map<Integer, RankListCellExpression>> tmp;
 				try {
 					selections = ExcelTools
 							.getParseInfo(replayData,replayDataContentType,replayDataFileName,problemDescription.size(),endTime - startTime,session);
