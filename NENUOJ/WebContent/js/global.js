@@ -557,9 +557,10 @@ OJ.prototype.loadContestList=function(){
 				"fnRender": function ( oObj ) {
 					if(oObj.aData[1].replace(/^.+?>(.+?)<.+?$/,"$1") == LOGIN_USERNAME || PERMISSION)
 					return "";
+					return "";//TODO contest mangement
 				},
 				"bSortable": false,
-				"sClass": ""// operation
+				"sClass": "options"// operation
 				
 			}
 		],

@@ -17,7 +17,7 @@
 			<th><s:text name="Length"/></th>
 			<th><s:text name="Type"/></th>
 			<th><s:text name="Manager"/></th>
-			<th><s:text name="Options"/></th>
+			<th class="options"><s:text name="Options"/></th>
 		</tr>
 	</thead>
 	<tbody>
