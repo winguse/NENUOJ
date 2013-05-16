@@ -528,18 +528,21 @@ OJ.prototype.loadContestList=function(){
 				"sClass": ""//Start Time
 			},{
 				"fnRender": function ( oObj ) {
+					function _0(x){
+						return x<10?"0"+x:x;
+					}
 					var ret = "",length = oObj.aData[3];
 					if(length / (1000*3600*24)>=1){
 						ret += parseInt(length / (1000*3600*24)) + " " + $.t("Days") + " ";
 						length  = length % (1000*3600*24);
 					}
-					ret += parseInt(length / (1000*3600)) + ":";
+					ret += _0(parseInt(length / (1000*3600))) + ":";
 					length  = length % (1000*3600);
 					
-					ret += parseInt(length / (1000*60)) + ":";
+					ret += _0(parseInt(length / (1000*60))) + ":";
 					length  = length % (1000*60);
 					
-					ret += parseInt(length / (1000));
+					ret += _0(parseInt(length / (1000)));
 					length  = length % (1000);
 					return ret;
 				},
