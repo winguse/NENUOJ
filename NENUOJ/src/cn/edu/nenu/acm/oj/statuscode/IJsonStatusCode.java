@@ -7,5 +7,6 @@ public interface IJsonStatusCode {
 	public static final int VIRIFY_CODE_ERROR=3;
 	public static final int CODE_ERROR = 4; 
 	public static final int CODE_WARNING = 5; 
+	public static final int USERNAME_NOT_LOGINED = 6; 
 	
 }

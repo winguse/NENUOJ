@@ -78,7 +78,10 @@ public class RegisterOperatingAction extends AbstractAction implements SessionAw
 		newUser.setSubmitted(0);
 		newUser.setPermission(Permission.DEFAULT_PERMISSION);
 		userDAO.persist(newUser);
-		session.put("user", new UserSimpleDTO(newUser));
+		session.put("user", 
+				new UserSimpleDTO(newUser.getId(), newUser.getUsername(),
+						(String) ((Remark) (newUser.getRemark()))
+								.get("nickname"), newUser.getPermission()));
 		code=0;
 		message=_("welcome")+newUser.getUsername()+"!";
 		return SUCCESS;

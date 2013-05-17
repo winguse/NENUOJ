@@ -7,7 +7,6 @@
 <s:set var="pageTitle" value="getText('contests')"/>
 <title><s:text name="site.title"/> - <s:property value="#pageTitle"/></title>
 <s:include value="../include/header.jsp"></s:include>
-
 <table id="contestList">
 	<thead>
 		<tr>

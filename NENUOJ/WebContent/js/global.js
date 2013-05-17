@@ -13,9 +13,13 @@ var STATUS_ALL = 0
 ,STATUS_MEMORY_LIMITED_EXCEED = 8
 ,STATUS_OUTPUT_LIMITED_EXCEED = 9
 ,STATUS_RUNTIME_ERROR = 10
-,STATUS_COMPLIE_ERROR = 11;
-
-var PERMISSION = true; // TODO set permission according to user login status
+,STATUS_COMPLIE_ERROR = 11,
+PERMISSION_LOGIN = 1,
+PERMISSION_VIEW_ALL_SOURCE_CODE = 2,
+PERMISSION_ADMIN_PRIVILEGE = 4,
+PERMISSION_SEE_LOCKED_DESCRIPTION = 8, 
+PERMISSION_SEE_LOCKED_PROBLEM = 16, 
+PERMISSION_ADD_CONTEST = 32; 
 
 function WinguseAjaxForm(form, successCallback) {
 	var $form = typeof (form) == "string" ? $(form)
@@ -520,7 +524,7 @@ OJ.prototype.loadContestList=function(){
 				"fnRender": function ( oObj ) {
 					return "<a href='"+baseUrl + "/contests/view.action#?id="+oObj.aData[0]+"'>"+oObj.aData[1]+"</a>";
 				},
-				"sClass": ""//Title
+				"sClass": "title"//Title
 			},{
 				"fnRender": function ( oObj ) {
 					return new Date(oObj.aData[2]).ojFormat();
@@ -558,8 +562,8 @@ OJ.prototype.loadContestList=function(){
 				"sClass": ""//Host User
 			},{
 				"fnRender": function ( oObj ) {
-					if(oObj.aData[1].replace(/^.+?>(.+?)<.+?$/,"$1") == LOGIN_USERNAME || PERMISSION)
-					return "";
+					if(oObj.aData[1].replace(/^.+?>(.+?)<.+?$/,"$1") == LOGIN_USERNAME || USER_PERMISSION&PERMISSION_ADMIN_PRIVILEGE == PERMISSION_ADMIN_PRIVILEGE)
+						return "";
 					return "";//TODO contest mangement
 				},
 				"bSortable": false,
@@ -568,7 +572,14 @@ OJ.prototype.loadContestList=function(){
 			}
 		],
 		"sPaginationType": "full_numbers",
-		"bJQueryUI": true
+		"bJQueryUI": true,
+		"fnDrawCallback": function( oSettings ) {
+			if(LOGIN_USERNAME!=""){
+				$(".options").show();
+			}else{
+				$(".options").hide();
+			}
+		}
 	} );
 };
 var oj;

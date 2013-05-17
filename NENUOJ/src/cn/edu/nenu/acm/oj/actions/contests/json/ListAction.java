@@ -2,14 +2,12 @@ package cn.edu.nenu.acm.oj.actions.contests.json;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.struts2.convention.annotation.InterceptorRef;
 import org.apache.struts2.convention.annotation.InterceptorRefs;
 import org.apache.struts2.convention.annotation.ParentPackage;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.convention.annotation.Results;
-import org.apache.struts2.interceptor.SessionAware;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import cn.edu.nenu.acm.oj.actions.AbstractJsonAction;
@@ -21,7 +19,7 @@ import cn.edu.nenu.acm.oj.util.Pair;
 @InterceptorRefs({ @InterceptorRef("i18n"),
 		@InterceptorRef("jsonValidationWorkflowStack") })
 @Results({ @Result(name = "success", type = "json") })
-public class ListAction extends AbstractJsonAction implements SessionAware {
+public class ListAction extends AbstractJsonAction {
 
 	private static final long serialVersionUID = 1727087661137013184L;
 
@@ -36,10 +34,6 @@ public class ListAction extends AbstractJsonAction implements SessionAware {
 	private LinkedList<Object[]> data;
 	private String[] indexMapping;
 	private static Long allContestsCount;
-	
-	private long permission;
-	
-	private Map<String, Object> session;
 	
 	@Override
 	public String execute() throws Exception {
@@ -109,11 +103,6 @@ public class ListAction extends AbstractJsonAction implements SessionAware {
 
 	public Long getAllContestsCount() {
 		return allContestsCount;
-	}
-
-	@Override
-	public void setSession(Map<String, Object> session) {
-		this.session = session;
 	}
 
 }

@@ -22,19 +22,15 @@ import com.opensymphony.xwork2.validator.annotations.RequiredStringValidator;
 import com.opensymphony.xwork2.validator.annotations.Validations;
 import com.opensymphony.xwork2.validator.annotations.FieldExpressionValidator;
 
-
 @ParentPackage("default")
-@InterceptorRefs({ 
-	@InterceptorRef("i18n"), 
-	@InterceptorRef("jsonValidationWorkflowStack")
-	,@InterceptorRef("permissionInterceptor")
-})
-@Results({
-	@Result(name = "success", type="json"),
-	@Result(name = "input", location="user-profiles-success.jsp")
-})
+@InterceptorRefs({ @InterceptorRef("i18n"),
+		@InterceptorRef("jsonValidationWorkflowStack"),
+		@InterceptorRef("permissionInterceptor") })
+@Results({ @Result(name = "success", type = "json"),
+		@Result(name = "input", location = "user-profiles-success.jsp") })
 @Namespace("/")
-public class UserProfilesOperatingAction extends AbstractAction implements SessionAware {
+public class UserProfilesOperatingAction extends AbstractAction implements
+		SessionAware {
 
 	private static final long serialVersionUID = -8077897542384482842L;
 	private String oldPassword;
@@ -46,36 +42,38 @@ public class UserProfilesOperatingAction extends AbstractAction implements Sessi
 	private String nickname;
 	private String email;
 	private Map<String, Object> session;
-	
+
 	private Integer code;
 	private String message;
-	
-	@Autowired(required=true)
+
+	@Autowired(required = true)
 	private UserDAO userDAO;
 	private String verifyCode;
 
 	@Override
 	public String execute() throws Exception {
-		UserSimpleDTO user=(UserSimpleDTO) session.get("user");
+		UserSimpleDTO user = (UserSimpleDTO) session.get("user");
 		User currentUser = userDAO.findUserByUsername(user.getUsername());
-		if(currentUser==null){
+		if (currentUser == null) {
 			session.remove("user");
 			return "reject";
 		}
-		if(password!=null&&!password.equals("")){
-			if(site.hash(oldPassword, currentUser.getSalt()).equals(currentUser.getPassword())){
+		if (password != null && !password.equals("")) {
+			if (site.hash(oldPassword, currentUser.getSalt()).equals(
+					currentUser.getPassword())) {
 				String salt = site.generateSalt();
 				password = site.hash(password, salt);
 				currentUser.setPassword(password);
 				currentUser.setSalt(salt);
-			}else{
-				code=PASSWORD_NOT_MATCH;
-				message=_("old_password_needed_to_update_password");
+			} else {
+				code = PASSWORD_NOT_MATCH;
+				message = _("old_password_needed_to_update_password");
 				return SUCCESS;
 			}
 		}
 
-		nickname=(nickname==null||nickname.equals(""))?user.getUsername():nickname;
+		nickname = (nickname == null || nickname.equals("")) ? user
+				.getUsername() : nickname;
 		currentUser.setEmail(email);
 		currentUser.setSchool(school);
 		currentUser.setMajor(major);
@@ -85,9 +83,16 @@ public class UserProfilesOperatingAction extends AbstractAction implements Sessi
 		currentUser.setRemark(remark);
 
 		userDAO.merge(currentUser);
-		session.put("user", new UserSimpleDTO(currentUser));
-		code=0;
-		message=_("profile_updated")+currentUser.getUsername()+"!";
+		session.put(
+				"user",
+				new UserSimpleDTO(currentUser.getId(), currentUser
+						.getUsername(), (String) ((Remark) (currentUser
+						.getRemark())).get("nickname"), currentUser
+						.getPermission())
+
+		);
+		code = 0;
+		message = _("profile_updated") + currentUser.getUsername() + "!";
 		return SUCCESS;
 	}
 
@@ -97,7 +102,6 @@ public class UserProfilesOperatingAction extends AbstractAction implements Sessi
 	public void setPassword(String password) {
 		this.password = password;
 	}
-
 
 	@FieldExpressionValidator(expression = "password.equals(password2)", key = "password_retype")
 	public void setPassword2(String password2) {
@@ -133,46 +137,46 @@ public class UserProfilesOperatingAction extends AbstractAction implements Sessi
 
 	@Override
 	public void setSession(Map<String, Object> session) {
-		this.session=session;
-		
+		this.session = session;
+
 	}
 
-	@JSON(serialize=false)
+	@JSON(serialize = false)
 	public String getPassword() {
 		return password;
 	}
 
-	@JSON(serialize=false)
+	@JSON(serialize = false)
 	public String getPassword2() {
 		return password2;
 	}
 
-	@JSON(serialize=false)
+	@JSON(serialize = false)
 	public String getSchool() {
 		return school;
 	}
 
-	@JSON(serialize=false)
+	@JSON(serialize = false)
 	public String getMajor() {
 		return major;
 	}
 
-	@JSON(serialize=false)
+	@JSON(serialize = false)
 	public String getGrade() {
 		return grade;
 	}
 
-	@JSON(serialize=false)
+	@JSON(serialize = false)
 	public String getNickname() {
 		return nickname;
 	}
 
-	@JSON(serialize=false)
+	@JSON(serialize = false)
 	public String getEmail() {
 		return email;
 	}
 
-	@JSON(serialize=false)
+	@JSON(serialize = false)
 	public String getVerifyCode() {
 		return verifyCode;
 	}
@@ -192,6 +196,5 @@ public class UserProfilesOperatingAction extends AbstractAction implements Sessi
 	public String getMessage() {
 		return message;
 	}
-	
-	
+
 }
