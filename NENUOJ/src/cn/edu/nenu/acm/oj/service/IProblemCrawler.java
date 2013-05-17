@@ -14,7 +14,19 @@ import cn.edu.nenu.acm.oj.eto.RemoteProblemNotFoundException;
  * 
  */
 public interface IProblemCrawler {
-
+	
+	/**
+	 * Set the attachment storage directory.
+	 * @param attachmentDirectory
+	 */
+	public void setAttachmentDirectory(String attachmentDirectory);
+	
+	/**
+	 * Set the attachment local base url 
+	 * @param attachmentDownloadBaseUrl
+	 */
+	public void setAttachmentDownloadBaseUrl(String attachmentDownloadBaseUrl);
+	
 	/**
 	 * The judger source name, like HDU,POJ,etc.
 	 * 

@@ -15,6 +15,8 @@ public class Site {
 	private boolean enableHtmlCompress;
 	private boolean enableLoginVerifyCode;
 	private boolean enableRegisterVerifyCode;
+	private String attachmentDirectory;
+	private String attachmentDownloadBaseUrl;
 	private String globalSalt;
 	private Random random = new Random();
 
@@ -29,6 +31,24 @@ public class Site {
 	
 	public boolean isEnableLoginVerifyCode() {
 		return enableLoginVerifyCode;
+	}
+	
+	public String getAttachmentDownloadBaseUrl() {
+		return attachmentDownloadBaseUrl;
+	}
+
+	@Value("${crawler.attachment.download.url}")
+	public void setAttachmentDownloadBaseUrl(String attachmentDownloadBaseUrl) {
+		this.attachmentDownloadBaseUrl = attachmentDownloadBaseUrl;
+	}
+
+	@Value("${crawler.attachment.directory}")
+	public void setAttachmentDirectory(String attachmentDirectory) {
+		this.attachmentDirectory = attachmentDirectory;
+	}
+
+	public String getAttachmentDirectory() {
+		return attachmentDirectory;
 	}
 
 	@Value("${security.login.verifycode}")

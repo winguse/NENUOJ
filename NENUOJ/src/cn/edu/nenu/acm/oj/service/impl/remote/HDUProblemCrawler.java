@@ -145,4 +145,16 @@ public class HDUProblemCrawler implements IProblemCrawler {
 		return problemSection(section, false);
 	}
 
+	@Override
+	public void setAttachmentDirectory(String attachmentDirectory) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setAttachmentDownloadBaseUrl(String attachmentDownloadBaseUrl) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

@@ -5,6 +5,7 @@ import static cn.edu.nenu.acm.oj.util.StringTools.regexFind;
 import java.io.IOException;
 import java.util.regex.Pattern;
 
+import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -14,6 +15,7 @@ import cn.edu.nenu.acm.oj.eto.CrawlingException;
 import cn.edu.nenu.acm.oj.eto.NetworkException;
 import cn.edu.nenu.acm.oj.eto.RemoteProblemNotFoundException;
 import cn.edu.nenu.acm.oj.service.IProblemCrawler;
+import cn.edu.nenu.acm.oj.download.DownloadImage;
 
 public class POJProblemCrawler implements IProblemCrawler {
 
@@ -35,11 +37,14 @@ public class POJProblemCrawler implements IProblemCrawler {
 		this.number = number;
 		try {
 			document = Jsoup.connect(problemBaseUrl + number).get();
+			
+//			bodyAsBytes()
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new NetworkException("IOException, Maybe network error: " + e.getMessage());
 		}
-		if (!document.title().equals(number + " -- A+B Problem")) {
+
+		if (!document.title().matches("^" + number+  " -- .*")) {
 			throw new RemoteProblemNotFoundException();
 		}
 	}
@@ -105,12 +110,22 @@ public class POJProblemCrawler implements IProblemCrawler {
 
 	@Override
 	public String getHint() throws CrawlingException {
-		return problemSection(".pst", "Hint", ".ptx");
+		try {
+			return problemSection(".pst", "Hint", ".ptx");
+		} catch (CrawlingException e) {
+			e.printStackTrace();
+			return "";
+		}
 	}
 
 	@Override
 	public String getSource() throws CrawlingException {
-		return problemSection(".pst", "Source", ".ptx");
+		try {
+			return problemSection(".pst", "Source", ".ptx");
+		} catch (CrawlingException e) {
+			e.printStackTrace();
+			return "";
+		}
 	}
 
 	@Override
@@ -122,15 +137,18 @@ public class POJProblemCrawler implements IProblemCrawler {
 		for (Element src : element.select("[src]")) {
 			src.attr("src", src.absUrl("src"));
 		}
-//		for(Element img : element.select("img")){
+		
+		for(Element img : element.select("img")){
 //			//download img to server,
-//			String stc = img.attr("src");
-//			String serverSrc = null;
+			String src = img.attr("src");
+			String serverSrc = null;
+			DownloadImage d = new DownloadImage(); 
+			d.down(src, "/tmp/", "POJ_" + number + "_");
 //
 //			Pattern.compile("");
 //			
 //			img.attr("src", serverSrc);
-//		}
+		}
 	}
 	
 
@@ -147,5 +165,17 @@ public class POJProblemCrawler implements IProblemCrawler {
 	
 	private String problemSection(String firstCss, String firstSection, String secondCss) throws CrawlingException {
 		return problemSection(firstCss, firstSection, secondCss, false);
+	}
+
+	@Override
+	public void setAttachmentDirectory(String attachmentDirectory) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setAttachmentDownloadBaseUrl(String attachmentDownloadBaseUrl) {
+		// TODO Auto-generated method stub
+		
 	}
 }

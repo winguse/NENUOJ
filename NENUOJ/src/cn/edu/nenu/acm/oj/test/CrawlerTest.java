@@ -21,7 +21,7 @@ public class CrawlerTest {
 	public static void main(String args[]) {
 		IProblemCrawler c = new POJProblemCrawler();
 		try {
-			c.crawl("1000");
+			c.crawl("1111");
 			System.out.println(c.getTitle());
 			System.out.println(c.getTimeLimit());
 			System.out.println(c.getMemoryLimit());
