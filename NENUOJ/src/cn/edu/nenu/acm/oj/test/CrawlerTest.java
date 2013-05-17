@@ -5,17 +5,26 @@ import cn.edu.nenu.acm.oj.eto.NetworkException;
 import cn.edu.nenu.acm.oj.eto.RemoteProblemNotFoundException;
 import cn.edu.nenu.acm.oj.service.IProblemCrawler;
 import cn.edu.nenu.acm.oj.service.impl.remote.HDUProblemCrawler;
+import cn.edu.nenu.acm.oj.service.impl.remote.POJProblemCrawler;
 
 public class CrawlerTest {
 
 	public CrawlerTest() {
 	}
 
+	/**
+	 * @param args
+	 */
+	/**
+	 * @param args
+	 */
 	public static void main(String args[]) {
-		IProblemCrawler c = new HDUProblemCrawler();
+		IProblemCrawler c = new POJProblemCrawler();
 		try {
-			c.crawl("44913");
+			c.crawl("1000");
 			System.out.println(c.getTitle());
+			System.out.println(c.getTimeLimit());
+			System.out.println(c.getMemoryLimit());
 			System.out.println(c.getDescription());
 			System.out.println(c.getInput());
 			System.out.println(c.getOutput());
