@@ -16,9 +16,11 @@ import com.opensymphony.xwork2.validator.annotations.RequiredStringValidator;
 import cn.edu.nenu.acm.oj.dao.UserDAO;
 import cn.edu.nenu.acm.oj.dto.UserSimpleDTO;
 import cn.edu.nenu.acm.oj.entitybeans.User;
+import cn.edu.nenu.acm.oj.util.Remark;
 
 @ParentPackage("json-default")
-@InterceptorRefs({ @InterceptorRef("i18n"), @InterceptorRef("jsonValidationWorkflowStack") })
+@InterceptorRefs({ @InterceptorRef("i18n"),
+		@InterceptorRef("jsonValidationWorkflowStack") })
 @Result(name = "success", type = "json")
 @Namespace("/")
 public class LoginAction extends AbstractAction implements SessionAware {
@@ -38,27 +40,34 @@ public class LoginAction extends AbstractAction implements SessionAware {
 
 	@Override
 	public String execute() throws Exception {
-		if (site.isEnableLoginVerifyCode() && (verifyCode == null || !verifyCode.equalsIgnoreCase((String)session.get("verifyCode")))) {
-			code=VIRIFY_CODE_ERROR;
-			message=getText("verify_code_error");
+		if (site.isEnableLoginVerifyCode()
+				&& (verifyCode == null || !verifyCode
+						.equalsIgnoreCase((String) session.get("verifyCode")))) {
+			code = VIRIFY_CODE_ERROR;
+			message = getText("Verify code is not correct!");
 			return SUCCESS;
 		}
 		User user = userDAO.findUserByUsername(username);
 		if (user == null) {
 			code = USERNAME_NOT_EXIST;
-			message = getText("login_user_not_exist");
-		} else if (!site.hash(password, user.getSalt()).equals(user.getPassword())) {
+			message = getText("Username not exist.");
+		} else if (!site.hash(password, user.getSalt()).equals(
+				user.getPassword())) {
 			code = PASSWORD_NOT_MATCH;
-			message = getText("login_password_wrong");
+			message = getText("Username and the password was not match.");
 		} else {
 			code = CODE_SUCCESS;
-			message = getText("login_welcome");
-			session.put("user", new UserSimpleDTO(user));
+			message = getText("Welcome back, ") + user.getUsername();
+			session.put(
+					"user",
+					new UserSimpleDTO(user.getId(), user.getUsername(),
+							(String) ((Remark) (user.getRemark()))
+									.get("nickname"), user.getPermission()));
 		}
 		return SUCCESS;
 	}
 
-	@RequiredStringValidator(key = "username_required")
+	@RequiredStringValidator(key = "Username is requried.")
 	public void setUsername(String username) {
 		this.username = username;
 	}

@@ -1,8 +1,6 @@
 package cn.edu.nenu.acm.oj.dto;
 
-import cn.edu.nenu.acm.oj.entitybeans.User;
 import cn.edu.nenu.acm.oj.statuscode.IPermissionCode;
-import cn.edu.nenu.acm.oj.util.Remark;
 
 public class UserSimpleDTO implements IPermissionCode {
 	private Integer id;
@@ -13,19 +11,15 @@ public class UserSimpleDTO implements IPermissionCode {
 	public UserSimpleDTO(){
 	}
 
-	@Deprecated
-	public UserSimpleDTO(User user){
-		//TODO Reduce Coupling
-		this.id=user.getId();
-		this.username=user.getUsername();
-		if(user.getRemark() instanceof Remark){
-			this.nickname=(String)((Remark)(user.getRemark())).get("nickname");
-		}else{
-			this.nickname=this.username;
-		}
-		this.permission=user.getPermission();
+	public UserSimpleDTO(Integer id, String username, String nickname,
+			Long permission) {
+		super();
+		this.id = id;
+		this.username = username;
+		this.nickname = nickname;
+		this.permission = permission;
 	}
-	
+
 	public Integer getId() {
 		return id;
 	}
