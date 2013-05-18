@@ -2,6 +2,9 @@
  * 
  */
 "use strict";
+
+i18n.init();
+
 var STATUS_ALL = 0
 ,STATUS_PEDDING = 1
 ,STATUS_PROCESSING = 2
@@ -20,6 +23,8 @@ PERMISSION_ADMIN_PRIVILEGE = 4,
 PERMISSION_SEE_LOCKED_DESCRIPTION = 8, 
 PERMISSION_SEE_LOCKED_PROBLEM = 16, 
 PERMISSION_ADD_CONTEST = 32; 
+
+var contestTypeDescription=[$.t("Public"),$.t("Private"),$.t("Registeration Needed"),$.t("Replay")];
 
 function WinguseAjaxForm(form, successCallback) {
 	var $form = typeof (form) == "string" ? $(form)
@@ -503,6 +508,7 @@ OJ.prototype.loadContestList=function(){
 				orderIndex=-orderIndex;
 			$.post( sSource, {
 				orderByIndex:orderIndex,
+				contestType:-1,
 				filterString:aoData.sSearch,
 				page:aoData.iDisplayStart/aoData.iDisplayLength,
 				pageSize:aoData.iDisplayLength
@@ -553,6 +559,9 @@ OJ.prototype.loadContestList=function(){
 				"bSortable": false,
 				"sClass": ""//Length
 			},{
+				"fnRender": function ( oObj ) {
+					return contestTypeDescription[oObj.aData[4]];
+				},
 				"sClass": ""//Type
 			},{
 				"fnRender": function ( oObj ) {
@@ -563,17 +572,24 @@ OJ.prototype.loadContestList=function(){
 			},{
 				"fnRender": function ( oObj ) {
 					if(oObj.aData[1].replace(/^.+?>(.+?)<.+?$/,"$1") == LOGIN_USERNAME || USER_PERMISSION&PERMISSION_ADMIN_PRIVILEGE == PERMISSION_ADMIN_PRIVILEGE)
-						return "";
+						return "<a href='#' data-id='"+oObj.aData[0]+"' class='icon-edit' title='"+$.t("Edit")+"'></a> <a href='#' data-id='"+oObj.aData[0]+"' class='icon-trash' title='"+$.t("Delete")+"'></a>";
 					return "";//TODO contest mangement
 				},
 				"bSortable": false,
 				"sClass": "options"// operation
-				
 			}
 		],
 		"sPaginationType": "full_numbers",
 		"bJQueryUI": true,
 		"fnDrawCallback": function( oSettings ) {
+			$(".options>.icon-edit").click(function(){
+				var contestId=$(this).attr("data-id");
+				console.log('edit contest #'+contestId);
+			});
+			$(".options>.icon-trash").click(function(){
+				var contestId=$(this).attr("data-id");
+				console.log('delete contest #'+contestId);
+			});
 			if(LOGIN_USERNAME!=""){
 				$(".options").show();
 			}else{
@@ -584,4 +600,3 @@ OJ.prototype.loadContestList=function(){
 };
 var oj;
 oj = new OJ();
-i18n.init();

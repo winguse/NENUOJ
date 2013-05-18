@@ -33,17 +33,17 @@ public class ContestDAO extends AbstractDAO<Contest> {
 	}
 
 	@Transactional(readOnly = true)
-	public Pair<Long, List<ContestSimpleDTO>> getContestList(
+	public Pair<Long, List<ContestSimpleDTO>> getContestList(int contestType,
 			String filterString, int page, int pageSize, int orderIndex) {
 		Pair<Long, List<ContestSimpleDTO>> result = new Pair<Long, List<ContestSimpleDTO>>();
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Contest> query = cb.createQuery(Contest.class);
 		CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
-		Pair<Predicate, Root<Contest>> pair = getPredicate(filterString, query,
+		Pair<Predicate, Root<Contest>> pair = getPredicate(contestType,filterString, query,
 				cb);
 		Root<Contest> root = pair.second;
 		Predicate predicate = pair.first;
-		Pair<Predicate, Root<Contest>> countPair = getPredicate(filterString,
+		Pair<Predicate, Root<Contest>> countPair = getPredicate(contestType,filterString,
 				countQuery, cb);
 		countQuery.select(cb.count(countPair.second)).where(countPair.first);
 		result.first = em.createQuery(countQuery).getSingleResult();
@@ -87,10 +87,13 @@ public class ContestDAO extends AbstractDAO<Contest> {
 		return result;
 	}
 
-	protected <T> Pair<Predicate, Root<Contest>> getPredicate(
+	protected <T> Pair<Predicate, Root<Contest>> getPredicate(int contestType,
 			String filterString, CriteriaQuery<T> query, CriteriaBuilder cb) {
 		Root<Contest> contestRoot = query.from(Contest.class);
 		Predicate predicate = cb.conjunction();
+		if(contestType>=0){
+			predicate = cb.and(predicate,cb.equal(contestRoot.get(Contest_.contestType), contestType));
+		}
 		if (!"".equals(filterString)) {
 			Predicate predicateOr = cb.disjunction();
 			predicateOr = cb.or(predicateOr,
