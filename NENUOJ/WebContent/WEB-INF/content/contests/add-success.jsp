@@ -24,20 +24,28 @@
 			</div>
 		</div>
 	</div>
-	<div class="control-group" id="realContestTypeSection">
-		<div class="controls">
-			<select name="contestType" class="span3" id="contestType">
-				<option value="<s:property value="@vs@CONTEST_TYPE_PUBLIC"/>"><s:text name="Public"/></option>
-				<option value="<s:property value="@vs@CONTEST_TYPE_PRIVATE"/>"><s:text name="Private"/></option>
-				<option value="<s:property value="@vs@CONTEST_TYPE_REGISTRATION_NEEDED"/>"><s:text name="Registration Needed"/></option>
-				<option value="<s:property value="@vs@CONTEST_TYPE_REPLAY"/>" hidden="hidden"></option>
-			</select>
+	<div  id="realContestTypeSection">
+		<div class="control-group">
+			<div class="controls">
+				<select name="contestType" class="span3" id="contestType">
+					<option value="<s:property value="@vs@CONTEST_TYPE_PUBLIC"/>"><s:text name="Public"/></option>
+					<option value="<s:property value="@vs@CONTEST_TYPE_PRIVATE"/>"><s:text name="Private"/></option>
+					<option value="<s:property value="@vs@CONTEST_TYPE_REGISTRATION_NEEDED"/>"><s:text name="Registration Needed"/></option>
+					<option value="<s:property value="@vs@CONTEST_TYPE_REPLAY"/>" hidden="hidden"></option>
+				</select>
+			</div>
+		</div>
+		<div class="control-group hide" id="contestPasswordSection">
+			<label class="control-label" for="contestPassword"><s:text name="Password"/></label>
+			<div class="controls">
+				<input type="text" name="contestPassword" id="contestPassword" class="span3">
+			</div>
 		</div>
 	</div>
 	<div class="control-group hide" id="replayDataSection">
 		<label class="control-label" for="replayData"><s:text name="Replay Data"/></label>
 		<div class="controls">
-			<input type="file" name="replayData" id="replayData">
+			<input type="file" name="replayData" id="replayData" class="span3">
 		</div>
 	</div>
 	<div class="control-group">
@@ -242,6 +250,13 @@ $(function(){
 			$("#realContestTypeSection").slideUp();
 			$("#replayDataSection").slideDown();
 		}
+	});
+	$("#contestType").change(function(){
+		var value = $(this)[0].value;
+		if(value=="<s:property value="@vs@CONTEST_TYPE_PRIVATE"/>")
+			$("#contestPasswordSection").slideDown();
+		else
+			$("#contestPasswordSection").slideUp();
 	});
 	WinguseAjaxForm($("#contest_add_form"),function(d){
 		oj.showMessage(d.message);

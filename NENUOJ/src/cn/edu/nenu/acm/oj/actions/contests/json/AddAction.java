@@ -50,6 +50,7 @@ public class AddAction extends AbstractJsonAction implements SessionAware, ICont
 	private static final long serialVersionUID = 6201478464197183393L;
 	private int contestType;
 	private String contestTitle;
+	private String contestPassword;
 	private Long startTime;
 	private Long endTime;
 	private String description = "";
@@ -114,6 +115,7 @@ public class AddAction extends AbstractJsonAction implements SessionAware, ICont
 		Remark remark = new Remark();
 		remark.set("description", description);
 		remark.set("announcement", announcement);
+		remark.set("contestPassword", contestPassword);
 		contest.setRemark(remark);
 		contest.setStartTime(new Date(startTime));
 		try{
@@ -268,6 +270,15 @@ public class AddAction extends AbstractJsonAction implements SessionAware, ICont
 		return code;
 	}
 
+	@JSON(serialize = false)
+	public String getContestPassword() {
+		return contestPassword;
+	}
+	
+	@FieldExpressionValidator(expression = "contestPassword.length()<=20", key = "Contest password must not longer than 20.")
+	public void setContestPassword(String contestPassword) {
+		this.contestPassword = contestPassword;
+	}
 
 	public void setReplayDataFileName(String replayDataFileName) {
 		this.replayDataFileName = replayDataFileName;

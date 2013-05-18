@@ -26,6 +26,8 @@ public class ListAction extends AbstractJsonAction {
 	@Autowired
 	private ContestDAO dao;
 
+	private int contestType = -1;
+	private int contestStatus = 7;
 	private int page = 0;
 	private int pageSize = 20;
 	private String filterString = "";
@@ -34,19 +36,20 @@ public class ListAction extends AbstractJsonAction {
 	private LinkedList<Object[]> data;
 	private String[] indexMapping;
 	private static Long allContestsCount;
-	
+
 	@Override
 	public String execute() throws Exception {
 		code = 0;
 		message = "success";
 		Pair<Long, List<ContestSimpleDTO>> result = dao.getContestList(
-				filterString, page, pageSize, orderByIndex);
+				contestType, filterString, page, pageSize, orderByIndex);
 		indexMapping = new String[] { _("ID"), _("Title"), _("Start Time"),
 				_("Length"), _("Type"), _("Host User") };
 		data = new LinkedList<Object[]>();
 		for (ContestSimpleDTO c : result.second) {
 			data.add(new Object[] { c.getId(), c.getTitle(), c.getStartTime(),
-					c.getEndTime()-c.getStartTime(), c.getContestType(), c.getHostUsername() });
+					c.getEndTime() - c.getStartTime(), c.getContestType(),
+					c.getHostUsername() });
 		}
 		totalCount = result.first;
 		if ("".equals(filterString)) {
@@ -75,6 +78,10 @@ public class ListAction extends AbstractJsonAction {
 			filterString = filterString.substring(0, 50);
 		System.out.println(filterString);
 		this.filterString = filterString;
+	}
+
+	public void setContestType(int contestType) {
+		this.contestType = contestType;
 	}
 
 	public void setOrderByIndex(int orderByIndex) {

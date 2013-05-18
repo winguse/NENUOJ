@@ -30,6 +30,5 @@ $(function(){
 	oj.loadContestList();
 });
 </script>
-
 <s:include value="../include/footer.jsp"></s:include>
 </c:html>
