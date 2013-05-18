@@ -26,8 +26,7 @@ public class ListAction extends AbstractJsonAction {
 	@Autowired
 	private ContestDAO dao;
 
-	private int contestType = -1;
-	private int contestStatus = 7;
+	private int contestStatus = 0;
 	private int page = 0;
 	private int pageSize = 20;
 	private String filterString = "";
@@ -42,7 +41,7 @@ public class ListAction extends AbstractJsonAction {
 		code = 0;
 		message = "success";
 		Pair<Long, List<ContestSimpleDTO>> result = dao.getContestList(
-				contestType, filterString, page, pageSize, orderByIndex);
+				contestStatus, filterString, page, pageSize, orderByIndex);
 		indexMapping = new String[] { _("ID"), _("Title"), _("Start Time"),
 				_("Length"), _("Type"), _("Host User") };
 		data = new LinkedList<Object[]>();
@@ -52,7 +51,7 @@ public class ListAction extends AbstractJsonAction {
 					c.getHostUsername() });
 		}
 		totalCount = result.first;
-		if ("".equals(filterString)) {
+		if ("".equals(filterString)&&contestStatus==0) {
 			allContestsCount = result.first;
 		}
 		return SUCCESS;
@@ -79,11 +78,7 @@ public class ListAction extends AbstractJsonAction {
 		System.out.println(filterString);
 		this.filterString = filterString;
 	}
-
-	public void setContestType(int contestType) {
-		this.contestType = contestType;
-	}
-
+	
 	public void setOrderByIndex(int orderByIndex) {
 		this.orderByIndex = orderByIndex;
 	}
@@ -110,6 +105,10 @@ public class ListAction extends AbstractJsonAction {
 
 	public Long getAllContestsCount() {
 		return allContestsCount;
+	}
+
+	public void setContestStatus(int contestStatus) {
+		this.contestStatus = contestStatus;
 	}
 
 }

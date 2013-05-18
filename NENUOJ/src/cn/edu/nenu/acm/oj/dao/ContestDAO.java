@@ -1,5 +1,6 @@
 package cn.edu.nenu.acm.oj.dao;
 
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -27,24 +28,32 @@ public class ContestDAO extends AbstractDAO<Contest> {
 	public static final int ORDER_BY_START_TIME = 3;
 	public static final int ORDER_BY_TYPE = 5;
 
+	public static final int LIST_PUBLIC = 1;
+	public static final int LIST_PRIVATE = 2;
+	public static final int LIST_REGISTERATION = 4;
+	public static final int LIST_REPLAY = 8;
+	public static final int LIST_RUNNING = 16;
+	public static final int LIST_PASSED = 32;
+	public static final int LIST_PEDDING = 64;
+
 	public ContestDAO() {
 		super();
 		super.setClazz(Contest.class);
 	}
 
 	@Transactional(readOnly = true)
-	public Pair<Long, List<ContestSimpleDTO>> getContestList(int contestType,
+	public Pair<Long, List<ContestSimpleDTO>> getContestList(int contestStatus,
 			String filterString, int page, int pageSize, int orderIndex) {
 		Pair<Long, List<ContestSimpleDTO>> result = new Pair<Long, List<ContestSimpleDTO>>();
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Contest> query = cb.createQuery(Contest.class);
 		CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
-		Pair<Predicate, Root<Contest>> pair = getPredicate(contestType,filterString, query,
-				cb);
+		Pair<Predicate, Root<Contest>> pair = getPredicate(contestStatus,
+				filterString, query, cb);
 		Root<Contest> root = pair.second;
 		Predicate predicate = pair.first;
-		Pair<Predicate, Root<Contest>> countPair = getPredicate(contestType,filterString,
-				countQuery, cb);
+		Pair<Predicate, Root<Contest>> countPair = getPredicate(contestStatus,
+				filterString, countQuery, cb);
 		countQuery.select(cb.count(countPair.second)).where(countPair.first);
 		result.first = em.createQuery(countQuery).getSingleResult();
 		switch (orderIndex) {
@@ -87,12 +96,63 @@ public class ContestDAO extends AbstractDAO<Contest> {
 		return result;
 	}
 
-	protected <T> Pair<Predicate, Root<Contest>> getPredicate(int contestType,
-			String filterString, CriteriaQuery<T> query, CriteriaBuilder cb) {
+	protected <T> Pair<Predicate, Root<Contest>> getPredicate(
+			int contestStatus, String filterString, CriteriaQuery<T> query,
+			CriteriaBuilder cb) {
 		Root<Contest> contestRoot = query.from(Contest.class);
 		Predicate predicate = cb.conjunction();
-		if(contestType>=0){
-			predicate = cb.and(predicate,cb.equal(contestRoot.get(Contest_.contestType), contestType));
+		if (contestStatus > 0) {
+			boolean used = false;
+			Predicate predicateOrForType = cb.disjunction();
+			if ((contestStatus & LIST_PUBLIC) == LIST_PUBLIC) {
+				predicateOrForType = cb.or(predicateOrForType, cb.equal(
+						contestRoot.get(Contest_.contestType),
+						Contest.CONTEST_TYPE_PUBLIC));
+				used = true;
+			}
+			if ((contestStatus & LIST_PRIVATE) == LIST_PRIVATE) {
+				predicateOrForType = cb.or(predicateOrForType, cb.equal(
+						contestRoot.get(Contest_.contestType),
+						Contest.CONTEST_TYPE_PRIVATE));
+				used = true;
+			}
+			if ((contestStatus & LIST_REGISTERATION) == LIST_REGISTERATION) {
+				predicateOrForType = cb.or(predicateOrForType, cb.equal(
+						contestRoot.get(Contest_.contestType),
+						Contest.CONTEST_TYPE_REGISTRATION_NEEDED));
+				used = true;
+			}
+			if ((contestStatus & LIST_REPLAY) == LIST_REPLAY) {
+				predicateOrForType = cb.or(predicateOrForType, cb.equal(
+						contestRoot.get(Contest_.contestType),
+						Contest.CONTEST_TYPE_REPLAY));
+				used = true;
+			}
+			if (used)
+				predicate = cb.and(predicate, predicateOrForType);
+			used = false;
+			Predicate predicateOrForTime = cb.disjunction();
+			Date now = new Date();
+			if ((contestStatus & LIST_RUNNING) == LIST_RUNNING) {
+				predicateOrForTime = cb
+						.or(predicateOrForTime, cb.and(cb.lessThan(
+								contestRoot.get(Contest_.startTime), now), cb
+								.greaterThan(contestRoot.get(Contest_.endTime),
+										now)));
+				used = true;
+			}
+			if ((contestStatus & LIST_PASSED) == LIST_PASSED) {
+				predicateOrForTime = cb.or(predicateOrForTime,
+						cb.lessThan(contestRoot.get(Contest_.endTime), now));
+				used = true;
+			}
+			if ((contestStatus & LIST_PEDDING) == LIST_PEDDING) {
+				predicateOrForTime = cb.or(predicateOrForTime, cb.greaterThan(
+						contestRoot.get(Contest_.startTime), now));
+				used = true;
+			}
+			if (used)
+				predicate = cb.and(predicate, predicateOrForTime);
 		}
 		if (!"".equals(filterString)) {
 			Predicate predicateOr = cb.disjunction();

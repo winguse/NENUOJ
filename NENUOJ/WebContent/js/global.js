@@ -5,24 +5,31 @@
 
 i18n.init();
 
-var STATUS_ALL = 0
-,STATUS_PEDDING = 1
-,STATUS_PROCESSING = 2
-,STATUS_JUDGE_ERROR = 3
-,STATUS_ACCEPTED = 4
-,STATUS_PRESENTATION_ERROR = 5
-,STATUS_WRONG_ANSWER = 6
-,STATUS_TIME_LIMITED_EXCEED = 7
-,STATUS_MEMORY_LIMITED_EXCEED = 8
-,STATUS_OUTPUT_LIMITED_EXCEED = 9
-,STATUS_RUNTIME_ERROR = 10
-,STATUS_COMPLIE_ERROR = 11,
-PERMISSION_LOGIN = 1,
-PERMISSION_VIEW_ALL_SOURCE_CODE = 2,
-PERMISSION_ADMIN_PRIVILEGE = 4,
-PERMISSION_SEE_LOCKED_DESCRIPTION = 8, 
-PERMISSION_SEE_LOCKED_PROBLEM = 16, 
-PERMISSION_ADD_CONTEST = 32; 
+var STATUS_ALL = 0,
+ STATUS_PEDDING = 1,
+ STATUS_PROCESSING = 2,
+ STATUS_JUDGE_ERROR = 3,
+ STATUS_ACCEPTED = 4,
+ STATUS_PRESENTATION_ERROR = 5,
+ STATUS_WRONG_ANSWER = 6,
+ STATUS_TIME_LIMITED_EXCEED = 7,
+ STATUS_MEMORY_LIMITED_EXCEED = 8,
+ STATUS_OUTPUT_LIMITED_EXCEED = 9,
+ STATUS_RUNTIME_ERROR = 10,
+ STATUS_COMPLIE_ERROR = 11,
+ PERMISSION_LOGIN = 1,
+ PERMISSION_VIEW_ALL_SOURCE_CODE = 2,
+ PERMISSION_ADMIN_PRIVILEGE = 4,
+ PERMISSION_SEE_LOCKED_DESCRIPTION = 8,
+ PERMISSION_SEE_LOCKED_PROBLEM = 16,
+ PERMISSION_ADD_CONTEST = 32,
+ LIST_PUBLIC = 1,
+ LIST_PRIVATE = 2,
+ LIST_REGISTERATION = 4,
+ LIST_REPLAY = 8,
+ LIST_RUNNING = 16,
+ LIST_PASSED = 32,
+ LIST_PEDDING = 64; 
 
 var contestTypeDescription=[$.t("Public"),$.t("Private"),$.t("Registeration Needed"),$.t("Replay")];
 
@@ -485,21 +492,24 @@ OJ.prototype.loadStatus=function(sortable){
 };
 
 OJ.prototype.loadContestList=function(){
-	$('#contestList').dataTable( {
-		"sDom": '<"H"if>t<"F"plr>',
+	var $contestList=$('#contestList').dataTable( {
+		"sDom": '<"H"f>t<"F"iplr>',
 		"bProcessing": true,
 		"bServerSide": true,
 		"iDisplayLength": 20,
 		"bStateSave":true,
 		"oLanguage": {
-			"sInfo": "_START_ to _END_ of _TOTAL_ contests",//TODO replace to _("xxx")
-			"sInfoEmpty": "No problems",
+			"sInfo": "_START_ to _END_ of _TOTAL_ contests, &nbsp;",//TODO replace to _("xxx")
+			"sInfoEmpty": "No contests",
 			"sInfoFiltered": " (filtering from _MAX_ total contests)"
 		},
 		"aaSorting": [[ 1, "desc" ]],
 		"sAjaxSource": baseUrl + "/contests/json/list.action",
 		"fnServerData": function ( sSource, _aoData, fnCallback ) {
-			var aoData={};
+			var aoData={},contestStatus = 0;
+			$("#contestList_extraFilter .active").each(function(){
+				contestStatus|=$(this).attr("data-value");
+			});
 			for(var i in _aoData){
 				aoData[_aoData[i].name]=_aoData[i].value;
 			}
@@ -511,7 +521,8 @@ OJ.prototype.loadContestList=function(){
 				contestType:-1,
 				filterString:aoData.sSearch,
 				page:aoData.iDisplayStart/aoData.iDisplayLength,
-				pageSize:aoData.iDisplayLength
+				pageSize:aoData.iDisplayLength,
+				contestStatus:contestStatus
 			}, function (json) {
 				for(var i = 0;i < json.data.length;i++){
 					json.data[i].push("");
@@ -597,6 +608,24 @@ OJ.prototype.loadContestList=function(){
 			}
 		}
 	} );
+	$("#contestList_filter").before(
+		'<div class="dataTables_info" data-toggle="buttons-checkbox" id="contestList_extraFilter">'+
+			'<div class="btn-group">'+
+				'<button data-value="'+LIST_PUBLIC+'" type="button" class="btn btn-mini">'+$.t("Public")+'</button>'+
+				'<button data-value="'+LIST_PRIVATE+'" type="button" class="btn btn-mini">'+$.t("Private")+'</button>'+
+				'<button data-value="'+LIST_REGISTERATION+'" type="button" class="btn btn-mini">'+$.t("Registeration")+'</button>'+
+				'<button data-value="'+LIST_REPLAY+'" type="button" class="btn btn-mini">'+$.t("Replay")+'</button>'+
+			'</div>'+
+			'<div class="btn-group">'+
+				'<button data-value="'+LIST_RUNNING+'" type="button" class="btn btn-mini">'+$.t("Running")+'</button>'+
+				'<button data-value="'+LIST_PASSED+'" type="button" class="btn btn-mini">'+$.t("Passed")+'</button>'+
+				'<button data-value="'+LIST_PEDDING+'" type="button" class="btn btn-mini">'+$.t("Pedding")+'</button>'+
+			'</div>'+
+		'</div>'
+	);
+	$("#contestList_extraFilter button").click(function(){
+		setTimeout(function(){$contestList.fnDraw();},200);// delay for 
+	});
 };
 var oj;
 oj = new OJ();
