@@ -4,7 +4,7 @@
 <%@ taglib uri="/struts-tags" prefix="s"%>
 <%@ taglib uri="/struts-bootstrap-tags" prefix="b"%>
 <s:include value="../include/init.jsp"></s:include>
-<s:set var="pageTitle" value="getText('contests')"/>
+<s:set var="pageTitle" value="getText('Contests')"/>
 <title><s:text name="site.title"/> - <s:property value="#pageTitle"/></title>
 <s:include value="../include/header.jsp"></s:include>
 <table id="contestList">

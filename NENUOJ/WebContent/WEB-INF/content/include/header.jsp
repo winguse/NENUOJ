@@ -15,21 +15,21 @@
 			<a class="brand" href="#">NENU OJ</a>
 			<div class="nav-collapse">
 				<ul class="nav">
-					<li><s:a namespace="/" action="home"><s:text name="home" /></s:a></li>
-					<li><s:a namespace="/problems" action="list"><s:text name="problems" /></s:a></li>
-					<li><s:a namespace="/problems" action="status"><s:text name="status" /></s:a></li>
-					<li><s:a namespace="/contests" action="list"><s:text name="contests" /></s:a></li>
+					<li><s:a namespace="/" action="home"><s:text name="Home" /></s:a></li>
+					<li><s:a namespace="/problems" action="list"><s:text name="Problems" /></s:a></li>
+					<li><s:a namespace="/problems" action="status"><s:text name="Status" /></s:a></li>
+					<li><s:a namespace="/contests" action="list"><s:text name="Contests" /></s:a></li>
 					<s:if test="#session.user==null">
 						<script>var LOGIN_USERNAME="",USER_PERMISSION = 0;</script>
-						<li><s:a namespace="/" action="register"><s:text name="register" /></s:a></li>
+						<li><s:a namespace="/" action="register"><s:text name="Register" /></s:a></li>
 						<div id="login_dialog" title="<s:text name="login"/>" class="hide">
 						<s:form id="login_form" namespace="/" action="login" theme="bootstrap" cssClass="form">
 							<p class="validateTips"></p>
-							<s:textfield label="%{_('username')}" name="username" />
-							<s:password label="%{_('password')}" name="password" />
+							<s:textfield label="%{_('Username')}" name="username" />
+							<s:password label="%{_('Password')}" name="password" />
 						</s:form>
 						</div>
-						<li><a id="login" href="#"><s:text name="login" /></a></li>
+						<li><a id="login" href="#"><s:text name="Login" /></a></li>
 					</s:if>
 					<s:else>
 						<script>var LOGIN_USERNAME="<s:property value="#session.user.username"/>",USER_PERMISSION = <s:property value="#session.user.permission"/>;</script>
@@ -37,7 +37,7 @@
 							<s:text name="welcome" />
 							<s:property value="#session.user.username"/>
 						</s:a></li>
-						<li><a href="#" id="logout" onclick="oj.logout();"><s:text name="logout" /></a></li>
+						<li><a href="#" id="logout" onclick="oj.logout();"><s:text name="Logout" /></a></li>
 					</s:else>
 				</ul>
 			</div>
