@@ -52,7 +52,7 @@ public class UserProfilesOperatingAction extends AbstractAction implements
 
 	@Override
 	public String execute() throws Exception {
-		UserSimpleDTO user = (UserSimpleDTO) session.get("user");
+		UserSimpleDTO user = (UserSimpleDTO) session.get(USER);
 		User currentUser = userDAO.findUserByUsername(user.getUsername());
 		if (currentUser == null) {
 			session.remove("user");

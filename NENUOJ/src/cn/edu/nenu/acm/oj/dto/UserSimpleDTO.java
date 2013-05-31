@@ -3,10 +3,10 @@ package cn.edu.nenu.acm.oj.dto;
 import cn.edu.nenu.acm.oj.statuscode.IPermissionCode;
 
 public class UserSimpleDTO implements IPermissionCode {
-	private Integer id;
-	private String username;
-	private String nickname;
-	private Long permission;
+	private Integer id = -1;
+	private String username = "";
+	private String nickname = "";
+	private Long permission = 0L;// default user permission (guest)
 
 	public UserSimpleDTO(){
 	}

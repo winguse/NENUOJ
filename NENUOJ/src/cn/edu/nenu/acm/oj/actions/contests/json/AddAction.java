@@ -33,8 +33,6 @@ import cn.edu.nenu.acm.oj.eto.ReplayDataInvalidException;
 import cn.edu.nenu.acm.oj.statuscode.IContestType;
 import cn.edu.nenu.acm.oj.statuscode.IPermissionCode;
 import cn.edu.nenu.acm.oj.util.ExcelTools;
-import cn.edu.nenu.acm.oj.util.Pair;
-import cn.edu.nenu.acm.oj.util.RankListCellExpression;
 import cn.edu.nenu.acm.oj.util.Remark;
 
 @ParentPackage("winguse-json-default")

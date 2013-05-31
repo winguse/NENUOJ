@@ -16,6 +16,7 @@ import com.opensymphony.xwork2.validator.annotations.RequiredStringValidator;
 import cn.edu.nenu.acm.oj.dao.UserDAO;
 import cn.edu.nenu.acm.oj.dto.UserSimpleDTO;
 import cn.edu.nenu.acm.oj.entitybeans.User;
+import cn.edu.nenu.acm.oj.statuscode.ISessionField;
 import cn.edu.nenu.acm.oj.util.Remark;
 
 @ParentPackage("json-default")
@@ -23,7 +24,7 @@ import cn.edu.nenu.acm.oj.util.Remark;
 		@InterceptorRef("jsonValidationWorkflowStack") })
 @Result(name = "success", type = "json")
 @Namespace("/")
-public class LoginAction extends AbstractAction implements SessionAware {
+public class LoginAction extends AbstractAction implements SessionAware,ISessionField {
 
 	private static final long serialVersionUID = -8077897542384482842L;
 
@@ -59,7 +60,7 @@ public class LoginAction extends AbstractAction implements SessionAware {
 			code = CODE_SUCCESS;
 			message = getText("Welcome back, ") + user.getUsername();
 			session.put(
-					"user",
+					USER,
 					new UserSimpleDTO(user.getId(), user.getUsername(),
 							(String) ((Remark) (user.getRemark()))
 									.get("nickname"), user.getPermission()));

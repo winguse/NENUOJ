@@ -627,5 +627,18 @@ OJ.prototype.loadContestList=function(){
 		setTimeout(function(){$contestList.fnDraw();},200);// delay for 
 	});
 };
+OJ.prototype.loadContest=function(){
+	var $contestTimeSlider = $("#contestTimeSlider"), $contestTabs = $("#contestTabs");
+	$contestTimeSlider.slider({
+		range: "min",
+		value: 0,
+		min: 1,
+		max: 700,//contest length, in seconds
+		slide: function( event, ui ) {
+			//ui.value;
+		}
+	});
+	$contestTabs.tabs();
+};
 var oj;
 oj = new OJ();

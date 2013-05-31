@@ -166,4 +166,10 @@ public class ContestDAO extends AbstractDAO<Contest> {
 		}
 		return new Pair<Predicate, Root<Contest>>(predicate, contestRoot);
 	}
+	
+	@Transactional(readOnly=true)
+	public ContestSimpleDTO getContestBasicInfo(int contestId){
+		
+		return null;
+	} 
 }
